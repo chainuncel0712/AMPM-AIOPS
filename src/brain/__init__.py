@@ -98,6 +98,12 @@ class Obsidian:
         self.base_dir = config.base_dir
         self.organs: dict = {}
 
+        # ===== 授權檢查 =====
+        from pro.license import LicenseManager
+        self.license = LicenseManager(str(self.base_dir / "data" / "license.json"))
+        self.license_tier = self.license.get_tier()
+        print(f"🔑 授權層級：{self.license_tier}")
+
         # ===== 骨架：註冊表 =====
         self.registry = Registry()
 
