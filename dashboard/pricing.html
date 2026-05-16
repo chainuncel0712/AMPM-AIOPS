@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>黑曜機械人 - 定價</title>
+    <style>
+        body {
+            background: #0a0e17;
+            color: #00ff88;
+            font-family: 'Courier New', monospace;
+            padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { text-align: center; margin-bottom: 40px; }
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background: #111827;
+            border: 1px solid #00ff88;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+        .card h2 { color: #00ff88; }
+        .price { font-size: 2em; margin: 20px 0; }
+        .features { text-align: left; margin: 20px 0; }
+        .features li { margin: 10px 0; }
+        .buy-btn {
+            background: #00ff88;
+            color: #0a0e17;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+        }
+        .buy-btn:hover { background: #00cc6a; }
+        .free { color: #00ff88; }
+        .paid { color: #fbbf24; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚙️ 黑曜機械人 - 定價方案</h1>
+        <div class="pricing-grid">
+            <div class="card">
+                <h2>🆓 社區版</h2>
+                <div class="price free">免費</div>
+                <ul class="features">
+                    <li>✅ 核心機械零件 (30 個)</li>
+                    <li>✅ 自我診斷 / 修復</li>
+                    <li>✅ Telegram Bot</li>
+                    <li>✅ 記憶系統</li>
+                    <li>✅ 工具系統 (162 個)</li>
+                    <li>✅ 科技感儀表板</li>
+                </ul>
+                <button class="buy-btn" onclick="window.location.href='https://github.com/chainuncel0712/ampm-aiops-ai'">免費下載</button>
+            </div>
+            <div class="card">
+                <h2>💿 基礎版</h2>
+                <div class="price paid">$29</div>
+                <ul class="features">
+                    <li>✅ 所有社區版功能</li>
+                    <li>✅ 一鍵安裝腳本</li>
+                    <li>✅ 優先技術支援</li>
+                </ul>
+                <button class="buy-btn" onclick="window.open('https://gumroad.com/l/ampm-aiops-basic', '_blank')">購買 $29</button>
+            </div>
+            <div class="card">
+                <h2>💼 商業版</h2>
+                <div class="price paid">$99</div>
+                <ul class="features">
+                    <li>✅ 所有基礎版功能</li>
+                    <li>✅ 加密 / NFT 零件</li>
+                    <li>✅ SEO / 廣告零件</li>
+                    <li>✅ AI 內容生成</li>
+                </ul>
+                <button class="buy-btn" onclick="window.open('https://gumroad.com/l/ampm-aiops-pro', '_blank')">購買 $99</button>
+            </div>
+            <div class="card">
+                <h2>🏢 企業版</h2>
+                <div class="price paid">$199/月</div>
+                <ul class="features">
+                    <li>✅ 所有商業版功能</li>
+                    <li>✅ 雲端託管服務</li>
+                    <li>✅ 專屬技術支援</li>
+                    <li>✅ 定製新零件</li>
+                    <li>✅ SLA 保障</li>
+                </ul>
+                <button class="buy-btn" onclick="window.open('https://gumroad.com/l/ampm-aiops-enterprise', '_blank')">購買 $199/月</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

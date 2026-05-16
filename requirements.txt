@@ -1,0 +1,29 @@
+# 黑曜機械人 — Python 依賴
+# 核心依賴
+python-dotenv>=1.0.0
+openai>=1.30.0
+
+# Telegram Bot
+python-telegram-bot>=21.0
+
+# Flask 儀表板
+flask>=3.0
+werkzeug>=3.0
+
+# HTTP 請求
+httpx>=0.27.0
+requests>=2.31.0
+
+# Web 搜尋
+duckduckgo-search>=6.0
+beautifulsoup4>=4.12
+
+# LLM 串接
+aiohttp>=3.9.0
+
+# 向量記憶（可選）
+# chromadb>=0.4.0
+# sentence-transformers>=2.7.0
+
+# 開發工具
+pytest>=8.0

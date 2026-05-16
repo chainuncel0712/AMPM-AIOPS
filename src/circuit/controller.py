@@ -1,0 +1,46 @@
+"""
+循環控制器
+"""
+
+from pathlib import Path
+from typing import Dict
+
+from .breaker import CircuitBreaker
+from .contradiction import ContradictionDetector
+from .health import HealthChecker
+
+class CircuitController:
+    def __init__(self, base_dir: Path):
+        self.base_dir = Path(base_dir)
+        self.breaker = CircuitBreaker()
+        self.contradiction = ContradictionDetector(self.base_dir)
+        self.health = HealthChecker()
+        self.total_checks = 0
+        self.blocks = 0
+    
+    def pre_process(self, user_input: str) -> Dict:
+        self.total_checks += 1
+        health = self.health.check_system()
+        if health["status"] == "UNHEALTHY":
+            return {"allowed": False, "reason": f"系統異常: {', '.join(health['issues'])}"}
+        
+        loop_check = self.breaker.record(user_input)
+        if loop_check["status"] == "BREAK":
+            self.blocks += 1
+            return {"allowed": False, "reason": loop_check["reason"]}
+        
+        return {"allowed": True, "warning": loop_check if loop_check["status"] == "WARNING" else None}
+    
+    def post_process(self, assistant_response: str) -> Dict:
+        contradiction = self.contradiction.record_statement(assistant_response)
+        if contradiction.get("is_contradiction"):
+            self.blocks += 1
+            return {"allowed": False, "reason": f"矛盾偵測: {contradiction.get('old_statement', '')}"}
+        return {"allowed": True}
+    
+    def get_status(self) -> Dict:
+        return {
+            "total_checks": self.total_checks,
+            "blocks": self.blocks,
+            "breaker": self.breaker.get_status()
+        }

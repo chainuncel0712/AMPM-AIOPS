@@ -1,0 +1,38 @@
+src
+├── __pycache__
+├── bag
+│   └── __pycache__
+├── blood
+│   └── __pycache__
+├── brain
+│   └── __pycache__
+├── circuit
+│   └── __pycache__
+├── compass
+├── core
+│   └── __pycache__
+├── dashboard
+│   └── __pycache__
+├── decisions
+├── immune
+│   └── __pycache__
+├── muscle
+│   └── __pycache__
+├── nerve
+│   └── __pycache__
+├── organs
+│   └── memory
+├── pro
+├── skeleton
+│   └── __pycache__
+├── skin
+│   └── __pycache__
+├── tasks
+├── waste
+│   └── __pycache__
+├── web
+│   └── __pycache__
+└── womb
+    └── __pycache__
+
+36 directories

@@ -1,0 +1,12 @@
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.env
+*.log
+heiyao.log
+.aider*
+data/vector_store/
+memory_db/
+data/snapshots/
+backup/

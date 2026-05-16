@@ -1,0 +1,30 @@
+{
+    "ls": {
+        "description": "列出目錄內容",
+        "type": "builtin",
+        "code": "def execute(path='.'): import os; return os.listdir(path)",
+        "created_at": "2026-05-14T03:53:56.888512",
+        "use_count": 0
+    },
+    "cat": {
+        "description": "讀取檔案內容",
+        "type": "builtin",
+        "code": "def execute(path): return open(path, 'r').read()",
+        "created_at": "2026-05-14T03:53:56.888516",
+        "use_count": 0
+    },
+    "web_search": {
+        "description": "搜尋網頁內容",
+        "type": "builtin",
+        "code": "def execute(query): from web.search import Search; return Search().query(query)",
+        "created_at": "2026-05-14T03:53:56.888518",
+        "use_count": 0
+    },
+    "system_stats": {
+        "description": "查詢系統硬碟和記憶體使用狀況",
+        "type": "builtin",
+        "code": "def execute(): import subprocess; disk = subprocess.run(['df', '-h'], capture_output=True, text=True).stdout; mem = subprocess.run(['free', '-h'], capture_output=True, text=True).stdout; return f'硬碟:\\n{disk}\\n記憶體:\\n{mem}'",
+        "created_at": "2026-05-14T03:53:56.888519",
+        "use_count": 0
+    }
+}

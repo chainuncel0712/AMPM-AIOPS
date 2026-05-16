@@ -1,0 +1,9 @@
+版本: v1.0.0
+日期: 2025-05-10
+功能:
+- 10 個核心模組 (agents, brain, memory, tools...)
+- 強化系統 (compass, decisions, tasks, circuit)
+- 網頁搜尋工具 (web_search)
+- 儀表板 (dashboard)
+- Telegram 機器人整合
+狀態: ✅ 穩定運行
