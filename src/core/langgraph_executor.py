@@ -143,19 +143,31 @@ class LangGraphExecutor:
         """
         tools = []  # 建立空的工具清單
         
-        # ===== 匯入所有器官類別 =====
-        from src.core.planner import PlannerOrgan
-        from src.core.self_learn import SelfLearnOrgan
-        from src.core.daily_growth_report import DailyGrowthReportOrgan
-        from src.core.market_analyzer import MarketAnalyzerOrgan
-        from src.core.customer_persona import CustomerPersonaOrgan
-        from src.core.email_marketer import EmailMarketerOrgan
-        from src.core.portfolio_tracker import PortfolioTrackerOrgan
-        from src.core.revenue_optimizer import RevenueOptimizerOrgan
-        from src.core.auto_content_creator import AutoContentCreatorOrgan
-        from src.core.seo_optimizer import SEOOptimizerOrgan
-        from src.core.social_media_manager import SocialMediaManagerOrgan
-        from src.core.smart_contract_auditor import SmartContractAuditorOrgan
+        # ===== 匯入所有器官類別（使用 try/except 避免 import 失敗導致整個系統崩潰） =====
+        organ_classes = []
+        
+        organ_imports = [
+            ("planner", "src.core.planner", "PlannerOrgan"),
+            ("self_learn", "src.core.self_learn", "SelfLearnOrgan"),
+            ("daily_growth_report", "src.core.daily_growth_report", "DailyGrowthReportOrgan"),
+            ("market_analyzer", "src.core.market_analyzer", "MarketAnalyzerOrgan"),
+            ("customer_persona", "src.core.customer_persona", "CustomerPersonaOrgan"),
+            ("email_marketer", "src.core.email_marketer", "EmailMarketerOrgan"),
+            ("portfolio_tracker", "src.core.portfolio_tracker", "PortfolioTrackerOrgan"),
+            ("revenue_optimizer", "src.core.revenue_optimizer", "RevenueOptimizerOrgan"),
+            ("auto_content_creator", "src.core.auto_content_creator", "AutoContentCreatorOrgan"),
+            ("seo_optimizer", "src.core.seo_optimizer", "SEOOptimizerOrgan"),
+            ("social_media_manager", "src.core.social_media_manager", "SocialMediaManagerOrgan"),
+            ("smart_contract_auditor", "src.core.smart_contract_auditor", "SmartContractAuditorOrgan"),
+        ]
+        
+        for name, module_path, class_name in organ_imports:
+            try:
+                module = __import__(module_path, fromlist=[class_name])
+                organ_class = getattr(module, class_name)
+                organ_classes.append((name, organ_class))
+            except Exception as e:
+                print(f"[LangGraphExecutor] ⚠️ 器官 {name} 載入失敗: {e}")
         
         # ===== 定義所有器官名稱與對應類別（使用英文名稱，顯示時再用機械零組件代號） =====
         organ_classes = [
@@ -1064,6 +1076,37 @@ class LangGraphExecutor:
         """
         print(f"[LangGraphExecutor] 處理訊息: {user_msg[:100]}")
         
+
+        # ===== v2: Agent Company - auto-dispatch to agent teams =====
+        agent_company = None
+        for organ in self.organs.values():
+            if hasattr(organ, "launch_mission") and hasattr(organ, "fill_all_departments"):
+                agent_company = organ
+                break
+        mission_context = ""
+        if agent_company:
+            try:
+                stats = agent_company.get_global_stats()
+                if stats.get("agents", 0) == 0:
+                    agent_company.fill_all_departments()
+                is_task = any(kw in user_msg for kw in [
+                    "幫我", "查", "分析", "寫", "做", "找", "搜",
+                    "code", "寫程式", "部署", "安裝", "報告", "規劃",
+                    "build", "deploy", "search", "analyze",
+                ])
+                print(f"[AgentCompany] task={is_task} agents={stats.get('agents',0)} depts={stats.get('departments',0)}")
+                if is_task:
+                    mission_id = agent_company.launch_mission(user_msg)
+                    mission = agent_company.get_mission(mission_id)
+                    if mission:
+                        st = mission.get("sub_tasks", [])
+                        mission_context = (
+                            f"\n[派遣報告：此任務已拆解為{len(st)}個子任務並派發給各部門]\n" +
+                            "\n".join(f"  - {s.get('department','')}: {s.get('description','')}" for s in st)
+                        )
+                        print(f"[AgentCompany] mission={mission_id} subtasks={len(st)}")
+            except Exception as e:
+                print(f"[AgentCompany] error: {e}")
         # ===== 修復 1：從硬碟讀取長期記憶 =====
         long_term_memory = self._load_long_term_memory()
         if long_term_memory:
@@ -1352,6 +1395,15 @@ class LangGraphExecutor:
         if agent_result:
             self._save_long_term_memory(user_msg, agent_result)
         
+
+        # ===== v2: Promise execution - if bot promised to do something, actually do it =====
+        if agent_company and agent_result:
+            try:
+                progress = agent_company.scan_and_execute_promises(agent_result)
+                if progress:
+                    agent_result = agent_result.rstrip() + progress
+            except Exception as e:
+                print(f"[AgentCompany] promise scan failed: {e}")
         if agent_result:
             return agent_result
         

@@ -7,7 +7,7 @@ from datetime import datetime, timezone, timedelta
 from typing import Optional, Dict, List, Any, Tuple
 
 from skeleton.brain_component import BrainComponent
-from src.tools import tool
+from tools import tool
 
 ACCOUNT_TYPES: Dict[str, Dict[str, Any]] = {
     "savings": {

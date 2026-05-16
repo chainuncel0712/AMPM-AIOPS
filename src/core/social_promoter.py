@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
 
 from skeleton.brain_component import BrainComponent
-from src.tools import tool
+from tools import tool
 
 PLATFORMS_CONFIG: Dict[str, Dict[str, Any]] = {
     "twitter": {

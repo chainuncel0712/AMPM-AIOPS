@@ -5,8 +5,8 @@ from __future__ import annotations
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
-from src.skeleton.brain_component import BrainComponent
-from src.tools import tool
+from skeleton.brain_component import BrainComponent
+from tools import tool
 
 
 class DomainIdentityOrgan(BrainComponent):

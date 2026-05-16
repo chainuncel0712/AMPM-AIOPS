@@ -70,11 +70,6 @@ class Config:
 
 config = Config()
 
-if not config.telegram_token:
-    print("⚠️ 警告: TELEGRAM_TOKEN 未設定")
-if not config.nvidia_key:
-    print("⚠️ 警告: NVIDIA_API_KEY 未設定")
-
 # ========== 指揮官/管理員設定 ==========
 def get_authorized_users():
     """取得授權的使用者 ID 列表"""

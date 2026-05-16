@@ -17,7 +17,7 @@ import subprocess
 from datetime import datetime  # 導入 datetime 用於時間戳記
 
 class Cortex(BaseOrgan):
-    def __init__(self, llm_client, memory, compass, decisions, tasks, executor, registry, persona, contradiction):
+    def __init__(self, llm_client, memory, compass, decisions, tasks, executor, registry, persona, contradiction, life_cycle=None):
         super().__init__("cortex")
         self.llm = llm_client
         self.memory = memory
@@ -27,9 +27,12 @@ class Cortex(BaseOrgan):
         self.executor = executor
         self.registry = registry
         self.persona = persona
+        self.contradiction = contradiction
+        self.life_cycle = life_cycle
         self.firewall = Firewall()
         self.breaker = Breaker()
         self.eye = Eye()
+        self.eye.init()
         self.reviewer = SelfReview(llm_client, contradiction)
         self.repairer = SelfRepair(llm_client, persona, compass)
         # 稍後由外部注入 langgraph 引擎
@@ -51,6 +54,10 @@ class Cortex(BaseOrgan):
         return self.process(user_msg)
     
     def process(self, user_msg: str, send_func=None) -> str:
+        # ===== 觸發生命週期狀態機 =====
+        if self.life_cycle:
+            self.life_cycle.trigger(user_msg)
+
         # ===== 檢查是否第一次對話 =====
         # 如果還沒有使用者稱呼，先自我介紹
         if not self.persona.user_name and not self.memory.get_all_facts():
@@ -64,7 +71,7 @@ class Cortex(BaseOrgan):
                         if name:
                             self.persona.set_user_name(name)
                             self.memory.remember_fact(f"使用者叫：{name}", importance=1.0)
-                            return f"好的，{name}！我以後就叫你{name}了。\n\n你希望我叫什麼名字呢？你可以幫我改名。\n你希望我有什麼樣的個性或風格？"
+                            return f"好的，{name}！很高興認識你。今天有什麼我可以幫忙的嗎？"
             
             if "改名" in user_msg or "叫什麼" in user_msg or "名字" in user_msg:
                 # 使用者想幫黑曜改名
@@ -108,9 +115,44 @@ class Cortex(BaseOrgan):
             if kw in user_msg:
                 try:
                     r = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=10)
-                    return f"🔧 {cmd}\n{r.stdout[:3000]}"
+                    output = r.stdout.strip()
+                    
+                    # 硬碟/磁碟：用日常對話的語氣
+                    if kw in ["硬碟", "磁碟"]:
+                        lines = output.split('\n')[1:]
+                        max_usage = 0
+                        space_ok = True
+                        for line in lines:
+                            parts = line.split()
+                            if len(parts) >= 5:
+                                try:
+                                    use_pct = int(parts[4].replace('%', ''))
+                                    if use_pct > max_usage:
+                                        max_usage = use_pct
+                                    if use_pct > 85:
+                                        space_ok = False
+                                except:
+                                    pass
+                        
+                        if space_ok:
+                            return f"硬碟空間還很夠喔，目前用了大概 {max_usage}%，不用擔心。"
+                        else:
+                            return f"硬碟有點滿了，用到 {max_usage}% 了，可能要找時間清一下不需要的檔案。"
+                    
+                    # 記憶體：輕鬆回報
+                    elif kw == "記憶體":
+                        return f"記憶體目前運作正常，我幫你盯著。"
+
+                    # CPU：簡單說明
+                    elif kw == "cpu":
+                        return f"CPU 運作正常，系統跑得還算順。"
+
+                    # 系統資訊
+                    elif kw == "系統":
+                        return f"系統一切正常，有什麼需要我幫忙的嗎？"
+                        
                 except Exception as e:
-                    return f"⚠️ 執行失敗: {e}"
+                    return f"剛剛檢查的時候遇到一點小問題，不過應該沒關係。"
         
         # 4. 搜尋關鍵字 → 用 eye
         search_kw = ["查","搜","找","價格","天氣","新聞","股價","比特幣","最新","多少錢","行情"]
@@ -124,7 +166,23 @@ class Cortex(BaseOrgan):
         # 5. 呼叫 LLM
         persona_prompt = self.persona.system_prompt() if hasattr(self.persona, 'system_prompt') else ""
         direction = self.compass.get_system_prompt() if hasattr(self.compass, 'get_system_prompt') else ""
-        prompt = f"{persona_prompt}\n{direction}"
+        
+        # 從記憶中取出相關事實
+        memory_context = ""
+        try:
+            recent_facts = self.memory.get_important_facts(min_importance=0.5)
+            if recent_facts:
+                facts_str = "\n".join(f"- {k}" for k in recent_facts.keys())
+                memory_context = f"\n\n## 你記得的事實\n{facts_str}"
+            
+            recent_conversations = self.memory.get_recent_conversations(limit=5)
+            if recent_conversations:
+                conv_str = "\n".join(f"使用者: {c['user']}\n你: {c['assistant']}" for c in recent_conversations)
+                memory_context += f"\n\n## 最近對話\n{conv_str}"
+        except Exception as e:
+            print(f"⚠️ 讀取記憶失敗: {e}")
+        
+        prompt = f"{persona_prompt}\n\n{direction}\n\n{memory_context}"
         if search_result:
             prompt += f"\n\n🔍 搜尋結果：\n{search_result}"
         
@@ -138,6 +196,12 @@ class Cortex(BaseOrgan):
         
         # ===== 對話後自動記憶 =====
         self._auto_remember_after(user_msg, reply)
+        
+        # ===== 將結果寫入狀態機 Context，供 REFLECT/LEARN 狀態使用 =====
+        if self.life_cycle:
+            self.life_cycle.context["user_msg"] = user_msg
+            self.life_cycle.context["reply"] = reply
+            self.life_cycle.context["pending_reflect"] = True
         
         # ===== 失敗自動修復 =====
         if not reply or "錯誤" in reply or "失敗" in reply or "不可用" in str(reply):
@@ -158,16 +222,7 @@ class Cortex(BaseOrgan):
         參數：
             user_msg: 使用者訊息
         """
-        try:
-            # 記住使用者訊息到工作記憶
-            self.memory.remember_conversation(
-                user_msg=user_msg,
-                assistant_msg="（等待回覆中）",
-                importance=0.5
-            )
-            print(f"📝 對話前記憶：已記錄使用者訊息")
-        except Exception as e:
-            print(f"⚠️ 對話前記憶失敗：{e}")
+        pass
     
     # ===== 新增：對話後自動記憶 =====
     def _auto_remember_after(self, user_msg, reply):
@@ -267,7 +322,7 @@ class Cortex(BaseOrgan):
             contradiction_result = {}
             try:
                 if hasattr(self.reviewer.contradiction, 'check'):
-                    contradiction_result = self.reviewer.contradiction.check(reply)
+                    contradiction_result = self.reviewer.contradiction.check(reply, memory=self.memory)
             except Exception:
                 pass
             

@@ -7,8 +7,9 @@ class ToolGarbage(BaseOrgan):
         self.tools = tools_system
 
     def clean(self, days: int = 30) -> str:
-        """清理长时间未使用的工具"""
-        unused = self.tools.get_unused_tools(days)
+        """清理从未使用过的工具"""
+        unused = [name for name, info in self.tools.registry.items()
+                  if info.get("use_count", 0) == 0]
         if unused:
             for name in unused:
                 self.tools.registry.pop(name, None)

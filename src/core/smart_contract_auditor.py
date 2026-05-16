@@ -1,7 +1,7 @@
 """SmartContractAuditorOrgan - 智能合約審計器官，進行漏洞掃描、風險評分與歷史比對"""
 from typing import Optional, Dict, List
 from skeleton.brain_component import BrainComponent
-from src.tools import tool
+from tools import tool
 import time
 import hashlib
 import random

@@ -86,6 +86,7 @@ from core.conversation import ConversationManager
 from core.feedback_learn import FeedbackLearn
 from core.task_planner import TaskPlanner
 from core.performance_profiler import PerformanceProfiler
+from runtime import LifeCycleManager
 
 # Meta 層 — 世界模型
 from meta import WorldModel, SystemConsciousness, EvolutionGovernor
@@ -144,11 +145,15 @@ class Obsidian:
             self.tasks, self._call_ai
         ))
 
+        # ===== 新增：生命週期狀態機 (Runtime State Machine) =====
+        # 必須在 Cortex 之前初始化，因為 Cortex 需要引用它
+        self.life_cycle = LifeCycleManager(self)
+        
         # ===== 介面層 =====
         self.persona = self.registry.add(Persona())
         self.cortex = self.registry.add(Cortex(
             self.llm, self.memory, self.compass, self.decisions, self.tasks,
-            self.muscle, self.registry, self.persona, self.contradiction
+            self.muscle, self.registry, self.persona, self.contradiction, self.life_cycle
         ))
         self.wardrobe = self.registry.add(Wardrobe())
         self.face = self.registry.add(Face())
@@ -232,14 +237,32 @@ class Obsidian:
         self.system_consciousness = SystemConsciousness(self.base_dir)
         self.evolution_governor = EvolutionGovernor(self.base_dir)
 
+        # ===== 啟動生命週期狀態機 =====
+        self.life_cycle.start()
+
         # ===== 啟動自主神經與心跳 =====
         self.hypothalamus.start_autonomous_tasks()
-        import threading; threading.Thread(target=self.scheduler.start, daemon=True).start()
+        threading.Thread(target=self.scheduler.start, daemon=True).start()
         print(f"⚙️ {self.name} 核心機組已啟動")
         print(f"📁 工作目錄: {self.base_dir}")
         print(f"🔧 工具模組: {len(self.tools.registry)} 個")
-        print(f"💾 記憶體: {self.memory.get_stats().get('working', 0)} 條")
-        print(f"👥 代理節點: {len(self.agents.agents) if hasattr(self.agents, 'agents') else 0}")
+        print(f"💾 記憶體: {self.memory.get_stats().get('working_count', 0)} 條")
+        print(f"👥 代理節點: {len(self.agents._agents)}")
+
+        # ===== v2: Wire agent company to LLM so agents actually execute =====
+        def _agent_executor(agent, task):
+            prompt = agent.get("prompt", "")
+            desc = task.get("description", "")
+            tools_list = agent.get("tools", [])
+            tools_str = ", ".join(tools_list) if tools_list else "無"
+            messages = [
+                {"role": "system", "content": f"{prompt}\n你可以使用這些工具: {tools_str}"},
+                {"role": "user", "content": f"執行以下任務並回報結果：{desc}"},
+            ]
+            result = self.llm.call(messages, temperature=0.3)
+            return result if result else f"[agent {agent.get('name','?')} completed task]"
+        self.agents.set_executor(_agent_executor)
+
         print(f"🛡️ 防護陣列: 防火牆、熔斷器、衝突檢測、自修復")
         print(f"🏭 模組工廠: 就緒")
         print(f"🔌 擴充槽: 就緒")

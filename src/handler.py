@@ -33,7 +33,10 @@ class MessageHandler:
 請回應（記得要有結論和行動建議）："""
         
         # 3. 呼叫 AI
-        messages = [{"role": "system", "content": enhanced_prompt}]
+        messages = [
+            {"role": "system", "content": enhanced_prompt},
+            {"role": "user", "content": user_msg}
+        ]
         response = self.llm.call(messages)
         if response is None:
             return "抱歉，目前無法處理您的請求。"

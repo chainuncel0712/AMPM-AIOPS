@@ -8,7 +8,7 @@ from datetime import datetime, timezone, timedelta
 from typing import Optional, Dict, List, Any, Tuple
 
 from skeleton.brain_component import BrainComponent
-from src.tools import tool
+from tools import tool
 
 SUPPORTED_CHAINS: Dict[str, Dict[str, Any]] = {
     "ethereum":  {"name": "Ethereum",       "native": "ETH",   "explorer": "https://etherscan.io"},

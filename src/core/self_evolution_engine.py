@@ -6,8 +6,8 @@ import os
 import sys
 from pathlib import Path
 from typing import Optional, Dict, List
-from src.skeleton.base_organ import BaseOrgan as BrainComponent
-from src.tools import tool  # 匯入 @tool 裝飾器
+from skeleton.base_organ import BaseOrgan as BrainComponent
+from tools import tool  # 匯入 @tool 裝飾器
 
 class SelfEvolutionEngine(BrainComponent):
     def __init__(self, dna: Optional[dict] = None):

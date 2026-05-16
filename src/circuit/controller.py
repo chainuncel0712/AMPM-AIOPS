@@ -24,15 +24,15 @@ class CircuitController:
         if health["status"] == "UNHEALTHY":
             return {"allowed": False, "reason": f"系統異常: {', '.join(health['issues'])}"}
         
-        loop_check = self.breaker.record(user_input)
-        if loop_check["status"] == "BREAK":
+        loop_check = self.breaker.check(user_input)
+        if not loop_check["allowed"]:
             self.blocks += 1
-            return {"allowed": False, "reason": loop_check["reason"]}
+            return {"allowed": False, "reason": loop_check.get("reason", "blocked")}
         
-        return {"allowed": True, "warning": loop_check if loop_check["status"] == "WARNING" else None}
+        return {"allowed": True}
     
     def post_process(self, assistant_response: str) -> Dict:
-        contradiction = self.contradiction.record_statement(assistant_response)
+        contradiction = self.contradiction.check(assistant_response)
         if contradiction.get("is_contradiction"):
             self.blocks += 1
             return {"allowed": False, "reason": f"矛盾偵測: {contradiction.get('old_statement', '')}"}
@@ -42,5 +42,5 @@ class CircuitController:
         return {
             "total_checks": self.total_checks,
             "blocks": self.blocks,
-            "breaker": self.breaker.get_status()
+            "breaker": self.breaker.status()
         }

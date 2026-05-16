@@ -12,9 +12,11 @@ class MuscularExecutor(BaseOrgan):
     def execute(self, tool_name: str, params: dict = None) -> str:
         """执行工具，并返回结果"""
         try:
-            return self.tools.execute(tool_name, params or {})
+            p = params or {}
+            r = self.tools.execute_tool(tool_name, **p)
+            return str(r) if r is not None else ""
         except Exception as e:
             return f"肌肉无法执行：{e}"
 
     def status(self) -> dict:
-        return {"name": self.name, "alive": self.is_alive(), "tools_available": list(self.tools.list_all().keys())}
+        return {"name": self.name, "alive": self.is_alive(), "tools_available": self.tools.list_tools()}

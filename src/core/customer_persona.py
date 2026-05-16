@@ -7,7 +7,7 @@
 from typing import Optional, Dict, List, Any
 from datetime import datetime, timedelta
 from skeleton.brain_component import BrainComponent
-from src.tools import tool
+from tools import tool
 
 
 class CustomerPersonaOrgan(BrainComponent):

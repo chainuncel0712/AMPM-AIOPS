@@ -10,7 +10,7 @@ from typing import List, Dict, Any, Optional
 class Memory:
     def __init__(self, base_dir: Path):
         self.base_dir = Path(base_dir)
-        self._lock = threading.Lock()
+        self._lock = threading.RLock()
 
         self.working_file = self.base_dir / "memory" / "working.json"
         self.episodic_file = self.base_dir / "memory" / "episodic.json"
@@ -39,7 +39,7 @@ class Memory:
         return default
     
     def _save(self, filepath, data):
-        """線程安全寫入"""
+        """線程安全寫入（RLock 支援重入）"""
         with self._lock:
             filepath.parent.mkdir(parents=True, exist_ok=True)
             filepath.write_text(json.dumps(data, ensure_ascii=False, indent=2))
@@ -67,18 +67,22 @@ class Memory:
                 "assistant_msg": assistant_msg[:50]
             })
     
-    def remember_fact(self, fact: str, importance: float = 0.5):
+    def remember_fact(self, fact: str, importance: float = 0.5, value: str = ""):
         """記住重要事實（線程安全）"""
+        importance = float(importance) if not isinstance(importance, (int, float)) else importance
         with self._lock:
             for existing in self.semantic:
                 if existing["fact"] == fact:
                     existing["importance"] = max(existing["importance"], importance)
+                    if value:
+                        existing["value"] = value
                     existing["last_recalled"] = datetime.now().isoformat()
                     self._save(self.semantic_file, self.semantic)
-                return
+                    return
         
         self.semantic.append({
             "fact": fact,
+            "value": value if value else fact,
             "importance": importance,
             "created_at": datetime.now().isoformat(),
             "last_recalled": datetime.now().isoformat()
@@ -127,7 +131,7 @@ class Memory:
         """檢查是否需要整理記憶"""
         now = datetime.now()
         # 每 1 小時整理一次
-        if (now - self.last_organize).seconds > 3600:
+        if (now - self.last_organize).total_seconds() > 3600:
             self.organize()
             self.last_organize = now
     
@@ -196,13 +200,14 @@ class Memory:
         """取得最近對話（從工作記憶）"""
         return self.working[-limit:]
     
-    def get_all_facts(self) -> List[str]:
+    def get_all_facts(self) -> Dict[str, str]:
         """取得所有記住的事實"""
-        return [f["fact"] for f in self.semantic]
+        return {f["fact"]: f.get("value", f["fact"]) for f in self.semantic}
     
-    def get_important_facts(self, min_importance: float = 0.7) -> List[str]:
+    def get_important_facts(self, min_importance: float = 0.7) -> Dict[str, str]:
         """取得重要事實"""
-        return [f["fact"] for f in self.semantic if f["importance"] >= min_importance]
+        return {f["fact"]: f.get("value", f["fact"]) 
+                for f in self.semantic if f["importance"] >= min_importance}
     
     def forget(self, keyword: str = None, min_importance: float = 0.1):
         """遺忘（主動）"""

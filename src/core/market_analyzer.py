@@ -1,7 +1,7 @@
 """MarketAnalyzerOrgan - 市場分析器官，提供技術摘要、情緒分析與進場建議"""
 from typing import Optional, Dict, List
 from skeleton.brain_component import BrainComponent
-from src.tools import tool
+from tools import tool
 import time
 import random
 import hashlib
@@ -26,7 +26,7 @@ class MarketAnalyzerOrgan(BrainComponent):
         """取得 MarketDataOrgan 實例 (延遲實例化)"""
         if self._market_data is None:
             from core.market_data import MarketDataOrgan
-            self._market_data = MarketDataOrgan(self.dna)
+            self._market_data = MarketDataOrgan(self._dna)
         return self._market_data
 
     def _generate_score_seed(self, symbol: str, base: str) -> float:

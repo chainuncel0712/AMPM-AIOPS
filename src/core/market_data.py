@@ -1,7 +1,7 @@
 """MarketDataOrgan - 市場數據器官，從 CoinGecko API 擷取即時加密貨幣價格"""
 from typing import Optional, Dict, List
 from skeleton.brain_component import BrainComponent
-from src.tools import tool
+from tools import tool
 import requests
 import time
 import random

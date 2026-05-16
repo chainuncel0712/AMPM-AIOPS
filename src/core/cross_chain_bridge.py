@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 from typing import Optional, Dict, List, Tuple, Any
 
 from skeleton.brain_component import BrainComponent
-from src.tools import tool
+from tools import tool
 
 
 class CrossChainBridgeOrgan(BrainComponent):

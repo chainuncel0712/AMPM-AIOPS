@@ -10,7 +10,7 @@ class ToolRegistry(BaseOrgan):
         self.tools = tools_system
 
     def list_tools(self) -> dict:
-        return self.tools.list_all()
+        return {name: self.tools.get_tool(name) for name in self.tools.list_tools()}
 
     def get_tool(self, name: str) -> dict:
         return self.tools.registry.get(name, {})

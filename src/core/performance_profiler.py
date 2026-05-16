@@ -25,7 +25,7 @@ class PerformanceProfiler(BaseOrgan):
 
     def __init__(self):
         super().__init__("performance_profiler")
-        self._lock = threading.Lock()
+        self._lock = threading.RLock()
 
         # organ_name -> {
         #   calls, total_latency, success, failures,

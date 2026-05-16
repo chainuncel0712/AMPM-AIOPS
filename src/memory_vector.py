@@ -1,9 +1,16 @@
 """向量記憶 - 語義搜尋"""
-import chromadb
-from chromadb.utils import embedding_functions
+try:
+    import chromadb
+    from chromadb.utils import embedding_functions
+    HAS_CHROMADB = True
+except ImportError:
+    HAS_CHROMADB = False
+    print("⚠️ chromadb 未安裝，向量記憶功能將不可用")
 
 class VectorMemory:
     def __init__(self):
+        if not HAS_CHROMADB:
+            raise RuntimeError("chromadb is required for VectorMemory")
         self.client = chromadb.PersistentClient(path="./memory_db")
         self.ef = embedding_functions.DefaultEmbeddingFunction()
         try:

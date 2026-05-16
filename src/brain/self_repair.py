@@ -50,8 +50,8 @@ class SelfRepair(BaseOrgan):
 4. 用繁體中文，語氣專業
 """
         try:
-            persona_prompt = self.persona.system_prompt()
-            direction = self.compass.get_system_prompt()
+            persona_prompt = self.persona.system_prompt() if self.persona else ""
+            direction = self.compass.get_system_prompt() if self.compass else ""
             messages = [
                 {"role": "system", "content": f"{persona_prompt}\n{direction}"},
                 {"role": "user", "content": repair_prompt}

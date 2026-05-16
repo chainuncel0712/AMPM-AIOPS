@@ -90,7 +90,7 @@ class LLMClient:
                 r = requests.post(
                     p["ep"],
                     headers={"Authorization": f"Bearer {p['key']}", "Content-Type": "application/json"},
-                    json={"model": p["model"], "messages": safe, "temperature": temperature, "max_tokens": 2000},
+                    json={"model": p["model"], "messages": safe, "temperature": temperature, "max_tokens": 4000},
                     timeout=30
                 )
                 if r.status_code == 200:

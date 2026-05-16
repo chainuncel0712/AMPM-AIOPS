@@ -1,11 +1,25 @@
 #!/usr/bin/env python3
+import os, sys, atexit, tempfile
+
+LOCK_FILE = os.path.join(tempfile.gettempdir(), "ampm_obsidian.lock")
+if os.path.exists(LOCK_FILE):
+    with open(LOCK_FILE) as f:
+        old_pid = f.read().strip()
+    try:
+        os.kill(int(old_pid), 0)
+        print(f"Another instance (PID {old_pid}) is already running. Exiting.")
+        sys.exit(1)
+    except (OSError, ValueError):
+        os.remove(LOCK_FILE)
+
+with open(LOCK_FILE, "w") as f:
+    f.write(str(os.getpid()))
+atexit.register(lambda: os.remove(LOCK_FILE) if os.path.exists(LOCK_FILE) else None)
+
 """
 AMPM Boss｜黑曜 - 完整啟動版 v3
 修復所有錯誤 + 儀表板整合 + LangGraph 引擎
 """
-import os
-import os
-import os
 import os
 import sys
 import time
@@ -362,7 +376,7 @@ def main():
         async def _run_bot():
             await app.initialize()
             await app.start()
-            await app.updater.start_polling()
+            await app.updater.start_polling(drop_pending_updates=True)
             print("[Bot] 輪詢已啟動，等待訊息...", flush=True)
             await _asyncio.Event().wait()
         try:
@@ -370,7 +384,7 @@ def main():
         except RuntimeError as e:
             print(f"[Bot] asyncio 錯誤: {e}", flush=True)
             # 降級方案：直接 run_polling
-            app.run_polling()
+            app.run_polling(drop_pending_updates=True)
         
     except Exception as e:
         print(f"  [❌] Bot 失敗: {translate_error(e)}")

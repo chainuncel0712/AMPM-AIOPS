@@ -17,7 +17,7 @@ class SelfReview(BaseOrgan):
         }
 
         # 1. 矛盾檢測
-        contra = self.contradiction.check(assistant_reply)
+        contra = self.contradiction.check(assistant_reply, memory=memory)
         if contra.get("is_contradiction"):
             result["passed"] = False
             result["issues"].append(f"矛盾：{contra.get('old_statement', '')}")
@@ -44,7 +44,10 @@ AI 回覆：{assistant_reply}
 - 是否用繁體中文、語氣專業
 """
         try:
-            raw = self.llm.call([{"role": "user", "content": review_prompt}])
+            raw = self.llm.call([
+                {"role": "system", "content": "你是一個專業的 AI 品質審查員，負責檢查回覆的品質和一致性。"},
+                {"role": "user", "content": review_prompt}
+            ])
             import json, re
             match = re.search(r'\{.*\}', raw, re.DOTALL)
             if match:

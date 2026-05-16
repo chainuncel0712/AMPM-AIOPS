@@ -1,7 +1,7 @@
 """PortfolioTrackerOrgan - 投資組合追蹤器官，管理持倉、計算損益與再平衡建議"""
 from typing import Optional, Dict, List
 from skeleton.brain_component import BrainComponent
-from src.tools import tool
+from tools import tool
 import time
 import uuid
 import re
@@ -20,7 +20,7 @@ class PortfolioTrackerOrgan(BrainComponent):
         """延遲取得 MarketDataOrgan 實例"""
         if self._market_data is None:
             from core.market_data import MarketDataOrgan
-            self._market_data = MarketDataOrgan(self.dna)
+            self._market_data = MarketDataOrgan(self._dna)
         return self._market_data
 
     def _parse_price(self, price_output: str) -> float:

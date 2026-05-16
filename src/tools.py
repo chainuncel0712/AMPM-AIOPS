@@ -20,7 +20,14 @@ class ToolSystem:
         return {}
 
     def _save_registry(self):
-        self.registry_file.write_text(json.dumps(self.registry, indent=4, ensure_ascii=False))
+        savable = {}
+        for k, v in self.registry.items():
+            if callable(v.get("code")):
+                savable[k] = {key: val for key, val in v.items() if key != "code"}
+                savable[k]["code"] = "<function>"
+            else:
+                savable[k] = v
+        self.registry_file.write_text(json.dumps(savable, indent=4, ensure_ascii=False))
 
     def _register_builtin_tools(self):
         # 1. ls 工具
