@@ -1,4 +1,7 @@
-# 麻 Core — ai 30 basi
+# 黑曜 — 從走投無路長出來的 AI
+
+[![Sponsor](https://img.shields.io/badge/贊助-❤️-ff69b4)](https://github.com/sponsors/chainuncel0712)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 [中文](#中文) | [English](#english)
 
