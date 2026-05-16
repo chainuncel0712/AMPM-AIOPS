@@ -1,118 +1,115 @@
-# 黑曜 — 這 AI 會長大。
+# AMPM-AIOPS — 黑曜 (Obsidian)
 
-[![Sponsor](https://img.shields.io/badge/贊助-❤️-ff69b4)](https://github.com/sponsors/chainuncel0712) [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE) [![Tests](https://img.shields.io/badge/tests-218/218-brightgreen)]()
+[![Sponsor](https://img.shields.io/badge/贊助-❤️-ff69b4)](https://github.com/sponsors/chainuncel0712) [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-> 賣掉房子做出來的。不是理論，是走投無路。
-
----
-
-## 一句話講完
-
-所有 AI 都不記得你。這個會。
-
-所有 AI 都寫死「我是助手」。這個你叫他什麼，他就是什麼。
-
-所有 AI 都只給你建議。這個自己拆任務、派代理、做完回報你。
+> A Modular AI Operating System. Runtime. Multi-agent. Self-healing. Long-term memory. Built for VPS.
 
 ---
 
-## 跟別人差在哪
+## 一句話
 
-| | ChatGPT | LangChain | CrewAI | **黑曜** |
-|---|---------|-----------|--------|------|
-| 記得你 | ❌ | ❌ | ❌ | ✅ |
-| 你定義它是誰 | ❌ | ❌ | ❌ | ✅ |
-| 自己拆任務執行 | ❌ | ❌ | 半套 | ✅ |
-| 從錯誤中進化 | ❌ | ❌ | ❌ | ✅ |
-| 出 bug 自己修 | ❌ | ❌ | ❌ | ✅ |
-| 開源 | ❌ | ✅ | ✅ | ✅ |
+普通的 AI 對話框，聊完就忘，只會給建議。
+
+黑曜不一樣：它會記住你、能自己拆任務、能派 Agent 去執行、出錯會自己修、還會從經驗中進化。
 
 ---
 
-## 它長這樣
+## 技術定位
+
+AMPM-AIOPS 是一個**模組化的 AI 作業系統（AIOS）**，設計目標是在 VPS 上持續自主運作。
+
+它**不是**一個聊天機器人，也**不是** AGI。
+
+它是：
+
+| 能力層 | 說明 |
+|--------|------|
+| **Runtime** | 生命週期狀態機，管理 IDLE → OBSERVE → THINK → ... → EVOLVE 全循環 |
+| **Orchestration** | 中樞調度，任務路由、Agent 協調、負載平衡 |
+| **Multi-Agent** | 多代理系統，可動態建立/釋放部門與 Agent，自動拆解並分派任務 |
+| **Self-Healing** | 回覆失敗自動修復，系統異常自動復原 |
+| **Memory** | 三層記憶架構（工作/情節/語義），支援向量檢索、自動整理與遺忘 |
+| **Tooling** | 內建工具系統、Tool Creator（自動生成工具）、Plugin SDK |
+| **Evolution** | 進化循環，從經驗中學習並優化參數（含沙盒防護） |
+| **Multi-Model** | 多層 LLM 備援（ATXP → DeepSeek → OpenRouter → NVIDIA → Ollama） |
+
+---
+
+## 系統架構
 
 ```
-你：從今天起你是我的技術長
-黑曜：好。你需要什麼？
-
-你：幫我建工程部，專門做後端
-黑曜：開了。3 個人在待命。
-
-你：以後叫你小工
-黑曜：好。我是小工。
-```
-
-沒有硬 code。全來自對話。
-
----
-
-## 現在能跑嗎
-
-```
-218/218 ✅  全部測試通過
-30 個功能   一鍵安裝
-10 層文明   基礎設施就緒
+src/
+├── brain/         # 大腦皮層：思考、決策、LLM 呼叫
+├── memory/        # 記憶系統：工作記憶、情節記憶、語義記憶
+├── immune/        # 免疫系統：防火牆、矛盾檢測、自我修復
+├── muscle/        # 肌肉系統：工具執行、Agent 管理
+├── nerve/         # 神經系統：網路搜尋、外部感知
+├── blood/         # 數據匯流排：事件總線、排程器
+├── core/          # 核心模組：進化循環、任務規劃、效能監控
+├── skin/          # 介面層：人格、語音、介面
+├── womb/          # 模組工廠：Agent 建立、插件載入
+├── skeleton/      # 骨架：基礎類別、註冊表、DNA
+├── compass/       # 方向感測器：KPI 追蹤、目標管理
+└── meta/          # Meta 層：世界模型、系統意識、進化治理
 ```
 
 ---
 
-## 30 秒開始
+## 進階商業模組
 
+核心框架為 MIT 開源，以下商業模組另有授權：
+
+- **行銷自動化**：Email 行銷、社群管理、SEO、廣告投放
+- **內容出版**：自動寫文章、電子書出版
+- **加密貨幣**：錢包管理、跨鏈橋接、Gas 追蹤、合約審計
+- **NFT 工具**：狙擊手、鯨魚追蹤、地板掃描、空投檢查
+- **企業 SaaS**：多租戶系統、API 金鑰管理、CRM
+
+---
+
+## 快速開始
+
+### 1. 安裝依賴
 ```bash
-# 要全部
-git clone https://github.com/chainuncel0712/AMPM-AIOPS.git
-
-# 只要核心 30 功能
-curl -fsSL https://raw.githubusercontent.com/chainuncel0712/AMPM-AIOPS/master/ampm-core-install.sh | bash
+pip install -r requirements.txt
 ```
+
+### 2. 設定環境變數
+```bash
+cp .env.example .env
+# 編輯 .env，至少填入一個 LLM API Key
+```
+
+### 3. 啟動
+```bash
+python main.py      # 完整版（含 LangGraph、儀表板）
+python bot.py       # 輕量版（純 Telegram Bot）
+```
+
+---
+
+## 誰適合使用
+
+- 需要在 **VPS 上長期自主運作** AI 系統的開發者
+- 想研究 **Multi-Agent 架構** 與 **Runtime 狀態機** 的工程師
+- 需要 **自動化商業流程**（行銷、加密貨幣、內容出版）的創業者
+- 不想被綁在某個雲端服務上，希望**完全掌控自己 AI** 的人
+
+---
+
+## 開源與授權
+
+| 部分 | 授權 | 說明 |
+|------|------|------|
+| `src/` 核心框架 | MIT | 器官架構、Runtime、記憶系統、工具系統 |
+| `src/core/` 商業模組 | Proprietary | 市場分析、營收優化、NFT 工具等 |
 
 ---
 
 ## 誰做的
 
-一個沒有工程背景的人，賣掉房子，跟 AI 對話八個月，從地獄裡爬出來做的。
+一個沒有工程背景的人，賣掉房子，全職做了八個月。
+
+沒有團隊，沒有資金，只有一個終端機、一個 AI 對話框、和一個不想放棄的念頭。
 
 [❤️ 支持這個專案](https://github.com/sponsors/chainuncel0712)
-
----
-
-[English](#english)
-
-## English
-
-### One sentence
-
-Every AI forgets you. This one remembers.
-
-Every AI says "I'm an assistant." This one becomes whatever you call it.
-
-Every AI gives you advice. This one splits the work, dispatches agents, and reports back.
-
-### What's different
-
-| | ChatGPT | LangChain | CrewAI | **Heiyao** |
-|---|---------|-----------|--------|------|
-| Remembers you | ❌ | ❌ | ❌ | ✅ |
-| You define it | ❌ | ❌ | ❌ | ✅ |
-| Auto task execution | ❌ | ❌ | partial | ✅ |
-| Self-evolution | ❌ | ❌ | ❌ | ✅ |
-| Self-repair | ❌ | ❌ | ❌ | ✅ |
-| Open source | ❌ | ✅ | ✅ | ✅ |
-
-### Quick start
-
-```bash
-git clone https://github.com/chainuncel0712/AMPM-AIOPS.git
-# or 30 core functions only:
-curl -fsSL https://raw.githubusercontent.com/chainuncel0712/AMPM-AIOPS/master/ampm-core-install.sh | bash
-```
-
-### Who built this
-
-Someone with zero engineering background. Sold their house. Spent 8 months talking to AI, trying to survive. This is what came out.
-
-[❤️ Sponsor this project](https://github.com/sponsors/chainuncel0712)
-
----
-
-MIT — core · Proprietary — `src/core/` commercial organs

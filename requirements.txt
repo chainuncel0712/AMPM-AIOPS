@@ -21,6 +21,9 @@ beautifulsoup4>=4.12
 # LLM 串接
 aiohttp>=3.9.0
 
+# 系統監控
+psutil>=5.9.0
+
 # 向量記憶（可選）
 # chromadb>=0.4.0
 # sentence-transformers>=2.7.0
