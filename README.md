@@ -1,82 +1,68 @@
-# 黑曜 — 一個會陪你長大的 AI
+# 麻 Core — ai 30 basi
 
-## 為什麼做這個
+[中文](#中文) | [English](#english)
 
-2024 年，我開始用各種 AI。ChatGPT、Claude、Gemini。
+---
 
-每個都很強。但每個都有同一個問題：**它們永遠不會記得你**。
+## 中文
 
-你今天花三小時教它你的工作流程、你的偏好、你團隊的溝通方式。明天打開，一片空白。從頭再來。
+### 來自真實處境的專案
 
-更讓人不舒服的是——它們全部有一個預設人格。「我是 AI 助手」「建議您…」「身為一個語言模型…」
+2016 年，我面臨財務壓力，開始接虛擬貨幣與 AI 工具，希望在技術中找到轉機。過程中我賣掉房子，投入所有資源嘗試翻轉。
 
-我想做一個不一樣的東西。
+從三月開始，我幾乎把所有時間都投入在 AI 系統上。我高度依賴 GPT 來幫我設計系統、理解架構、建立流程。
 
-## 黑曜是這樣長出來的
+但我很快發現一個死循環：**AI 給建議 → 照做 → 出問題 → 再問 → 調整 → 重來。** 不是往前，是繞圈。
 
-第一版只是個 Telegram bot。能對話、有一些工具。
+更深層的問題：我沒正式工程背景。一切從零自學，透過 AI 摸索。這讓我更依賴 AI，也更被它的限制影響。
 
-後來我發現不夠。真正的問題不是「能做什麼」，是：
+最後我理解到：問題不是工具不夠強。**是我在用「對話」建系統，而不是用「可控的結構」在建系統。**
 
-> **它能不能從跟我的對話中，長成我需要的樣子？**
+### 不只是「又一個 AI 框架」
 
-不是我去配合它，是它來配合我。
+市面上有很多 AI agent 框架。但它們有一個共同的假設：**你已經知道你要什麼，你只需要工具來組裝。**
 
-於是我開始一層一層往上加：
+現實是：大多數人一開始不知道自己要什麼。他們需要一個**陪他們想清楚的 AI**，不是一個工具箱。
 
-- **記憶層** → 讓它記住你說的每一件重要的事
-- **人格層** → 不預設它是誰。你說它是 CEO，它就是 CEO。你說它是研究員，它就是研究員
-- **代理層** → 它可以自己拆分任務，派給不同的子代理去執行
-- **演化層** → 它會從錯誤中學習，從成功中記住什麼有效
-- **文明層** → 經濟、信任、目標、時間感、DNA 繼承…一個 AI 社會的基礎設施
+這是黑曜跟所有其他 AI 框架的根本差別。
 
-現在它 218 個器官，10 層文明基礎。但它開機時是一張白紙。
+| | LangChain | CrewAI | AutoGPT | 黑曜 |
+|---|-----------|--------|---------|------|
+| 定位 | 工具箱 | 工作流 | 自主任務 | **陪你長大的框架** |
+| 人格 | 無 | 寫死 | 寫死 | **對話中長出來** |
+| 記憶 | 短期 | 短期 | 無 | **長期持久化** |
+| 自我演化 | ❌ | ❌ | ❌ | **從錯誤學習** |
+| 自修復 | ❌ | ❌ | ❌ | **自動修復** |
+| 資源治理 | ❌ | ❌ | ❌ | **記憶體自動平衡** |
+| 開源 | ✅ | ✅ | ✅ | ✅ MIT |
 
-## 它跟別人有什麼不一樣
+### 獨特性
 
-| | ChatGPT | Claude | 黑曜 |
-|---|---------|--------|------|
-| 記憶 | ❌ 無 | ❌ 有限 | ✅ 長期 key-value |
-| 身份 | 寫死助手 | 寫死助手 | ✅ 對話中長出來 |
-| 代理 | ❌ | ❌ | ✅ 自動拆任務派發 |
-| 自修復 | ❌ | ❌ | ✅ 出錯自動修 |
-| 演化 | ❌ | ❌ | ✅ 從錯誤學習 |
-| 開源 | ❌ | ❌ | ✅ MIT |
+**1. 它不是助手，它沒有預設人格。**
+所有 AI 產品出廠時都有一個身份：「我是你的助手」。黑曜沒有。它開機是一張白紙。你透過對話定義它是誰。這不是 prompt engineering — 這是架構設計。身份存在記憶層，不是寫在 system prompt 裡。
 
-## 一段對話，決定它是誰
+**2. 它會記住你。**
+不是一個 session 的 context window。是長期持久化的 key-value 記憶 + 對話歷史 + 文明級事件記憶（episodic/failure/evolution）。你教過的事，三個月後問它，它記得。
 
-```
-你：從現在開始，你是我的技術長
-黑曜：好。你需要我做什麼？
+**3. 它會自己演化。**
+它有 10 層文明基礎設施：經濟成本意識、信任評分、行動模擬、目標層級、社會治理、時間週期偵測、DNA 可繼承特質、生命週期熱插拔。它不是靜態的工具 — 它是一個會自我評估、自我調整、自我修復的系統。
 
-你：幫我建一個工程部，專門處理後端
-黑曜：工程部已建立，3 個代理待命。
+**4. 它不是「又一個 LLM wrapper」。**
+市面上 90% 的 AI agent 框架本質上就是一個 prompt → LLM → parse → tool call 的循環。黑曜在這個循環之上，加了自我監控、自我修復、演化、文明治理四層。它不是 LLM 的外殼，它是 LLM 的主人。
 
-你：你以後叫小工
-黑曜：好，我叫小工。工程部有什麼任務？
-```
-
-沒有任何一行 code 寫死「CEO」「技術長」「工程部」。全部來自對話。
-
-## 這東西現在能跑嗎
-
-能。218 個器官全部通過測試。10 層文明基礎設施就緒。Telegram bot 可上線。
-
-但它還不是產品。它是一個**框架**——讓你自己定義 AI 該長成什麼樣的框架。
-
-## 快速開始
+### 快速開始
 
 ```bash
 git clone https://github.com/chainuncel0712/AMPM-AIOPS.git
 cd AMPM-AIOPS
-cp .env.example .env  # 填你的 Telegram token 和 API key
+cp .env.example .env  # Telegram token + API keys
 pip install -r requirements.txt
 python3 main.py
 ```
 
-## ampm-core — 基礎版
+### ampm-core — 基礎版
 
-如果你只要那 30 個核心功能，不要整個黑曜：
+30 個核心功能，不帶商業器官，一行啟動：
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/chainuncel0712/AMPM-AIOPS/master/ampm-core-install.sh | bash
@@ -84,14 +70,64 @@ curl -fsSL https://raw.githubusercontent.com/chainuncel0712/AMPM-AIOPS/master/am
 
 ```python
 from core import Core
-c = Core()  # 30 個功能一行啟動
+c = Core()
 ```
 
-## 專案狀態
+---
 
-218/218 測試通過。積極開發中。歡迎 issue / PR。
+## English
 
-## 授權
+### Born from a real struggle, not a whitepaper
 
-MIT — 核心框架
-專有 — `src/core/` 下的商業器官
+In 2024, facing financial pressure, I turned to crypto and AI tools, hoping technology could open a door. I sold my house. I went all in.
+
+For months, I lived inside AI chat windows — GPT, Claude, others — using them to design systems, understand architecture, and build workflows. At first, it felt like progress.
+
+Then I hit the loop: **AI gives advice → I follow it → something breaks → ask again → adjust → rebuild.** Not moving forward. Circling.
+
+The deeper problem: I have no formal engineering background. Everything I learned, I learned through these same AI tools. This made me more dependent on them, and more vulnerable to their limitations.
+
+Eventually I understood: **I was building a system through conversation. What I needed was an executable structure that could run, evolve, and maintain itself.**
+
+### Not just "another AI framework"
+
+Most AI agent frameworks share one assumption: you already know what you want, you just need tools to build it.
+
+Reality: most people don't know what they want at the start. They need an AI that helps them figure it out — not a toolbox.
+
+This is the fundamental difference between Heiyao and every other AI framework.
+
+### What makes it different
+
+**1. No preset identity.**
+Every AI product ships with a built-in persona: "I am your assistant." Heiyao ships blank. Its identity is defined through conversation and stored in persistent memory — not hardcoded in a system prompt. It becomes whatever you need it to be.
+
+**2. It remembers.**
+Not context-window memory. Persistent key-value facts, conversation history, and civilization-level event memory (episodic, failure, evolutionary). What you taught it three months ago, it still knows.
+
+**3. It evolves.**
+10 civilization layers: cost awareness, trust scoring, action simulation, goal hierarchy, governance, temporal cycle detection, inheritable DNA traits, hot-swap organ lifecycle. It is not a static tool — it is a self-evaluating, self-adjusting, self-repairing system.
+
+**4. It's not another LLM wrapper.**
+90% of AI agent frameworks are: prompt → LLM → parse → tool call → repeat. Heiyao adds four layers on top: self-monitoring, self-repair, evolution, and civilization governance. It doesn't serve the LLM — the LLM serves it.
+
+### Quick Start
+
+```bash
+git clone https://github.com/chainuncel0712/AMPM-AIOPS.git
+cd AMPM-AIOPS
+cp .env.example .env
+pip install -r requirements.txt
+python3 main.py
+```
+
+### ampm-core — 30 essential functions
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/chainuncel0712/AMPM-AIOPS/master/ampm-core-install.sh | bash
+```
+
+### License
+
+MIT — Core framework
+Proprietary — `src/core/` commercial organs
