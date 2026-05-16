@@ -60,4 +60,4 @@ app.add_handler(CommandHandler("status", status))
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle))
 
 print("🤖 啟動中...")
-app.run_polling()
+app.run_polling(drop_pending_updates=True)

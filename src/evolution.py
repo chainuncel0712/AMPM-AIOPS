@@ -62,6 +62,12 @@ class Evolution:
         data = {"current_version": self.version, "history": self._get_history()}
         self.evolution_log.write_text(json.dumps(data, ensure_ascii=False, indent=2))
     
+    def _last_n_facts(self, n: int):
+        raw = self.memory.get_all_facts()
+        if hasattr(raw, 'values'):
+            return list(raw.values())[-n:]
+        return list(raw)[-n:]
+
     def _get_history(self) -> List:
         if self.evolution_log.exists():
             data = json.loads(self.evolution_log.read_text())
@@ -176,7 +182,7 @@ class Evolution:
         """自我分析 - 主動找出弱點"""
         state = {
             "tool_count": len(self.tools.list_tools()),
-            "memory_facts": self.memory.get_all_facts()[-10:],
+            "memory_facts": self._last_n_facts(10),
             "error_rate": self.error_count / max(1, self.message_count),
             "current_goals": self.growth_goals
         }
@@ -200,7 +206,7 @@ class Evolution:
     
     def daily_review(self) -> str:
         """每日回顧 - 今天學到什麼、哪裡可以更好"""
-        facts = self.memory.get_all_facts()[-20:]
+        facts = self._last_n_facts(20)
         stats = {
             "messages": self.message_count,
             "errors": self.error_count,

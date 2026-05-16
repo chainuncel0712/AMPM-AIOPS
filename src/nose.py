@@ -84,7 +84,8 @@ class NoseSystem:
         # 從記憶中提取近期對話關鍵字
         recent_facts = []
         if self.memory:
-            recent_facts = self.memory.get_all_facts()[-10:]
+            raw = self.memory.get_all_facts()
+            recent_facts = list(raw.values())[-10:] if hasattr(raw, 'values') else list(raw)[-10:]
         
         prompt = f"""根據以下資訊，嗅出可能的賺錢機會：
 
@@ -123,7 +124,8 @@ class NoseSystem:
         if not self.memory or not self.call_ai_func:
             return []
         
-        facts = self.memory.get_all_facts()[-30:]
+        raw = self.memory.get_all_facts()
+        facts = list(raw.values())[-30:] if hasattr(raw, 'values') else list(raw)[-30:]
         if len(facts) < 10:
             return []
         
