@@ -1,0 +1,60 @@
+========================================
+Gumroad 商品填入內容（直接複製貼上）
+========================================
+
+【商品名稱】
+AMPM-AIOPS Pro 月費授權
+
+【價格】
+$29
+
+【商品描述 — 雙語版】
+
+=== 中文 ===
+
+AMPM-AIOPS Pro 月費授權
+
+解鎖黑曜 Pro 功能：
+✅ 自我進化循環
+✅ 自動修復
+✅ 工具自動生成
+✅ 多 Agent 協作
+✅ 進階儀表板
+✅ 技術支援
+
+使用方式：
+購買後你會收到一組授權金鑰（AMPM-PRO-XXXX-XXXX-XXXX）
+將金鑰放入 .env 檔案中的 AMPM_LICENSE_KEY 欄位即可解鎖
+
+社群版永久免費：https://github.com/chainuncel0712/AMPM-AIOPS
+
+=== English ===
+
+AMPM-AIOPS Pro Monthly License
+
+Unlock Pro features:
+✅ Evolution Cycle
+✅ Self-Repair
+✅ Auto Tool Creator
+✅ Multi-Agent Collaboration
+✅ Advanced Dashboard
+✅ Email Support
+
+How to use:
+Add the license key to your .env file as AMPM_LICENSE_KEY
+
+Community edition always free: https://github.com/chainuncel0712/AMPM-AIOPS
+
+----------------------------------------
+【金鑰內容 — 貼在商品檔案/內容欄位】
+
+AMPM-PRO-8IU0-BZYU-O3X9
+AMPM-PRO-55OI-SCUG-G1QN
+AMPM-PRO-DOWI-ZK4V-3UOZ
+AMPM-PRO-834R-RT6K-Y4OS
+AMPM-PRO-2D8V-HI9O-Y695
+AMPM-PRO-LTD1-522K-QSU4
+AMPM-PRO-Q68Z-0FYH-ZZMF
+AMPM-PRO-EYH5-DW3Z-DLCA
+AMPM-PRO-Z94W-93EQ-BH68
+AMPM-PRO-PXH4-MHUW-X5MW

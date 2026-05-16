@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a1a"/>
+      <stop offset="100%" style="stop-color:#1a1a3e"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#6c5ce7"/>
+      <stop offset="100%" style="stop-color:#a29bfe"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- 裝飾圓 -->
+  <circle cx="1000" cy="150" r="200" fill="#6c5ce7" opacity="0.08"/>
+  <circle cx="200" cy="500" r="250" fill="#a29bfe" opacity="0.05"/>
+
+  <!-- 主標題 -->
+  <text x="100" y="200" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="white">
+    AMPM-AIOPS
+  </text>
+  <text x="100" y="260" font-family="Arial, sans-serif" font-size="28" fill="url(#accent)" opacity="0.9">
+    黑曜 Pro 授權
+  </text>
+
+  <!-- 分隔線 -->
+  <rect x="100" y="290" width="300" height="3" rx="1" fill="url(#accent)" opacity="0.6"/>
+
+  <!-- 功能列表 -->
+  <text x="100" y="360" font-family="Arial, sans-serif" font-size="24" fill="#ccc">
+    ✅ 自我進化循環     ✅ 自動修復
+  </text>
+  <text x="100" y="400" font-family="Arial, sans-serif" font-size="24" fill="#ccc">
+    ✅ 工具自動生成     ✅ 多 Agent 協作
+  </text>
+  <text x="100" y="440" font-family="Arial, sans-serif" font-size="24" fill="#ccc">
+    ✅ 進階儀表板       ✅ 技術支援
+  </text>
+
+  <!-- 版本標籤 -->
+  <text x="100" y="530" font-family="Arial, sans-serif" font-size="20" fill="#888">
+    AI 作業系統  ·  VPS 自主運作  ·  長期記憶  ·  社群版永久免費
+  </text>
+
+  <!-- 右下角標記 -->
+  <text x="850" y="530" font-family="Arial, sans-serif" font-size="20" fill="#555">
+    Runtime · Multi-Agent · Self-Healing
+  </text>
+</svg>
