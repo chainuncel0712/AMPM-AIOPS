@@ -97,3 +97,35 @@ class LicenseManager:
             ],
         }
         return features.get(self.get_tier(), features["community"])
+    
+    def validate_key(self, key: str) -> bool:
+        """驗證授權金鑰"""
+        import hashlib
+        if not key or "AMPM-" not in key:
+            return False
+        
+        if "AMPM-PRO" in key:
+            self.license_data["tier"] = "pro"
+        elif "AMPM-ENT" in key:
+            self.license_data["tier"] = "enterprise"
+        
+        key_hash = hashlib.md5(key.encode()).hexdigest()[:8]
+        
+        valid_hashes = {
+            "pro": ["97068ed4","35e42cb5","60fd1dfd","d2442225","836c0dc5",
+                    "777449d8","65ecfedd","c9b1c025","ce526e19","4d66c0ee"],
+            "enterprise": ["21519d65","e17b9160","ebfd839e","25d6c76f","e2e4eca1"],
+        }
+        
+        for tier, hashes in valid_hashes.items():
+            if key_hash in hashes:
+                self.license_data["tier"] = tier
+                return True
+        return False
+    
+    def load_from_env(self):
+        """從環境變數載入授權"""
+        key = os.getenv("AMPM_LICENSE_KEY", "")
+        if key:
+            self.validate_key(key)
+            print(f"🔑 已從環境變數載入授權：{self.get_tier()}")
