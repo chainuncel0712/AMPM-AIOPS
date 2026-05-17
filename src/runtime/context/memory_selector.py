@@ -47,8 +47,8 @@ class MemorySelector:
         vector_memory=None,
         episodic_memory=None,
         llm_call: Optional[Callable] = None,
-        max_candidates: int = 100,
-        max_output: int = 20,
+        max_candidates: int = 200,
+        max_output: int = 50,
     ):
         self.memory = memory_organ
         self.vector_memory = vector_memory
@@ -102,7 +102,7 @@ class MemorySelector:
 
         if self.memory:
             try:
-                working = self.memory.get_recent_conversations(limit=10)
+                working = self.memory.get_recent_conversations(limit=50)
                 for w in working:
                     w["_source"] = "working"
                     candidates.append(w)

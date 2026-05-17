@@ -44,7 +44,7 @@ class MemoryManager:
         self.semantic: List[Dict] = self._load(self.semantic_file, [])
         self.episodic: List[Dict] = self._load(self.episodic_file, [])
 
-        self.max_working = 50
+        self.max_working = 200
         self.max_semantic = 500
         self.max_episodic = 500
 
