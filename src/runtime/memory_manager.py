@@ -44,9 +44,9 @@ class MemoryManager:
         self.semantic: List[Dict] = self._load(self.semantic_file, [])
         self.episodic: List[Dict] = self._load(self.episodic_file, [])
 
-        self.max_working = 200
-        self.max_semantic = 500
-        self.max_episodic = 500
+        self.max_working = 10000  # 不刪，硬碟夠大
+        self.max_semantic = 50000
+        self.max_episodic = 50000
 
         self.last_organize = datetime.now()
 
@@ -86,9 +86,8 @@ class MemoryManager:
             if len(self.working) > self.max_working:
                 self._compress_working()
 
-            # Layer 2: semantic — 重要訊息寫入長期記憶（門檻 0.4）
-            if importance >= 0.4:
-                self._write_semantic(user_msg, assistant_msg, importance, ts)
+            # Layer 2: semantic — 全寫，不刪
+            self._write_semantic(user_msg, assistant_msg, importance, ts)
 
             # Layer 3: episodic — 含事件關鍵字寫入
             self._write_episodic(user_msg, assistant_msg, importance, ts)
