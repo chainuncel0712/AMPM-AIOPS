@@ -167,8 +167,7 @@ class Compass:
                 for g in sorted(goals, key=lambda x: x['priority'])[:5]
             )
         kpi_summary = self.get_evolution_direction()
-        return f"""🎯 北極星：{self.direction['north_star']}
-{goal_lines}
+        return f"""{goal_lines}
 
 📊 {kpi_summary}
 
