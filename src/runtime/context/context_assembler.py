@@ -122,6 +122,10 @@ class ContextAssembler:
             except Exception:
                 pass
 
+        # 5. RuntimeUpdate 學習規則 (自動注入，不用手動傳 extra_system)
+        if not extra_system and self.runtime_update:
+            extra_system = self.runtime_update.get_extra_system_prompt() or None
+
         # 5. 对话历史 messages
         history_messages = self.conversation_window.build_messages(n=5)
 
