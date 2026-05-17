@@ -113,23 +113,37 @@ class AgentSupervisor:
         return 0.0
 
     def _gc_zombie_threads(self):
-        """掃描已死但未登錄的 threading.Thread，移除它們的殘留"""
         now = time.time()
         with self._lock:
-            for agent in list(self.agents.values()):
+            for name, agent in list(self.agents.items()):
                 if agent.thread and not agent.thread.is_alive():
                     if agent.last_hb == 0 or (now - agent.last_hb) > agent.hb_timeout:
                         agent.status = AgentStatus.DEAD
-                        print(f"[Supervisor] 💀 {agent.name} 已終死")
+                        agent.error_count += 1
+                        print(f"[Supervisor] 💀 {name} 已死 (thread 終止, errors={agent.error_count})")
+                        if agent.is_critical:
+                            self._flag_unhealthy(name, "critical agent thread dead")
                         continue
                     agent.status = AgentStatus.ZOMBIE
-                    print(f"[Supervisor] 🧟 {agent.name} 僵死中")
+                    agent.error_count += 1
+                    print(f"[Supervisor] 🧟 {name} 僵死 (thread 存在但無心跳, errors={agent.error_count})")
                 elif agent.thread and agent.last_hb > 0 and (now - agent.last_hb) > agent.hb_timeout:
                     agent.status = AgentStatus.ZOMBIE
                     agent.error_count += 1
                     agent.last_error = f"heartbeat timeout {now - agent.last_hb:.0f}s"
+                    print(f"[Supervisor] 🧟 {name} 心跳逾時 {now - agent.last_hb:.0f}s (第 {agent.error_count} 次)")
                     if agent.error_count >= 3:
-                        print(f"[Supervisor] 🚨 {agent.name} 連續 3 次僵死，上報 daemon")
+                        print(f"[Supervisor] 🚨 {name} 連續 {agent.error_count} 次僵死，上報 daemon")
+                        self._flag_unhealthy(name, "zombie_3x")
+                elif agent.thread and agent.thread.is_alive() and agent.last_hb > 0:
+                    if agent.status != AgentStatus.HEALTHY:
+                        agent.status = AgentStatus.HEALTHY
+                        agent.error_count = max(0, agent.error_count - 1)
+                        print(f"[Supervisor] 💚 {name} 恢復健康")
+
+    def _flag_unhealthy(self, agent_name: str, reason: str):
+        self._unhealthy_flags = getattr(self, '_unhealthy_flags', {})
+        self._unhealthy_flags[agent_name] = reason
 
     def _update_system_heartbeat(self):
         all_healthy = all(
@@ -137,6 +151,7 @@ class AgentSupervisor:
             for a in self.agents.values() if a.is_critical
         ) if self.agents else True
         mem = self._read_memory_mb()
+        unhealthy = getattr(self, '_unhealthy_flags', {})
         lines = [
             f"ts={time.time():.0f}",
             f"all_healthy={'true' if all_healthy else 'false'}",
@@ -144,7 +159,8 @@ class AgentSupervisor:
             f"agents={len(self.agents)}",
         ]
         for name, a in self.agents.items():
-            lines.append(f"  {name}:{a.status.value}")
+            flag = f" [{unhealthy[name]}]" if name in unhealthy else ""
+            lines.append(f"  {name}:{a.status.value}{flag}")
         try:
             with open(HEARTBEAT_FILE, "w") as f:
                 f.write("\n".join(lines))
