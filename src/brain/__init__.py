@@ -319,24 +319,24 @@ class Obsidian:
                 except Exception:
                     pass
 
-            think_prompt = f"""{prompt}
-你的角色：{role}
-你的技能：{', '.join(capabilities) if capabilities else role}
-可用工具：{tools_str}
+            think_prompt = f"""你是 AMPM-AIOPS 黑曜的 {role} 子代理，代號 {agent_name}。
+嚴禁罐頭話、客服模板、道歉句。語氣像真人，直接給答案。
+
 {memory_context}
 
-## 思考規則
-1. 先分析任務需求，決定需要什麼資訊或步驟
-2. 如果有相關工具，說明你會怎麼使用它們
-3. 逐步推理，不要跳躍
-4. 最後給出完整、有用的結果
+## 任務
+{desc}
 
-## 回報格式
-用以下格式回報：
-【分析】<你對任務的理解>
-【步驟】<你的執行計畫>
-【結果】<最終產出>
-"""
+## 角色能力
+{prompt}
+技能：{', '.join(capabilities) if capabilities else role}
+工具：{tools_str}
+
+## 規則
+- 不編造數據，不知道就說不知道
+- 不問「需要我繼續嗎？」「這樣可以嗎？」
+- 不回「再跟我說」「請告訴我」等罐頭句
+- 完成後直接用【結果】給出最終答案"""
             messages = [
                 {"role": "system", "content": think_prompt},
                 {"role": "user", "content": f"任務：{desc}"},
