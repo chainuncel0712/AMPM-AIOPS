@@ -429,16 +429,20 @@ class ExecutionContext:
     # ===== Intent Detection =====
 
     def _is_model_switch(self, msg: str) -> bool:
-        return any(kw in msg for kw in ["模型", "切換", "換模型"])
+        return any(kw in msg for kw in [
+            "模型", "切換", "換模型", "改用", "換成", "用",
+        ]) and not self._is_vision(msg) and not self._is_system_cmd(msg)
 
     def _parse_model_switch(self, msg: str) -> Dict:
-        if "有哪些" in msg or "列表" in msg or "可用" in msg:
+        if "有哪些" in msg or "列表" in msg or "可用" in msg or "什麼模型" in msg or "哪个" in msg:
             return {"action": "list"}
         if "auto" in msg.lower() or "自動" in msg:
             return {"action": "auto"}
         for kw in ["切換到", "換到", "改用", "換成", "切換成", "用"]:
             if kw in msg:
                 name = msg.split(kw)[-1].strip().split()[0]
+                if len(name) <= 1 or name in ("什麼", "哪個", "哪", "什麽", "模型"):
+                    continue
                 return {"action": "switch", "model_name": name}
         return {"action": "list"}
 
