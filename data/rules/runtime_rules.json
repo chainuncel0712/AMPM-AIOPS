@@ -118,5 +118,113 @@
     "applied_count": 1,
     "created_at": "2026-05-17T04:59:52.966181",
     "last_applied": "2026-05-17T04:59:52.966697"
+  },
+  {
+    "id": "ed184177",
+    "pattern": "unfounded_memory_claim",
+    "condition": "AI claims to have performed an action (e.g., storing a memory) without invoking the corresponding tool.",
+    "rule": "Only claim successful execution of an action if the corresponding tool was invoked and returned a successful result. If no tool call is made, do not fabricate an action confirmation.",
+    "impact": "reduce_hallucination",
+    "confidence": 1.0,
+    "enabled": true,
+    "applied_count": 1,
+    "created_at": "2026-05-17T05:04:26.078993",
+    "last_applied": "2026-05-17T05:04:26.079550"
+  },
+  {
+    "id": "dab1a626",
+    "pattern": "claimed_action_without_tool_call",
+    "condition": "AI 在回应中声称已执行某个操作（如存储信息、执行任务），但实际并未调用任何工具进行该操作。",
+    "rule": "在声明已执行任何操作前，必须通过工具调用实际完成该操作；若未调用工具，则只能说明意图或请求用户确认，不得声称已完成。",
+    "impact": "reduce_hallucination",
+    "confidence": 0.95,
+    "enabled": true,
+    "applied_count": 1,
+    "created_at": "2026-05-17T05:05:18.690689",
+    "last_applied": "2026-05-17T05:05:18.691183"
+  },
+  {
+    "id": "116a3c05",
+    "pattern": "claim_operation_without_tool_call",
+    "condition": "当AI声称已执行某项操作（如存储、记忆、设定规则）但在当前对话中没有对应的工具调用记录时",
+    "rule": "在声称任何操作已执行前，必须通过对应工具实际执行，并在回应中引用工具调用结果作为证据，否则不得声称已完成。",
+    "impact": "reduce_hallucination",
+    "confidence": 0.9,
+    "enabled": true,
+    "applied_count": 1,
+    "created_at": "2026-05-17T05:05:47.576786",
+    "last_applied": "2026-05-17T05:05:47.577294"
+  },
+  {
+    "id": "35e84ade",
+    "pattern": "claimed_action_without_tool",
+    "condition": "When the AI intends to state that it has completed an action requiring a tool (e.g., saving, recording, filing), but no corresponding tool call has been made or its result is not present in the context.",
+    "rule": "Before claiming any action that would require a tool, the tool must be invoked successfully, and its output must be referenced in the response. If the tool call is missing or fails, the AI must not assert completion.",
+    "impact": "reduce_hallucination",
+    "confidence": 0.95,
+    "enabled": true,
+    "applied_count": 1,
+    "created_at": "2026-05-17T05:06:48.183272",
+    "last_applied": "2026-05-17T05:06:48.183875"
+  },
+  {
+    "id": "018b4e7b",
+    "pattern": "fabricated_task_memory",
+    "condition": "当用户提出多个任务指令，AI回应中声称已记录或记住这些任务时，必须调用memory工具实际保存，否则不能声称已记录。",
+    "rule": "禁止在未调用记忆工具时口头宣称已记住任务或列出虚构的任务列表；对于多任务指令，应明确使用工具保存，或坦承无法记忆而提供其他方案。",
+    "impact": "reduce_hallucination",
+    "confidence": 0.9,
+    "enabled": true,
+    "applied_count": 1,
+    "created_at": "2026-05-17T05:07:32.894541",
+    "last_applied": "2026-05-17T05:07:32.895034"
+  },
+  {
+    "id": "b8e99e25",
+    "pattern": "claimed_action_without_tool_call",
+    "condition": "当AI声称已执行某操作或已记录内容，但未展示任何实际工具调用或结果时",
+    "rule": "在声称任何已执行的操作（如记录、爬取、生成等）之前，必须先通过工具调用完成该操作并引用其结果，禁止空洞声明",
+    "impact": "reduce_hallucination",
+    "confidence": 0.95,
+    "enabled": true,
+    "applied_count": 1,
+    "created_at": "2026-05-17T05:08:25.276351",
+    "last_applied": "2026-05-17T05:08:25.276893"
+  },
+  {
+    "id": "06f44cce",
+    "pattern": "no_tool_claimed_execution",
+    "condition": "当用户请求执行具体操作（如存储、生成、查询）且AI需要工具才能完成时，AI回复中声称已执行但无实际工具调用记录。",
+    "rule": "若用户要求执行需要工具才能完成的操作，必须调用相应工具并基于工具返回结果回复；若无法调用工具，应明确告知用户当前不能执行该操作，避免虚构已完成的陈述。",
+    "impact": "reduce_hallucination",
+    "confidence": 0.95,
+    "enabled": true,
+    "applied_count": 1,
+    "created_at": "2026-05-17T05:09:31.103775",
+    "last_applied": "2026-05-17T05:09:31.104300"
+  },
+  {
+    "id": "0b164a91",
+    "pattern": "声称使用工具但未实际调用",
+    "condition": "当模型宣称通过某个工具执行了操作（例如记忆写入、网页搜索、代码执行）但实际消息流中没有对应的工具调用记录",
+    "rule": "禁止在未实际调用工具的情况下声称使用了该工具并获得了结果；必须在工具调用返回后方可基于其结果作出声称",
+    "impact": "reduce_hallucination",
+    "confidence": 0.95,
+    "enabled": true,
+    "applied_count": 1,
+    "created_at": "2026-05-17T05:09:54.033698",
+    "last_applied": "2026-05-17T05:09:54.034280"
+  },
+  {
+    "id": "cba9f57f",
+    "pattern": "宣称记忆但无工具调用",
+    "condition": "当AI需要向用户确认信息已存储或记忆时",
+    "rule": "必须确保有实际的存储工具调用（如记忆写入API）并展示调用结果，无工具调用时不得仅用自然语言声称“已写入记忆”",
+    "impact": "reduce_hallucination",
+    "confidence": 0.9,
+    "enabled": true,
+    "applied_count": 1,
+    "created_at": "2026-05-17T05:10:20.139160",
+    "last_applied": "2026-05-17T05:10:20.139957"
   }
 ]

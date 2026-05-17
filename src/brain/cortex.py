@@ -163,7 +163,18 @@ class Cortex(BaseOrgan):
         # 2. 如果 LangGraph 引擎可用，優先使用（保留雙重保險）
         if self.langgraph:
             try:
-                return self.langgraph.process(user_msg)
+                reply = self.langgraph.process(user_msg)
+                # LangGraph 路徑也需要寫記憶
+                if self.context_assembler and reply:
+                    self.context_assembler.record_response(
+                        assistant_msg=reply,
+                        user_msg=user_msg,
+                    )
+                    self.context_assembler.write_memory(
+                        user_msg=user_msg,
+                        assistant_msg=reply,
+                    )
+                return reply
             except Exception:
                 pass
 
