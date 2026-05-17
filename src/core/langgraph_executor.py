@@ -63,6 +63,11 @@ class LangGraphExecutor:
         self.agent = self._create_agent()  # 建立思考引擎
         print(f"[LangGraphExecutor] 已註冊 {len(self.tools)} 個工具")
         
+        # ===== Phase 1: 接入 ContextAssembler =====
+        self.context_assembler = getattr(brain, "context_assembler", None)
+        if self.context_assembler:
+            print("[LangGraphExecutor] 已接入 ContextAssembler")
+        
         # ===== 修復 10：啟動自檢 =====
         self._run_startup_diagnosis()
 
@@ -788,7 +793,14 @@ class LangGraphExecutor:
             """
             
             print(f"  [🧠] === REFLECTION PROMPT ===\n{reflection_prompt[:500]}\n  [🧠] === END REFLECTION ===")
-            reflection_result = llm.call([{"role": "user", "content": reflection_prompt}])
+            if self.context_assembler:
+                sys_msgs = self.context_assembler.get_system_context(
+                    task_hint="你正在自我反省：檢查你的回覆是否正確。"
+                )
+                messages = sys_msgs + [{"role": "user", "content": reflection_prompt}]
+                reflection_result = llm.call(messages)
+            else:
+                reflection_result = llm.call([{"role": "user", "content": reflection_prompt}])
             result = str(reflection_result)
             print(f"  [🧠] === REFLECTION RESPONSE ===\n{result[:300]}\n  [🧠] === END REFLECTION ===")
             
@@ -870,7 +882,14 @@ class LangGraphExecutor:
             """
             
             print(f"  [🔧] === REPAIR PROMPT ===\n{repair_prompt[:500]}\n  [🔧] === END REPAIR ===")
-            repaired = llm.call([{"role": "user", "content": repair_prompt}])
+            if self.context_assembler:
+                sys_msgs = self.context_assembler.get_system_context(
+                    task_hint="你正在自我修復：修正你上一個錯誤回覆。"
+                )
+                messages = sys_msgs + [{"role": "user", "content": repair_prompt}]
+                repaired = llm.call(messages)
+            else:
+                repaired = llm.call([{"role": "user", "content": repair_prompt}])
             result = str(repaired)
             print(f"  [🔧] === REPAIR RESULT ===\n{result[:300]}\n  [🔧] === END REPAIR ===")
             
@@ -1203,7 +1222,14 @@ class LangGraphExecutor:
                 
                 # 第一步：讓 LLM 決定要用哪個工具
                 print(f"  [🧠] === LLM PROMPT ===\n{prompt[:800]}\n  [🧠] === END PROMPT ===")
-                result = llm.call([{"role": "user", "content": prompt}])
+                if self.context_assembler:
+                    messages = self.context_assembler.assemble(
+                        user_msg=enriched_msg,
+                        extra_system=f"你有以下工具可用：\n{tool_str}\n\n如果需要使用工具，請輸出 JSON 格式：\n{{\"tool\": \"工具名稱\", \"args\": {{\"參數1\": \"值1\"}}}}\n如果不需要使用工具，請直接回答。",
+                    )
+                    result = llm.call(messages)
+                else:
+                    result = llm.call([{"role": "user", "content": prompt}])
                 llm_response = str(result)
                 print(f"  [🧠] === LLM RESPONSE ===\n{llm_response[:500]}\n  [🧠] === END RESPONSE ===")
                 
@@ -1221,14 +1247,20 @@ class LangGraphExecutor:
                     tool_result_text = str(tool_result)
                     
                     # 第二步：將工具執行結果傳回給 LLM，讓它產生最終回覆
-                    # 明確要求 LLM 使用工具結果
                     final_prompt = (
                         f"工具執行結果：\n{tool_result}\n\n"
                         f"請根據工具執行結果，用繁體中文簡短回覆使用者。\n"
                         f"⚠️ 你必須使用工具執行結果來回答，不能忽略工具結果。\n"
                         f"使用者說：{user_msg}"
                     )
-                    final_result = llm.call([{"role": "user", "content": final_prompt}])
+                    if self.context_assembler:
+                        sys_msgs = self.context_assembler.get_system_context(
+                            task_hint="你正在根據工具執行結果回答使用者。必須使用工具結果中的真實資料。"
+                        )
+                        msgs = sys_msgs + [{"role": "user", "content": final_prompt}]
+                        final_result = llm.call(msgs)
+                    else:
+                        final_result = llm.call([{"role": "user", "content": final_prompt}])
                     print(f"  [🧠] === FINAL PROMPT ===\n{final_prompt[:500]}\n  [🧠] === END FINAL ===")
                     agent_result = str(final_result)[:2000]
                 else:
@@ -1436,8 +1468,11 @@ class LangGraphExecutor:
                     "工具不可用時，要想辦法找到答案並學會。\n\n"
                     f"使用者說：{user_msg}"
                 )
-                result = llm.call([{"role": "user", "content": prompt}])
-                return str(result)[:2000]
+                if self.context_assembler:
+                    messages = self.context_assembler.assemble(user_msg=user_msg)
+                    result = llm.call(messages)
+                else:
+                    result = llm.call([{"role": "user", "content": prompt}])
         except Exception as e:
             if not hasattr(self, '_llm_fail_count'):
                 self._llm_fail_count = 0

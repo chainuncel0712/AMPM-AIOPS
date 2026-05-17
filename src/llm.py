@@ -70,6 +70,15 @@ class LLMClient:
         self.rate_limiter = TokenBucket(rate=int(os.getenv("MAX_API_CALLS_PER_MINUTE", "30")), per_seconds=60)
 
     def call(self, messages, temperature=0.7):
+        # ===== Phase 8: runtime guard — 檢查是否經 ContextAssembler =====
+        from runtime.context.persona_builder import RUNTIME_IDENTITY
+        has_identity = any(
+            isinstance(m, dict) and m.get("role") == "system" and RUNTIME_IDENTITY[:20] in m.get("content", "")
+            for m in (messages if isinstance(messages, list) else [])
+        )
+        if not has_identity and isinstance(messages, list) and len(messages) > 0:
+            print("⚠️ [Guard] LLM call bypasses ContextAssembler — 缺少 RUNTIME_IDENTITY")
+
         if self.breath and not self.breath.can_call_api():
             return "休息中..."
         if self.breath:

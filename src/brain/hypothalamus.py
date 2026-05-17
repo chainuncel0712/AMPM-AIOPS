@@ -1,6 +1,7 @@
 """下視丘 - 自主神經系統，負責定時維護 + 記憶任務執行 + 被動觸發機制"""
 from skeleton.base_organ import BaseOrgan
-from datetime import datetime  # 導入 datetime 用於時間戳記
+from datetime import datetime
+from runtime.context.persona_builder import RUNTIME_IDENTITY, RUNTIME_RULES
 
 class Hypothalamus(BaseOrgan):
     def __init__(self, memory, tools, nose, evolution, scheduler, tasks, call_ai_func):
@@ -161,8 +162,9 @@ class Hypothalamus(BaseOrgan):
             """
             
             try:
+                system_identity = f"{RUNTIME_IDENTITY}\n\n{RUNTIME_RULES}\n\n你正在執行背景任務修復。"
                 repair_response = self.call_ai([
-                    {"role": "system", "content": "你是一個任務修復專家"},
+                    {"role": "system", "content": system_identity},
                     {"role": "user", "content": repair_prompt}
                 ])
                 

@@ -1,4 +1,5 @@
-"""丘腦 - 判斷使用者意圖，決定是否呼叫工具"""
+"""丘腦 - Phase 7: 降級為 passive observation only。
+路由決策已移入 ContextAssembler，此模組僅保留供參考。"""
 from skeleton.base_organ import BaseOrgan
 
 class Thalamus(BaseOrgan):

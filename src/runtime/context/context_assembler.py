@@ -136,6 +136,13 @@ class ContextAssembler:
             extra_system=extra_system,
         )
 
+        # ===== Phase 8: runtime guard — 確保 system 永遠在前 =====
+        if messages and messages[0].get("role") != "system":
+            print("⚠️ [Guard] ContextAssembler 輸出異常：第一則不是 system message")
+        system_count = sum(1 for m in messages if m.get("role") == "system")
+        if system_count == 0:
+            print("⚠️ [Guard] ContextAssembler 輸出異常：沒有任何 system message")
+
         return messages
 
     def record_response(self, assistant_msg: str, user_msg: str = ""):

@@ -10,6 +10,9 @@ import time
 from pathlib import Path
 from datetime import datetime
 from typing import Dict, List, Any, Optional
+from runtime.context.persona_builder import RUNTIME_IDENTITY, RUNTIME_RULES
+
+SYSTEM_CONTEXT = f"{RUNTIME_IDENTITY}\n\n{RUNTIME_RULES}\n\n你正在執行背景進化任務。分析系統狀態並提出改進方案。"
 
 class Evolution:
     def __init__(self, base_dir: Path, memory, tools, agents, call_ai_func):
@@ -132,7 +135,7 @@ class Evolution:
     "focus": "主要改進方向"
 }}
 """
-        result = self.call_ai([{"role": "user", "content": prompt}])
+        result = self.call_ai([{"role": "system", "content": SYSTEM_CONTEXT}, {"role": "user", "content": prompt}])
         
         try:
             json_match = re.search(r'\{.*\}', result, re.DOTALL)
@@ -156,7 +159,7 @@ class Evolution:
     "code_changes": "如果要改自己的程式碼，給我新的程式碼片段"
 }}
 """
-        result = self.call_ai([{"role": "user", "content": prompt}])
+        result = self.call_ai([{"role": "system", "content": SYSTEM_CONTEXT}, {"role": "user", "content": prompt}])
         
         try:
             json_match = re.search(r'\{.*\}', result, re.DOTALL)
@@ -198,7 +201,7 @@ class Evolution:
 
 直接回答，不要廢話。用繁體中文。
 """
-        return self.call_ai([{"role": "user", "content": prompt}])
+        return self.call_ai([{"role": "system", "content": SYSTEM_CONTEXT}, {"role": "user", "content": prompt}])
     
     def self_optimize(self) -> str:
         """自我優化"""
@@ -226,7 +229,7 @@ class Evolution:
 
 用繁體中文。
 """
-        review = self.call_ai([{"role": "user", "content": prompt}])
+        review = self.call_ai([{"role": "system", "content": SYSTEM_CONTEXT}, {"role": "user", "content": prompt}])
         self._log_change("每日回顧", review[:100])
         self.memory.remember_fact(f"回顧: {review[:200]}", 0.7)
         return review
@@ -238,7 +241,7 @@ class Evolution:
 輸出JSON：
 {{"tool_name": "名稱", "description": "用途", "code": "def execute(params): return '結果'"}}
 """
-        result = self.call_ai([{"role": "user", "content": prompt}])
+        result = self.call_ai([{"role": "system", "content": SYSTEM_CONTEXT}, {"role": "user", "content": prompt}])
         
         try:
             json_match = re.search(r'\{.*\}', result, re.DOTALL)

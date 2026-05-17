@@ -8,6 +8,7 @@ import threading
 import json
 from pathlib import Path
 from datetime import datetime
+from runtime.context.persona_builder import RUNTIME_IDENTITY, RUNTIME_RULES
 from typing import Dict, List, Optional
 
 class NoseSystem:
@@ -95,7 +96,11 @@ class NoseSystem:
 [{{"opportunity": "機會描述", "confidence": 0.0-1.0, "suggested_action": "建議行動"}}]
 """
         try:
-            response = self.call_ai_func([{"role": "user", "content": prompt}])
+            system_identity = f"{RUNTIME_IDENTITY}\n\n{RUNTIME_RULES}\n\n你正在執行系統嗅覺任務：尋找機會。"
+            response = self.call_ai_func([
+                {"role": "system", "content": system_identity},
+                {"role": "user", "content": prompt}
+            ])
             import re
             json_match = re.search(r'\[.*\]', response, re.DOTALL)
             if json_match:
@@ -137,7 +142,11 @@ class NoseSystem:
 [{{"pattern": "模式描述", "frequency": "頻率"}}]
 """
         try:
-            response = self.call_ai_func([{"role": "user", "content": prompt}])
+            system_identity = f"{RUNTIME_IDENTITY}\n\n{RUNTIME_RULES}\n\n你正在執行系統嗅覺任務：尋找模式。"
+            response = self.call_ai_func([
+                {"role": "system", "content": system_identity},
+                {"role": "user", "content": prompt}
+            ])
             import re
             json_match = re.search(r'\[.*\]', response, re.DOTALL)
             if json_match:

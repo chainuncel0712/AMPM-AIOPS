@@ -3,6 +3,7 @@
 這是黑曜的自我進化閉環：持續從環境吸收資訊，學習提煉，
 保留好的強化自己，排除壞的，然後繼續。
 """
+from runtime.context.persona_builder import RUNTIME_IDENTITY, RUNTIME_RULES
 import json
 import threading
 import time
@@ -258,7 +259,11 @@ class EvolutionCycleOrgan(BaseOrgan):
 
 只回 JSON，不要其他文字。"""
 
-                raw = self.llm.call([{"role": "user", "content": prompt}])
+                system_ctx = f"{RUNTIME_IDENTITY}\n\n{RUNTIME_RULES}\n\n你正在執行進化循環學習任務。"
+                raw = self.llm.call([
+                    {"role": "system", "content": system_ctx},
+                    {"role": "user", "content": prompt}
+                ])
                 import re
                 match = re.search(r'\[.*\]', raw, re.DOTALL)
                 if match:

@@ -28,7 +28,7 @@ from tasks.tracker import TaskTracker
 from circuit.controller import CircuitController
 from llm import LLMClient
 from executor import ToolExecutor as OldExecutor
-from handler import MessageHandler
+# from handler import MessageHandler  # Phase 1: 死碼，已被 Cortex.process() 取代
 
 # 骨架
 from skeleton.registry import Registry
@@ -129,7 +129,7 @@ class Obsidian:
         # 舊 LLM 和執行器
         self.llm = LLMClient(self.breath)
         self.old_executor = OldExecutor(self.tools)
-        self.handler = MessageHandler(self.llm, self.memory, self.compass, self.decisions, self.tasks)
+        # self.handler = MessageHandler(...)  # Phase 1: 死碼
 
         # ===== 數據匯流排 =====
         self.bus = self.registry.add(EventBus())
