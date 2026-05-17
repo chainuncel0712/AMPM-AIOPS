@@ -317,7 +317,6 @@ class MemoryManager:
 
     def _maybe_organize(self):
         pass  # 不自動整理，記憶永遠保留
-            self.last_organize = now
 
     def organize(self):
         """維護：不刪記憶，只存檔"""
