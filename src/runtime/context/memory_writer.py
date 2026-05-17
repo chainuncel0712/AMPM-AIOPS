@@ -31,6 +31,15 @@ class MemoryWriter:
         "完成", "執行", "建立", "寫了", "改了", "修正",
     ]
 
+    # 任務/規劃相關關鍵字（高分）
+    TASK_KEYWORDS = [
+        "任務", "規劃", "專案", "計畫", "目標", "公司",
+        "組織", "架構", "架設", "網站", "工具書", "電子書",
+        "生成", "自動化", "代理", "AI", "銷售", "客服",
+        "審核", "上架", "追蹤", "創作", "選題", "童書",
+        "一條龍", "客製化", "安裝服務", "網域",
+    ]
+
     def __init__(
         self,
         memory_organ=None,
@@ -87,11 +96,15 @@ class MemoryWriter:
         if any(kw in user_msg for kw in self.IDENTITY_KEYWORDS):
             score = max(score, 0.85)
 
+        # 任務/規劃 → 最高優先
+        if any(kw in combined for kw in self.TASK_KEYWORDS):
+            score = max(score, 0.9)
+
         # 事件/行動
         if any(kw in combined for kw in self.EPISODIC_KEYWORDS):
             score = max(score, 0.7)
 
-        # 一般對話
+        # 一般對話（長訊息）
         if len(user_msg) > 30:
             score = max(score, 0.5)
 
@@ -122,12 +135,24 @@ class MemoryWriter:
 
     def _write_semantic(self, user_msg: str, assistant_msg: str, importance: float):
         """萃取並寫入語義記憶（知識性事實）"""
-        if not self.memory or importance < 0.6:
+        if not self.memory or importance < 0.5:
             return
 
-        # 簡單萃取：assistant 回覆中的關鍵資訊
+        # 高重要性（任務/身份）→ 無條件寫入，不限 assistant 關鍵字
+        if importance >= 0.7:
+            try:
+                self.memory.remember_fact(
+                    fact=f"對話: {user_msg[:120]}",
+                    importance=importance,
+                    value=assistant_msg[:300],
+                )
+            except Exception:
+                pass
+            return
+
+        # 中重要性 → 需要 assistant 回覆含關鍵資訊
         if len(assistant_msg) > 30 and any(
-            kw in assistant_msg for kw in ["是", "有", "可以", "需要", "建議"]
+            kw in assistant_msg for kw in ["是", "有", "可以", "需要", "建議", "規劃", "建立", "完成"]
         ):
             try:
                 self.memory.remember_fact(

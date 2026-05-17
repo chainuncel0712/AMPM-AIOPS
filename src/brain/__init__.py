@@ -15,6 +15,7 @@ from config import config
 
 # 頂層模組
 from memory import Memory
+from runtime.memory_manager import MemoryManager
 from tools import ToolSystem
 from agents import AgentManager
 from monitor import Monitor
@@ -110,7 +111,7 @@ class Obsidian:
         self.registry = Registry()
 
         # ===== 舊器官初始化 =====
-        self.memory = self.registry.add(Memory(self.base_dir))
+        self.memory = self.registry.add(MemoryManager(self.base_dir))
         self.tools = self.registry.add(ToolSystem(str(self.base_dir / "data" / "tools" / "registry.json")))
         self.agents = self.registry.add(AgentManager(self.base_dir))
         self.models = self.registry.add(ModelCapability(self.base_dir))
@@ -275,6 +276,9 @@ class Obsidian:
         self.world_model = WorldModel(self.base_dir)
         self.system_consciousness = SystemConsciousness(self.base_dir)
         self.evolution_governor = EvolutionGovernor(self.base_dir)
+
+        # ===== 將所有註冊的器官同步到 self.organs（LangGraph 依賴此 dict） =====
+        self.organs = self.registry.all()
 
         # ===== 啟動生命週期狀態機 =====
         self.life_cycle.start()
