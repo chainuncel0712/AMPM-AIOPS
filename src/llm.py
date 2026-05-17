@@ -68,6 +68,37 @@ class LLMClient:
 
         print(f"🤖 {len(self.providers)}層: {' → '.join(p['name'] for p in self.providers)}")
         self.rate_limiter = TokenBucket(rate=int(os.getenv("MAX_API_CALLS_PER_MINUTE", "30")), per_seconds=60)
+        self.preferred_model = None  # None = 自動 fallback，設值後優先使用指定模型
+
+    def list_models(self) -> list:
+        """列出所有可用模型"""
+        return [{"name": p["name"], "model": p["model"]} for p in self.providers]
+
+    def switch_model(self, name: str) -> str:
+        """切換到指定模型
+
+        Args:
+            name: 模型名稱 (大小寫不敏感)，'auto' 恢復自動 fallback
+        Returns:
+            目前使用的模型名稱
+        """
+        if name.lower() == "auto":
+            self.preferred_model = None
+            return "自動 fallback"
+
+        for p in self.providers:
+            if name.lower() in p["name"].lower():
+                self.preferred_model = p["name"]
+                return f"{p['name']} ({p['model']})"
+
+        return f"找不到 {name}，可用: {', '.join(p['name'] for p in self.providers)}"
+
+    def current_model(self) -> str:
+        """取得目前模型"""
+        if self.preferred_model:
+            return self.preferred_model
+        return "auto (fallback: " + " → ".join(p["name"] for p in self.providers) + ")"
+        self.preferred_model = None  # None = 自動 fallback，設值後優先使用指定模型
 
     def call(self, messages, temperature=0.7):
         # ===== Phase 8: runtime guard — 檢查是否經 ContextAssembler =====
@@ -94,7 +125,15 @@ class LLMClient:
         if not safe:
             safe = [{"role": "user", "content": str(messages)}]
 
-        for p in self.providers:
+        # 若有用戶指定模型，優先嘗試
+        ordered_providers = list(self.providers)
+        if self.preferred_model:
+            pref = next((p for p in ordered_providers if p["name"] == self.preferred_model), None)
+            if pref:
+                ordered_providers.remove(pref)
+                ordered_providers.insert(0, pref)
+
+        for p in ordered_providers:
             try:
                 r = requests.post(
                     p["ep"],

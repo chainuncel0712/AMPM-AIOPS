@@ -117,6 +117,21 @@ class Cortex(BaseOrgan):
         
         # 3. 🔥 系統指令直接執行
         sys_cmds = {"硬碟":"df -h","磁碟":"df -h","記憶體":"free -h","cpu":"top -bn1 | head -5","系統":"uname -a"}
+
+        # ===== 模型切換指令 =====
+        if "切換模型" in user_msg or "換模型" in user_msg or "模型" in user_msg:
+            if "有哪些" in user_msg or "列表" in user_msg or "可用" in user_msg:
+                models = self.llm.list_models()
+                lines = "\n".join(f"  {m['name']}: {m['model']}" for m in models)
+                return f"可用模型：\n{lines}\n\n目前使用：{self.llm.current_model()}\n\n輸入「切換到 XXX」來切換。"
+            for kw in ["切換到", "換到", "改用", "換成", "用"]:
+                if kw in user_msg:
+                    name = user_msg.split(kw)[-1].strip().split()[0]
+                    result = self.llm.switch_model(name)
+                    return f"🔄 {result}\n目前模型：{self.llm.current_model()}"
+            if "auto" in user_msg.lower() or "自動" in user_msg:
+                result = self.llm.switch_model("auto")
+                return f"🔄 已恢復自動 fallback 模式"
         for kw, cmd in sys_cmds.items():
             if kw in user_msg:
                 try:

@@ -1,0 +1,50 @@
+[
+  {
+    "id": "33739c46",
+    "pattern": "未识别输入内容",
+    "condition": "当用户输入包含非标准或未知词汇时，AI未能正确识别并直接回应，而未请求澄清或解释。",
+    "rule": "遇到无法识别或理解的输入内容时，应先请求用户澄清或解释该词汇含义，而非直接回应。",
+    "impact": "reduce_hallucination",
+    "confidence": 0.95,
+    "enabled": true,
+    "applied_count": 1,
+    "created_at": "2026-05-17T03:57:11.766354",
+    "last_applied": "2026-05-17T03:57:11.766666"
+  },
+  {
+    "id": "fc4af279",
+    "pattern": "虚假工具调用反馈",
+    "condition": "AI 声称记住或追踪了用户历史信息，但实际未调用任何记忆或检索工具，也未获得相关工具的结果",
+    "rule": "当用户询问历史信息或记忆内容时，若未实际调用记忆/检索工具并获得结果，不得声称已记住、追踪或掌握相关内容，应明确说明当前无法访问或缺乏该信息，并建议用户补充或重新提供细节",
+    "impact": "reduce_hallucination",
+    "confidence": 0.95,
+    "enabled": true,
+    "applied_count": 1,
+    "created_at": "2026-05-17T03:59:09.314906",
+    "last_applied": "2026-05-17T03:59:09.315248"
+  },
+  {
+    "id": "6be9c8af",
+    "pattern": "虚假工具调用声明",
+    "condition": "AI 声称已执行操作或记录任务，但未实际调用任何工具或未提供工具调用结果",
+    "rule": "当用户请求涉及外部操作、数据抓取或任务记录时，AI 必须实际调用相关工具，并在回复中明确展示工具调用的结果或状态；如无法调用工具，应明确说明限制，避免虚假执行声明。",
+    "impact": "reduce_hallucination",
+    "confidence": 0.95,
+    "enabled": true,
+    "applied_count": 1,
+    "created_at": "2026-05-17T04:07:51.176183",
+    "last_applied": "2026-05-17T04:07:51.176542"
+  },
+  {
+    "id": "8cc967d8",
+    "pattern": "虚假工具调用声明",
+    "condition": "AI声称已执行某项操作或获得结果，但实际未调用任何工具或未展示工具调用结果",
+    "rule": "当需要执行操作或获取外部信息时，必须实际调用相应工具，并在回复中明确展示工具调用及其结果；如无法调用工具，应明确说明仅为模拟或假设。",
+    "impact": "reduce_hallucination",
+    "confidence": 0.95,
+    "enabled": true,
+    "applied_count": 1,
+    "created_at": "2026-05-17T04:08:29.798527",
+    "last_applied": "2026-05-17T04:08:29.798918"
+  }
+]
