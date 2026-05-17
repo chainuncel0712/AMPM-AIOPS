@@ -107,18 +107,11 @@ class Cortex(BaseOrgan):
         fw_result = self.firewall.scan(user_msg)
         if not fw_result["allowed"]:
             return f"⛔ {fw_result['reason']}"
-        
-        # 2. 如果 LangGraph 引擎可用，優先使用（保留雙重保險）
-        if self.langgraph:
-            try:
-                return self.langgraph.process(user_msg)
-            except Exception:
-                pass
-        
-        # 3. 🔥 系統指令直接執行
+
+        # ===== 🔥 系統指令 — 必須在 LangGraph 之前執行 =====
         sys_cmds = {"硬碟":"df -h","磁碟":"df -h","記憶體":"free -h","cpu":"top -bn1 | head -5","系統":"uname -a"}
 
-        # ===== 視覺分析指令 =====
+        # 視覺分析
         if "看圖" in user_msg or "分析圖片" in user_msg or "這張圖" in user_msg:
             import re
             url_match = re.search(r'https?://\S+\.(?:jpg|jpeg|png|gif|webp)(?:\?\S*)?', user_msg)
@@ -128,11 +121,11 @@ class Cortex(BaseOrgan):
                 return "🔍 正在分析圖片...\n\n" + self.llm.call_vision(prompt=prompt, image_url=image_url)
             return "請提供圖片網址（例如：看圖 https://example.com/photo.jpg）"
 
-        # ===== 模型擴充指令 (黑曜自主進化) =====
+        # 模型擴充
         if "找模型" in user_msg or "探索模型" in user_msg or "新模型" in user_msg:
             models = self.llm.discover_models(limit=8)
             if models:
-                lines = "\n".join(f"  {m['name']}: {m['id']} (context: {m.get('context_length', '?')})" for m in models)
+                lines = "\n".join(f"  {m['name']}: {m['id']}" for m in models)
                 return f"🔍 找到 {len(models)} 個可用模型：\n{lines}\n\n輸入「加入模型 XXX」來啟用。"
             return "找不到可用模型。檢查 OPENROUTER_API_KEY 是否設定。"
         if "加入模型" in user_msg or "加模型" in user_msg:
@@ -143,19 +136,38 @@ class Cortex(BaseOrgan):
                 result = self.llm.add_openrouter_model(model_id)
                 return f"📡 {result}\n目前共 {len(self.llm.list_models())} 個模型"
             return "請提供模型 ID（例如：加入模型 google/gemini-2.0-flash-001）"
-        if "切換模型" in user_msg or "換模型" in user_msg or "模型" in user_msg:
+
+        # 模型切換
+        if "模型" in user_msg or "切換" in user_msg or "換模型" in user_msg:
             if "有哪些" in user_msg or "列表" in user_msg or "可用" in user_msg:
                 models = self.llm.list_models()
                 lines = "\n".join(f"  {m['name']}: {m['model']}" for m in models)
                 return f"可用模型：\n{lines}\n\n目前使用：{self.llm.current_model()}\n\n輸入「切換到 XXX」來切換。"
-            for kw in ["切換到", "換到", "改用", "換成", "用"]:
+            for kw in ["切換到", "換到", "改用", "換成", "切換成", "用"]:
                 if kw in user_msg:
                     name = user_msg.split(kw)[-1].strip().split()[0]
                     result = self.llm.switch_model(name)
                     return f"🔄 {result}\n目前模型：{self.llm.current_model()}"
+            # 只說「換模型」→ 列出可用模型
+            if "換模型" in user_msg or "切換模型" in user_msg:
+                models = self.llm.list_models()
+                lines = "\n".join(f"  {m['name']}: {m['model']}" for m in models)
+                return f"要切換到哪個？\n{lines}\n\n目前：{self.llm.current_model()}"
             if "auto" in user_msg.lower() or "自動" in user_msg:
                 result = self.llm.switch_model("auto")
-                return f"🔄 已恢復自動 fallback 模式"
+                return f"🔄 已恢復自動 fallback"
+
+        # 語言模型判斷 — "模型" 後面沒指定 → 可能是聊模型話題，不是切換指令
+        # 已在上面的「只說換模型」處理，安全放行到 LangGraph/LLM
+
+        # 2. 如果 LangGraph 引擎可用，優先使用（保留雙重保險）
+        if self.langgraph:
+            try:
+                return self.langgraph.process(user_msg)
+            except Exception:
+                pass
+
+        # 3. 系統指令直接執行 (硬碟、記憶體等)
         for kw, cmd in sys_cmds.items():
             if kw in user_msg:
                 try:

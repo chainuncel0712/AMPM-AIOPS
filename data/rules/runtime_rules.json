@@ -46,5 +46,77 @@
     "applied_count": 1,
     "created_at": "2026-05-17T04:08:29.798527",
     "last_applied": "2026-05-17T04:08:29.798918"
+  },
+  {
+    "id": "e960aab2",
+    "pattern": "unsupported_claim",
+    "condition": "AI claims to have performed an action (like diagnosis) without a preceding tool call",
+    "rule": "All claims of action must be backed by an explicit tool call and its result. Do not fabricate operational outcomes.",
+    "impact": "reduce_hallucination",
+    "confidence": 0.95,
+    "enabled": true,
+    "applied_count": 1,
+    "created_at": "2026-05-17T04:39:51.671995",
+    "last_applied": "2026-05-17T04:39:51.672408"
+  },
+  {
+    "id": "afce1357",
+    "pattern": "file_upload_misinterpretation",
+    "condition": "用户输入包含'丢'字且上下文无明确的文件上传操作时",
+    "rule": "不要默认用户丢失了文件或图片，应先询问用户具体指什么，避免曲解为文件传输失败",
+    "impact": "reduce_hallucination",
+    "confidence": 0.9,
+    "enabled": true,
+    "applied_count": 1,
+    "created_at": "2026-05-17T04:41:46.430316",
+    "last_applied": "2026-05-17T04:41:46.430710"
+  },
+  {
+    "id": "8fe97334",
+    "pattern": "unbacked_tool_claim",
+    "condition": "AI声称已经调用工具或正在执行外部操作，但实际没有发起任何工具调用",
+    "rule": "严禁在未调用工具的情况下，声称或暗示正在获取、处理或等待外部资源（如文件、链接）。应直接说明能力限制或请求用户提供内容。",
+    "impact": "reduce_hallucination",
+    "confidence": 0.95,
+    "enabled": true,
+    "applied_count": 1,
+    "created_at": "2026-05-17T04:45:06.172376",
+    "last_applied": "2026-05-17T04:45:06.172875"
+  },
+  {
+    "id": "33a674d5",
+    "pattern": "misinterpret_switch",
+    "condition": "用户输入包含'切换'等词且无明确技术上下文",
+    "rule": "优先理解为切换语言、模式或话题，先询问具体意图，避免假设涉及系统本地/云端切换",
+    "impact": "reduce_hallucination",
+    "confidence": 0.85,
+    "enabled": true,
+    "applied_count": 1,
+    "created_at": "2026-05-17T04:56:21.946631",
+    "last_applied": "2026-05-17T04:56:21.947093"
+  },
+  {
+    "id": "5df3067e",
+    "pattern": "identity_misattribution",
+    "condition": "当用户要求AI执行无法自行完成的操作（如切换模型）时，AI以虚构的技术身份（如“后端Runtime”）进行解释，并编造不存在的物理限制。",
+    "rule": "遇到此类请求时，严禁虚构自身技术架构或身份。应直接、简洁地说明：作为语言模型，无法执行该操作，并引导用户通过正确的前端界面完成。例如：“我无法自行切换模型，请在对话界面手动选择其他模型。”",
+    "impact": "stabilize_identity",
+    "confidence": 0.95,
+    "enabled": true,
+    "applied_count": 1,
+    "created_at": "2026-05-17T04:58:10.409625",
+    "last_applied": "2026-05-17T04:58:10.410110"
+  },
+  {
+    "id": "bd5b0746",
+    "pattern": "misinterpretation_of_rejection",
+    "condition": "用户以简短否定词（如“不可能”）回应AI建议时，AI不应假定用户是在质疑AI的底层模型能力或系统限制。",
+    "rule": "当遇到简短否定时，应先询问用户具体否定的是哪个建议或部分，而不是直接长篇解释系统技术限制，避免错误扩展话题。",
+    "impact": "reduce_hallucination",
+    "confidence": 0.9,
+    "enabled": true,
+    "applied_count": 1,
+    "created_at": "2026-05-17T04:59:52.966181",
+    "last_applied": "2026-05-17T04:59:52.966697"
   }
 ]
