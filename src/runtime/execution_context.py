@@ -341,7 +341,7 @@ class ExecutionContext:
         if not self.llm:
             sandbox.response = "⚠️ LLM 不可用"
             return sandbox
-        action = sandbox.intent_params.get("action", "list")
+        action = sandbox.intent_params.get("action", "smart")
         if action == "list":
             models = self.llm.list_models()
             lines = "\n".join(f"  {m['name']}: {m['model']}" for m in models)
@@ -351,13 +351,17 @@ class ExecutionContext:
             result = self.llm.switch_model(name)
             sandbox.response = f"🔄 {result}\n目前模型：{self.llm.current_model()}"
         elif action == "smart":
-            task = sandbox.intent_params.get("task_type", "reasoning")
+            task = sandbox.intent_params.get("task_type", "general")
             best = self._pick_best_model(task)
             if best:
-                self.llm.switch_model(best)
-                sandbox.response = f"🧠 已自動切換到最強 {task} 模型：{best}\n目前：{self.llm.current_model()}"
+                current = self.llm.current_model()
+                if best.lower() not in current.lower():
+                    self.llm.switch_model(best)
+                    sandbox.response = f"🧠 已為 {task} 任務切換到 {best}"
+                else:
+                    sandbox.response = f"✅ 已在最適合的模型：{best}"
             else:
-                sandbox.response = "找不到合適模型，目前：" + self.llm.current_model()
+                sandbox.response = f"目前模型：{self.llm.current_model()}"
         elif action == "auto":
             self.llm.switch_model("auto")
             sandbox.response = "🔄 已恢復自動 fallback"
@@ -365,35 +369,42 @@ class ExecutionContext:
         return sandbox
 
     def _pick_best_model(self, task_type: str) -> str:
-        """根據任務類型 + 成本優先級選擇最佳模型
-
-        優先級：免費 API > 付費 API > 本地模型
-        """
         models = self.llm.list_models()
         model_names = [m["name"] for m in models]
 
         def has(name): return any(name.lower() in n.lower() for n in model_names)
 
+        # 推理/複雜任務 → 最強模型
         if task_type == "reasoning":
-            # 1. 免費推理模型優先
-            for name in ["NV-Llama"]:
-                if has(name): return name
-            # 2. 付費高階推理
             for name in ["DeepSeek", "ATXP", "OR-DeepSeek"]:
                 if has(name): return name
-            # 3. 本地
+            if has("NV-Llama"): return "NV-Llama"
             if has("Ollama"): return "Ollama"
 
+        # 圖片分析
         if task_type == "vision":
             for name in ["OR-Gemini"]:
                 if has(name): return name
             for name in ["DeepSeek", "ATXP"]:
                 if has(name): return name
 
-        # 通用：免費優先
-        for name in ["NV-Llama"]:
-            if has(name): return name
+        # 程式碼
+        if task_type == "coding":
+            for name in ["DeepSeek", "NV-Llama", "OR-DeepSeek"]:
+                if has(name): return name
+            if has("Ollama"): return "Ollama"
+
+        # 快速回覆（最便宜/最快）
+        if task_type == "fast":
+            for name in ["NV-Llama", "Ollama"]:
+                if has(name): return name
+            for name in ["DeepSeek", "OR-DeepSeek", "ATXP"]:
+                if has(name): return name
+
+        # 通用：最強優先
         for name in ["DeepSeek", "ATXP", "OR-DeepSeek"]:
+            if has(name): return name
+        for name in ["NV-Llama"]:
             if has(name): return name
         if has("Ollama"): return "Ollama"
         return model_names[0] if model_names else ""
@@ -410,8 +421,14 @@ class ExecutionContext:
             prompt = sandbox.user_msg.replace(image_url, "").strip() or "請描述這張圖片的內容"
             sandbox.response = "🔍 正在分析圖片...\n\n" + self.llm.call_vision(prompt=prompt, image_url=image_url)
             self.tracer.decision(sandbox, "route:vision", "call_vision", image_url[:50])
+        elif self.llm:
+            try:
+                self.llm.switch_model("gemini")
+            except Exception:
+                pass
+            sandbox.response = "👁️ 已切換到視覺模型，目前：{0}\n請提供圖片網址或直接上傳圖片。".format(self.llm.current_model())
         else:
-            sandbox.response = "請提供圖片網址（例如：看圖 https://example.com/photo.jpg）"
+            sandbox.response = "⚠️ LLM 不可用，無法切換視覺模型。"
         return sandbox
 
     def _route_system_cmd(self, sandbox: RequestSandbox) -> RequestSandbox:
@@ -471,31 +488,47 @@ class ExecutionContext:
     # ===== Intent Detection =====
 
     def _is_model_switch(self, msg: str) -> bool:
-        keywords = [
-            "模型", "切換", "換模型", "改用", "換成", "用",
-            "切模型", "思考", "邏輯", "想辦法",
-        ]
-        return any(kw in msg for kw in keywords) and not self._is_vision(msg) and not self._is_system_cmd(msg)
+        # 變數語法：MODEL=xxx 或 model=xxx
+        import re as _re
+        if _re.search(r'(?i)\bmodel\s*=', msg):
+            return True
+        if "模型" not in msg:
+            return False
+        return True
 
     def _parse_model_switch(self, msg: str) -> Dict:
-        # 列出可用模型
-        if any(k in msg for k in ["有哪些", "列表", "可用", "什麼模型", "哪个", "切模型", "換模型"]):
+        import re as _re
+        m = _re.search(r'(?i)\bmodel\s*=\s*(\S+)', msg)
+        if m:
+            return {"action": "switch", "model_name": m.group(1)}
+        if any(k in msg for k in ["有哪些", "列表"]):
             return {"action": "list"}
-        # 自動切換到最強推理模型
-        if any(k in msg for k in ["思考", "邏輯", "想辦法"]):
-            return {"action": "smart", "task_type": "reasoning"}
         if "auto" in msg.lower() or "自動" in msg:
             return {"action": "auto"}
-        for kw in ["切換到", "換到", "改用", "換成", "切換成", "用"]:
+        for kw in ["切換到", "換到", "改用", "換成", "切換成", "切成"]:
             if kw in msg:
                 name = msg.split(kw)[-1].strip().split()[0]
-                if len(name) <= 1 or name in ("什麼", "哪個", "哪", "什麽", "模型"):
-                    continue
-                return {"action": "switch", "model_name": name}
-        return {"action": "list"}
+                if len(name) > 1 and name not in ("什麼", "哪個", "哪", "什麽", "模型"):
+                    return {"action": "switch", "model_name": name}
+        return {"action": "smart", "task_type": "general"}
 
     def _is_vision(self, msg: str) -> bool:
-        return any(kw in msg for kw in ["看圖", "分析圖片", "這張圖"])
+        import re
+        # 有圖片網址 + 視覺相關關鍵字
+        if re.search(r'https?://\S+\.(?:jpg|jpeg|png|gif|webp)(?:\?\S*)?', msg):
+            if any(kw in msg for kw in ["看圖", "分析", "圖片", "這張", "照片"]):
+                return True
+        # 檢查「看圖」在句首且沒有延後意圖
+        if "看圖" in msg:
+            idx = msg.index("看圖")
+            after = msg[idx+2:].strip()
+            if after and any(after.startswith(w) for w in ["先", "等等", "等一下", "稍等", "晚點", "之後"]):
+                return False
+            return True
+        # 其他視覺關鍵字
+        if any(kw in msg for kw in ["分析圖片", "這張圖"]):
+            return True
+        return False
 
     def _parse_vision(self, msg: str) -> Dict:
         import re

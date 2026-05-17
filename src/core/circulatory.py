@@ -527,6 +527,11 @@ def start_health_loop(brain, interval_seconds: int = 300):
                 cycle_result = evolution.run_cycle()
                 print(f"  {cycle_result}\n")
 
+                try:
+                    from core.agent_supervisor import supervisor
+                    supervisor.heartbeat("circulatory")
+                except Exception:
+                    pass
             except Exception as e:
                 print(f"[循環系統] 檢查失敗: {e}")
 
@@ -534,3 +539,9 @@ def start_health_loop(brain, interval_seconds: int = 300):
 
     t = threading.Thread(target=_loop, daemon=True)
     t.start()
+    try:
+        from core.agent_supervisor import supervisor
+        supervisor.register("circulatory", thread=t, hb_interval=interval_seconds,
+                            hb_timeout=interval_seconds*2, is_restartable=False)
+    except Exception:
+        pass

@@ -11,6 +11,12 @@ from datetime import datetime
 from runtime.context.persona_builder import RUNTIME_IDENTITY, RUNTIME_RULES
 from typing import Dict, List, Optional
 
+
+try:
+    from core.agent_supervisor import supervisor
+except Exception:
+    supervisor = None
+
 class NoseSystem:
     def __init__(self, base_dir: Path, call_ai_func=None, memory=None):
         self.base_dir = Path(base_dir)
@@ -43,13 +49,20 @@ class NoseSystem:
     
     def start(self):
         """啟動嗅覺循環"""
-        threading.Thread(target=self._sniff_loop, daemon=True).start()
+        t = threading.Thread(target=self._sniff_loop, daemon=True)
+        t.start()
+        if supervisor:
+            supervisor.register("nose", thread=t, hb_interval=120,
+                                hb_timeout=300, is_restartable=False,
+                                is_critical=False)
         print("👃 嗅覺系統已啟動")
     
     def _sniff_loop(self):
         """嗅覺循環 - 持續偵測"""
         while self.sniffing:
             try:
+                if supervisor:
+                    supervisor.heartbeat("nose")
                 # 每 5 分鐘偵測一次
                 time.sleep(60)
                 

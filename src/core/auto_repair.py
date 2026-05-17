@@ -1,6 +1,7 @@
 """自我修復系統 - 定時檢查器官並自動修復"""
 import threading
 import time
+from core.agent_supervisor import supervisor
 
 
 def start_auto_repair(brain, interval_seconds: int = 600):
@@ -33,6 +34,7 @@ def start_auto_repair(brain, interval_seconds: int = 600):
                             print(f"  修復結果: {result}")
                         except Exception as e:
                             print(f"  修復失敗: {e}")
+                supervisor.heartbeat("auto_repair")
             except Exception as e:
                 print(f"[自動修復] 檢查失敗: {e}")
 
@@ -40,3 +42,5 @@ def start_auto_repair(brain, interval_seconds: int = 600):
 
     t = threading.Thread(target=_loop, daemon=True)
     t.start()
+    supervisor.register("auto_repair", thread=t, hb_interval=interval_seconds,
+                        hb_timeout=interval_seconds*2, is_restartable=False)

@@ -6,6 +6,11 @@ import threading
 from datetime import datetime
 from typing import Dict
 
+try:
+    from core.agent_supervisor import supervisor
+except Exception:
+    supervisor = None
+
 class BreathSystem:
     def __init__(self, call_ai_func=None):
         self.call_ai_func = call_ai_func
@@ -34,12 +39,19 @@ class BreathSystem:
             self.max_api_calls_per_minute = 30
 
     def start(self):
-        threading.Thread(target=self._breathe_loop, daemon=True).start()
+        t = threading.Thread(target=self._breathe_loop, daemon=True)
+        t.start()
+        if supervisor:
+            supervisor.register("breath", thread=t, hb_interval=30,
+                                hb_timeout=120, is_restartable=False,
+                                is_critical=False)
         print("🌬️ 智慧呼吸系統已啟動")
 
     def _breathe_loop(self):
         while self.breathing:
             try:
+                if supervisor:
+                    supervisor.heartbeat("breath")
                 now = datetime.now()
                 if (now - self.last_reset).seconds >= 60:
                     self.api_calls_this_minute = 0

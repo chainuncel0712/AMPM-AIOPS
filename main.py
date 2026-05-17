@@ -49,6 +49,18 @@ def print_header(text):
     print("=" * 60)
 
 def main():
+    # ── 設定行程群組（避免孤兒殭屍） ──
+    try:
+        import os as _os
+        _os.setpgid(0, 0)
+        print("  [🔗] 行程群組已設定")
+    except Exception:
+        pass
+    
+    # ── 啟動 AgentSupervisor ──
+    from core.agent_supervisor import supervisor
+    supervisor.start()
+    
     print_header("🛡️ 黑曜神經防護網 v3")
     print()
     
@@ -203,6 +215,8 @@ def main():
     try:
         from core.circulatory import start_health_loop
         start_health_loop(obsidian, interval_seconds=300)
+        supervisor.register("circulatory", hb_interval=300, hb_timeout=600,
+                            is_restartable=False, is_critical=True)
         print("  [✅] 健康循環系統已啟動 (每 5 分鐘檢查一次)")
     except Exception as e:
         print(f"  [❌] 健康循環系統啟動失敗: {e}")
@@ -218,6 +232,8 @@ def main():
     try:
         from core.auto_repair import start_auto_repair
         start_auto_repair(obsidian, interval_seconds=600)
+        supervisor.register("auto_repair", hb_interval=600, hb_timeout=1200,
+                            is_restartable=False, is_critical=True)
         print("  [✅] 自我修復系統已啟動 (每 10 分鐘檢查一次)")
     except Exception as e:
         print(f"  [❌] 自我修復系統啟動失敗: {e}")
@@ -238,6 +254,8 @@ def main():
             app.run(host="127.0.0.1", port=port, debug=False, use_reloader=False)
         t = threading.Thread(target=run_dash, daemon=True)
         t.start()
+        supervisor.register("dashboard", thread=t, hb_interval=60,
+                            is_restartable=False, is_critical=False)
         print(f"  [✅] 科技感儀表板: http://127.0.0.1:{port}")
     except Exception as e:
         print(f"  [❌] 科技感儀表板啟動失敗: {e}")
@@ -292,10 +310,20 @@ def main():
     print("🤖 步驟 3/3: 啟動 Bot...")
     _sys.stdout.flush()
     
+    # ── 建立 ExecutionContext（用於 model switching / vision / system cmd） ──
+    try:
+        from runtime.execution_context import ExecutionContext
+        obsidian.execution_context = ExecutionContext(obsidian)
+        print("  [✅] ExecutionContext 已就緒")
+    except Exception as e:
+        print(f"  [⚠️] ExecutionContext 初始化失敗: {e}")
+        obsidian.execution_context = None
+    
     try:
         from telegram.ext import Application, CommandHandler, MessageHandler, filters
         
         async def handle(update, context):
+            supervisor.heartbeat("bot")
             msg = update.message.text
             import sys as _sys
             _sys.stdout.write(f"[Bot] 收到訊息: {msg[:100]}\n")
@@ -307,22 +335,44 @@ def main():
             _sys.stdout.write(f"[Bot] 除錯: langgraph={obsidian.langgraph is not None}, cortex={obsidian.cortex is not None}, llm={obsidian.llm is not None}\n")
             _sys.stdout.flush()
             try:
-                # 優先透過 LangGraph 引擎處理
-                if obsidian.langgraph and hasattr(obsidian.langgraph, 'process'):
-                    _sys.stdout.write(f"[Bot] 使用 LangGraph 引擎\n")
-                    _sys.stdout.flush()
-                    # 檢查 LLM 是否可用
-                    agent = getattr(obsidian.langgraph, 'agent', None)
-                    if agent:
-                        llm = agent.get('llm')
-                        _sys.stdout.write(f"[Bot] LLM 狀態: {llm is not None}\n")
-                    reply = obsidian.langgraph.process(msg)
-                elif hasattr(obsidian, 'cortex') and obsidian.cortex and hasattr(obsidian.cortex, 'think'):
-                    _sys.stdout.write(f"[Bot] 使用 Cortex 引擎\n")
-                    reply = obsidian.cortex.think(msg)
-                else:
-                    _sys.stdout.write(f"[Bot] 無可用引擎\n")
-                    reply = "🤔 我目前無法處理這個請求，因為思考引擎尚未初始化。"
+                try:
+                    # ── 先檢查 ExecutionContext 特殊意圖（模型切換/看圖/系統指令） ──
+                    ec = getattr(obsidian, 'execution_context', None)
+                    from runtime.execution_context import RequestSandbox
+                    check_sandbox = RequestSandbox(user_msg=msg)
+                    if ec:
+                        ec._phase_intent(check_sandbox)
+                        if check_sandbox.intent_type != "chat":
+                            _sys.stdout.write(f"[Bot] 使用 ExecutionContext ({check_sandbox.intent_type})\n")
+                            _sys.stdout.flush()
+                            reply = ec.handle(msg)
+                            _sys.stdout.write(f"[Bot] EC 回覆: {reply[:100] if reply else 'empty'}\n")
+                            _sys.stdout.flush()
+                        else:
+                            raise StopIteration("fallthrough")
+                    else:
+                        raise StopIteration("fallthrough")
+                except StopIteration:
+                    # fallthrough: 走原本 langgraph / cortex 路徑
+                    try:
+                        if obsidian.langgraph and hasattr(obsidian.langgraph, 'process'):
+                            _sys.stdout.write(f"[Bot] 使用 LangGraph 引擎\n")
+                            _sys.stdout.flush()
+                            agent = getattr(obsidian.langgraph, 'agent', None)
+                            if agent:
+                                llm = agent.get('llm')
+                                _sys.stdout.write(f"[Bot] LLM 狀態: {llm is not None}\n")
+                            reply = obsidian.langgraph.process(msg)
+                        elif hasattr(obsidian, 'cortex') and obsidian.cortex and hasattr(obsidian.cortex, 'think'):
+                            _sys.stdout.write(f"[Bot] 使用 Cortex 引擎\n")
+                            reply = obsidian.cortex.think(msg)
+                        else:
+                            _sys.stdout.write(f"[Bot] 無可用引擎\n")
+                            reply = "🤔 我目前無法處理這個請求，因為思考引擎尚未初始化。"
+                    except Exception as e:
+                        _sys.stdout.write(f"[Bot] 引擎錯誤: {e}\n")
+                        reply = f"⚠️ {translate_error(e)}"
+
                 _sys.stdout.write(f"[Bot] 回覆: {reply[:100]}\n")
                 _sys.stdout.flush()
                 # 長訊息分段發送
@@ -372,6 +422,8 @@ def main():
         app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle))
         
         print("  [✅] Bot 已啟動")
+        supervisor.register("bot", hb_interval=30, hb_timeout=120,
+                            is_restartable=False, is_critical=True)
         print()
         print_header("🎉 黑曜啟動完成，所有系統就緒")
         
