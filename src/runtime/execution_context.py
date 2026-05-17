@@ -353,15 +353,22 @@ class ExecutionContext:
         elif action == "smart":
             task = sandbox.intent_params.get("task_type", "general")
             best = self._pick_best_model(task)
+            current = self.llm.current_model()
             if best:
-                current = self.llm.current_model()
-                if best.lower() not in current.lower():
-                    self.llm.switch_model(best)
-                    sandbox.response = f"🧠 已為 {task} 任務切換到 {best}"
+                # 精準比對：只比較模型系列關鍵字，不分大小寫
+                best_key = best.lower().replace("-", "").replace("_", "").replace(" ", "")
+                curr_key = current.lower().replace("-", "").replace("_", "").replace(" ", "")
+                if best_key not in curr_key:
+                    result = self.llm.switch_model(best)
+                    sandbox.response = f"🧠 已為{task}任務切換 → {result}\n目前：{self.llm.current_model()}"
                 else:
-                    sandbox.response = f"✅ 已在最適合的模型：{best}"
+                    # 已在最佳模型，顯示目前模型資訊
+                    models = self.llm.list_models()
+                    alternatives = [m['name'] for m in models if m['name'].lower() != best_key][:3]
+                    alt_str = "、".join(alternatives) if alternatives else "無"
+                    sandbox.response = f"🧠 目前 {self.llm.current_model()}\n任務類型：{task} | 可用替代：{alt_str}\n輸入「切換到 XXX」改用其他模型"
             else:
-                sandbox.response = f"目前模型：{self.llm.current_model()}"
+                sandbox.response = f"目前模型：{self.llm.current_model()}\n（無可用替代）"
         elif action == "auto":
             self.llm.switch_model("auto")
             sandbox.response = "🔄 已恢復自動 fallback"
