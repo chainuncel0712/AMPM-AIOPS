@@ -391,6 +391,27 @@ def main():
                         _sys.stdout.write(f"[Bot] 引擎錯誤: {e}\n")
                         reply = f"⚠️ {translate_error(e)}"
 
+                # ── 子代理任務觸發：掃描使用者訊息，自動開 mission ──
+                try:
+                    agents = getattr(obsidian, 'agents', None)
+                    if agents and hasattr(agents, 'launch_mission'):
+                        mission_id = agents.launch_mission(msg)
+                        if mission_id:
+                            _sys.stdout.write(f"[Bot] 🚀 子代理任務已啟動: {mission_id}\n")
+                            reply += "\n\n[後台任務已啟動，完成後通知你]"
+                except Exception as e:
+                    _sys.stdout.write(f"[Bot] 代理任務失敗: {e}\n")
+
+                # ── 掃描回覆中的承諾，自動執行 ──
+                try:
+                    agents = getattr(obsidian, 'agents', None)
+                    if agents and hasattr(agents, 'scan_and_execute_promises') and reply:
+                        extra = agents.scan_and_execute_promises(reply)
+                        if extra:
+                            reply += extra
+                except Exception:
+                    pass
+
                 _sys.stdout.write(f"[Bot] 回覆: {reply[:100]}\n")
                 _sys.stdout.flush()
                 # 長訊息分段發送
