@@ -373,12 +373,46 @@ class AgentTaskRouter(BaseOrgan):
 
     def route_all_pending(self) -> int:
         count = 0
-        active = sum(1 for a in self._agents.values() if a["status"] == "busy")
-        slots = 20 - active
+        idle = sum(1 for a in self._agents.values() if a["status"] == "idle")
+        pending = sum(1 for t in self._task_queue if t["status"] == "pending")
+        slots = 20 - sum(1 for a in self._agents.values() if a["status"] == "busy")
         for task in [t for t in self._task_queue if t["status"] == "pending"][:slots]:
             if self.route_task(task["id"]):
                 count += 1
+        # 自動擴容：任務還在排隊但沒人接 → 生新代理
+        still_pending = sum(1 for t in self._task_queue if t["status"] == "pending")
+        if still_pending > 0 and idle == 0:
+            self._auto_scale(still_pending)
         return count
+
+    def _auto_scale(self, pending_count: int):
+        expanded = set()
+        for task in [t for t in self._task_queue if t["status"] == "pending"]:
+            skills = task.get("required_skills", [])
+            dept_name = None
+            for s in skills:
+                for dn, d in self._departments.items():
+                    d_role = d.get("role", "")
+                    if d_role == s or s in d_role or d_role in s:
+                        dept_name = dn
+                        break
+                if dept_name:
+                    break
+            if not dept_name:
+                dept_name = "general_pool"
+            if dept_name in expanded:
+                continue
+            expanded.add(dept_name)
+            dept = self._departments[dept_name]
+            dept["target_count"] += 1
+            agent = self.create_agent(
+                name=f"{dept_name}_{dept['target_count']}",
+                role=dept["role"],
+            )
+            if agent:
+                dept["agent_ids"].append(agent["id"])
+                self._grant_template_skills(agent)
+                print(f"[AgentCompany] 🔧 自動擴容: {agent['name']} x{dept['target_count']} ({agent['role']}) pending={pending_count}")
 
     def _find_best_agent(self, task: Dict) -> Optional[str]:
         best, best_score = None, -1
@@ -396,6 +430,28 @@ class AgentTaskRouter(BaseOrgan):
                 best_score = score
                 best = aid
         return best
+
+    def _grant_template_skills(self, agent: Dict):
+        role = agent.get("role", "")
+        template = AGENT_TEMPLATES.get(role, {})
+        skills = template.get("capabilities", [role])
+        agent["capabilities"] = set(skills)
+        agent["tools"] = list(template.get("tools", []))
+        for cap in skills:
+            reg = self._skill_registry.setdefault(cap, {"source": "system", "agents": set()})
+            reg.setdefault("agents", set()).add(agent["id"])
+        agent["memory_quota"] = 200
+        agent["persist"] = True
+        agent["specialty"] = role
+        if self._brain and hasattr(self._brain, 'memory') and self._brain.memory:
+            try:
+                self._brain.memory.write(
+                    key=f"agent:{agent['id']}:born",
+                    content=f"新代理 {agent['name']} ({role}) 已生成，技能: {skills}",
+                    layer="episodic", importance=0.3
+                )
+            except Exception:
+                pass
 
     # ═══════════════════════════════════════════════════════
     # Task Completion (任務回報)
@@ -434,6 +490,9 @@ class AgentTaskRouter(BaseOrgan):
                 self._check_mission_complete(mission_id)
             self._save_state()
 
+            # 回饋：代理學到的東西寫回黑曜記憶
+            self._feedback_to_brain(task, agent_id, success, result)
+
     def _check_mission_complete(self, mission_id: str):
         m = self._missions.get(mission_id)
         if not m:
@@ -443,6 +502,43 @@ class AgentTaskRouter(BaseOrgan):
         if done >= total:
             m["status"] = "completed"
             m["completed_at"] = time.time()
+            # 回饋：整個 mission 完成，總結寫回黑曜記憶
+            self._feedback_mission_summary(m)
+
+    def _feedback_to_brain(self, task: Dict, agent_id: str, success: bool, result: Any):
+        if not (self._brain and hasattr(self._brain, 'memory') and self._brain.memory):
+            return
+        try:
+            agent = self._agents.get(agent_id, {})
+            summary = str(result)[:300] if result else ""
+            mem = self._brain.memory
+            mem.write(
+                key=f"sub_agent:{agent.get('name', agent_id)}:{task['id']}",
+                content=f"[{'成功' if success else '失敗'}] {task.get('description','')[:100]} → {summary}",
+                layer="episodic", importance=0.4 if success else 0.2
+            )
+        except Exception:
+            pass
+
+    def _feedback_mission_summary(self, mission: Dict):
+        if not (self._brain and hasattr(self._brain, 'memory') and self._brain.memory):
+            return
+        try:
+            results = mission.get("results", {})
+            success_count = sum(1 for r in results.values() if r.get("success"))
+            total = len(mission.get("sub_tasks", []))
+            combined = "; ".join(
+                r.get("result", "")[:80] for r in results.values() if r.get("success")
+            )[:500]
+            mem = self._brain.memory
+            mem.write(
+                key=f"mission:{mission['id']}:done",
+                content=f"任務完成 ({success_count}/{total}): {mission.get('description','')[:80]} → {combined}",
+                layer="episodic", importance=0.5
+            )
+            print(f"[AgentCompany] 🧠 回饋黑曜記憶: mission {mission['id']} ({success_count}/{total})")
+        except Exception:
+            pass
 
     def get_mission(self, mission_id: str) -> Optional[Dict]:
         m = self._missions.get(mission_id)
