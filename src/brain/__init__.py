@@ -181,10 +181,11 @@ class Obsidian:
         self.context_assembler = ContextAssembler(
             persona_organ=self.persona,
             memory_organ=self.memory,
+            episodic_memory=self.memory,
             compass_organ=self.compass,
             llm_call=self._call_ai,
             runtime_update=self.runtime_update,
-            max_conversation_turns=10,
+            max_conversation_turns=20,
         )
         self.critic = Critic()
         self.learning_engine = LearningEngine(
