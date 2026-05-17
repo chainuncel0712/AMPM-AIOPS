@@ -3,11 +3,12 @@ from skeleton.base_organ import BaseOrgan
 from datetime import datetime  # 導入 datetime 用於時間戳記
 
 class SelfRepair(BaseOrgan):
-    def __init__(self, llm_client, persona, compass):
+    def __init__(self, llm_client, persona, compass, context_assembler=None):
         super().__init__("self_repair")
         self.llm = llm_client
         self.persona = persona
         self.compass = compass
+        self.context_assembler = context_assembler
         
         # ===== 新增：被動觸發機制狀態 =====
         self.repair_count = 0  # 修復次數
@@ -50,12 +51,20 @@ class SelfRepair(BaseOrgan):
 4. 用繁體中文，語氣專業
 """
         try:
-            persona_prompt = self.persona.system_prompt() if self.persona else ""
-            direction = self.compass.get_system_prompt() if self.compass else ""
-            messages = [
-                {"role": "system", "content": f"{persona_prompt}\n{direction}"},
-                {"role": "user", "content": repair_prompt}
-            ]
+            if self.context_assembler:
+                system_messages = self.context_assembler.get_system_context(
+                    task_hint="你正在自我修正：審查你的上一個回覆並重新生成更好的版本。"
+                )
+                messages = system_messages + [
+                    {"role": "user", "content": repair_prompt}
+                ]
+            else:
+                persona_prompt = self.persona.system_prompt() if self.persona else ""
+                direction = self.compass.get_system_prompt() if self.compass else ""
+                messages = [
+                    {"role": "system", "content": f"{persona_prompt}\n{direction}"},
+                    {"role": "user", "content": repair_prompt}
+                ]
             repaired = self.llm.call(messages)
             
             # ===== 新增：記錄修復結果 =====

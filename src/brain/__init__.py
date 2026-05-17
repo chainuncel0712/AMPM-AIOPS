@@ -91,6 +91,14 @@ from runtime import LifeCycleManager
 # Meta 層 — 世界模型
 from meta import WorldModel, SystemConsciousness, EvolutionGovernor
 
+# Context + Memory + Learning 三層整合
+from runtime.context import ContextAssembler
+from runtime.rule_store import RuleStore
+from runtime.update_runtime import RuntimeUpdate
+from brain.critic import Critic
+from brain.learning_engine import LearningEngine
+from brain.evolution_engine import EvolutionEngine
+
 
 class Obsidian:
     def __init__(self):
@@ -151,9 +159,40 @@ class Obsidian:
         
         # ===== 介面層 =====
         self.persona = self.registry.add(Persona())
+
+        # ==================================================================
+        # Context + Memory + Learning 三層整合 (Persistent Consciousness)
+        # 必須在 Cortex 之前初始化，因為 Cortex 需要引用 context_assembler
+        # ==================================================================
+        self.rule_store = RuleStore()
+        self.runtime_update = RuntimeUpdate(rule_store=self.rule_store)
+        self.context_assembler = ContextAssembler(
+            persona_organ=self.persona,
+            memory_organ=self.memory,
+            compass_organ=self.compass,
+            llm_call=self._call_ai,
+            runtime_update=self.runtime_update,
+            max_conversation_turns=10,
+        )
+        self.critic = Critic()
+        self.learning_engine = LearningEngine(
+            llm_call=self._call_ai,
+            rule_store=self.rule_store,
+            runtime_update=self.runtime_update,
+        )
+        self.evolution_engine = EvolutionEngine()
+        print("🧠 Context Layer (組裝器 + 記憶選擇器): 就緒")
+        print("📏 Critic + Learning Engine + Rule Store: 就緒")
+        print("🔄 Evolution Engine + Runtime Update: 就緒")
+
         self.cortex = self.registry.add(Cortex(
             self.llm, self.memory, self.compass, self.decisions, self.tasks,
-            self.muscle, self.registry, self.persona, self.contradiction, self.life_cycle
+            self.muscle, self.registry, self.persona, self.contradiction, self.life_cycle,
+            context_assembler=self.context_assembler,
+            critic=self.critic,
+            learning_engine=self.learning_engine,
+            evolution_engine=self.evolution_engine,
+            runtime_update=self.runtime_update,
         ))
         self.wardrobe = self.registry.add(Wardrobe())
         self.face = self.registry.add(Face())

@@ -10,3 +10,6 @@ data/vector_store/
 memory_db/
 data/snapshots/
 backup/
+structure.txt
+src/data/
+src/brain/learning_loop.py

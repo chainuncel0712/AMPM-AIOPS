@@ -17,7 +17,7 @@ import subprocess
 from datetime import datetime  # 導入 datetime 用於時間戳記
 
 class Cortex(BaseOrgan):
-    def __init__(self, llm_client, memory, compass, decisions, tasks, executor, registry, persona, contradiction, life_cycle=None):
+    def __init__(self, llm_client, memory, compass, decisions, tasks, executor, registry, persona, contradiction, life_cycle=None, context_assembler=None, critic=None, learning_engine=None, evolution_engine=None, runtime_update=None):
         super().__init__("cortex")
         self.llm = llm_client
         self.memory = memory
@@ -29,12 +29,17 @@ class Cortex(BaseOrgan):
         self.persona = persona
         self.contradiction = contradiction
         self.life_cycle = life_cycle
+        self.context_assembler = context_assembler
+        self.critic = critic
+        self.learning_engine = learning_engine
+        self.evolution_engine = evolution_engine
+        self.runtime_update = runtime_update
         self.firewall = Firewall()
         self.breaker = Breaker()
         self.eye = Eye()
         self.eye.init()
         self.reviewer = SelfReview(llm_client, contradiction)
-        self.repairer = SelfRepair(llm_client, persona, compass)
+        self.repairer = SelfRepair(llm_client, persona, compass, context_assembler=context_assembler)
         # 稍後由外部注入 langgraph 引擎
         self.langgraph = None
         
@@ -42,6 +47,7 @@ class Cortex(BaseOrgan):
         self.last_user_msg = None  # 上一次的使用者訊息
         self.last_assistant_reply = None  # 上一次的助理回覆
         self.conversation_count = 0  # 對話計數器
+        self.learning_counter = 0  # 每 N 次对话触发一次进化
     
     def think(self, user_msg: str) -> str:
         """思考介面：優先使用 LangGraph 引擎"""
@@ -163,39 +169,86 @@ class Cortex(BaseOrgan):
             except:
                 pass
         
-        # 5. 呼叫 LLM
-        persona_prompt = self.persona.system_prompt() if hasattr(self.persona, 'system_prompt') else ""
-        direction = self.compass.get_system_prompt() if hasattr(self.compass, 'get_system_prompt') else ""
-        
-        # 從記憶中取出相關事實
-        memory_context = ""
-        try:
-            recent_facts = self.memory.get_important_facts(min_importance=0.5)
-            if recent_facts:
-                facts_str = "\n".join(f"- {k}" for k in recent_facts.keys())
-                memory_context = f"\n\n## 你記得的事實\n{facts_str}"
-            
-            recent_conversations = self.memory.get_recent_conversations(limit=5)
-            if recent_conversations:
-                conv_str = "\n".join(f"使用者: {c['user']}\n你: {c['assistant']}" for c in recent_conversations)
-                memory_context += f"\n\n## 最近對話\n{conv_str}"
-        except Exception as e:
-            print(f"⚠️ 讀取記憶失敗: {e}")
-        
-        prompt = f"{persona_prompt}\n\n{direction}\n\n{memory_context}"
-        if search_result:
-            prompt += f"\n\n🔍 搜尋結果：\n{search_result}"
-        
-        messages = [
-            {"role": "system", "content": prompt},
-            {"role": "user", "content": user_msg}
-        ]
-        
+        # 5. 呼叫 LLM — 使用 ContextAssembler（如果可用）
+        if self.context_assembler:
+            extra_system = ""
+            if search_result:
+                extra_system = f"🔍 搜尋結果：\n{search_result}"
+            if self.learning_engine:
+                rules_context = self.learning_engine.get_rules_context()
+                if rules_context:
+                    extra_system = f"{extra_system}\n\n{rules_context}" if extra_system else rules_context
+            messages = self.context_assembler.assemble(
+                user_msg=user_msg,
+                extra_system=extra_system or None,
+            )
+        else:
+            # 舊版 inline prompt 組裝（fallback）
+            persona_prompt = self.persona.system_prompt() if hasattr(self.persona, 'system_prompt') else ""
+            direction = self.compass.get_system_prompt() if hasattr(self.compass, 'get_system_prompt') else ""
+            memory_context = ""
+            try:
+                recent_facts = self.memory.get_important_facts(min_importance=0.5)
+                if recent_facts:
+                    facts_str = "\n".join(f"- {k}" for k in recent_facts.keys())
+                    memory_context = f"\n\n## 你記得的事實\n{facts_str}"
+                recent_conversations = self.memory.get_recent_conversations(limit=5)
+                if recent_conversations:
+                    conv_str = "\n".join(f"使用者: {c['user']}\n你: {c['assistant']}" for c in recent_conversations)
+                    memory_context += f"\n\n## 最近對話\n{conv_str}"
+            except Exception as e:
+                print(f"⚠️ 讀取記憶失敗: {e}")
+            prompt = f"{persona_prompt}\n\n{direction}\n\n{memory_context}"
+            if search_result:
+                prompt += f"\n\n🔍 搜尋結果：\n{search_result}"
+            messages = [
+                {"role": "system", "content": prompt},
+                {"role": "user", "content": user_msg}
+            ]
+
         # 呼叫 LLM 取得回覆
         reply = self.llm.call(messages)
+
+        # ===== Critic + Learning 閉環 =====
+        if self.critic:
+            critic_result = self.critic.evaluate(
+                user_msg=user_msg,
+                assistant_msg=reply or "",
+            )
+            if self.learning_engine:
+                self.learning_engine.learn(
+                    critic_result=critic_result.to_dict(),
+                    user_msg=user_msg,
+                    assistant_msg=reply or "",
+                )
+            # 每 10 次对话触发进化
+            self.learning_counter += 1
+            if self.learning_counter >= 10 and self.evolution_engine:
+                self.learning_counter = 0
+                evolution_result = self.evolution_engine.evolve(
+                    self.learning_engine.history
+                )
+                if evolution_result.get("mutated"):
+                    self.runtime_update.apply_evolution(
+                        memory_weights=evolution_result.get("memory_weights"),
+                        tool_priorities=evolution_result.get("tool_priorities"),
+                        planner_strategies=evolution_result.get("planner_strategies"),
+                    )
+
+        # ===== 記錄到 ConversationWindow + 分類寫入記憶 =====
+        if self.context_assembler:
+            self.context_assembler.record_response(
+                assistant_msg=reply or "",
+                user_msg=user_msg,
+            )
+            self.context_assembler.write_memory(
+                user_msg=user_msg,
+                assistant_msg=reply or "",
+            )
         
-        # ===== 對話後自動記憶 =====
-        self._auto_remember_after(user_msg, reply)
+        # ===== 對話後自動記憶（舊路徑，context_assembler 存在時不跑）=====
+        if not self.context_assembler:
+            self._auto_remember_after(user_msg, reply)
         
         # ===== 將結果寫入狀態機 Context，供 REFLECT/LEARN 狀態使用 =====
         if self.life_cycle:
@@ -350,10 +403,19 @@ class Cortex(BaseOrgan):
                 """
                 
                 try:
-                    reflection_response = self.llm.call([
-                        {"role": "system", "content": "你是一個矛盾分析專家"},
-                        {"role": "user", "content": reflection_prompt}
-                    ])
+                    if self.context_assembler:
+                        system_messages = self.context_assembler.get_system_context(
+                            task_hint="你正在進行矛盾反省：檢查你的回覆是否與記憶中的資訊有衝突。"
+                        )
+                        messages = system_messages + [
+                            {"role": "user", "content": reflection_prompt}
+                        ]
+                    else:
+                        messages = [
+                            {"role": "system", "content": "你是一個矛盾分析專家"},
+                            {"role": "user", "content": reflection_prompt}
+                        ]
+                    reflection_response = self.llm.call(messages)
                     
                     import json
                     import re
