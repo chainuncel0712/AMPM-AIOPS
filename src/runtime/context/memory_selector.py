@@ -132,11 +132,19 @@ class MemorySelector:
 
         if self.episodic_memory:
             try:
-                query_tags = query.split()[:3] if query else []
+                # 高重要性事件直接撈，不靠 tag
                 episodes = self.episodic_memory.recall_by_tags(
-                    query_tags + ["conversation", "task"], limit=10
+                    ["任務", "important", "user"], limit=20
                 )
-                for e in episodes:
+                # 也試 query 關鍵字
+                query_tags = (query or "").split()[:5] + ["任務", "重要"]
+                extra = self.episodic_memory.recall_by_tags(query_tags, limit=10)
+                seen = {id(e): True for e in episodes}
+                for e in extra:
+                    if id(e) not in seen:
+                        episodes.append(e)
+                        seen[id(e)] = True
+                for e in episodes[-15:]:
                     e["_source"] = "episodic"
                     candidates.append(e)
             except Exception:
