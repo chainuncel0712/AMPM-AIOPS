@@ -86,9 +86,8 @@ class MemoryManager:
             if len(self.working) > self.max_working:
                 self._compress_working()
 
-            # Layer 2: semantic — 僅高重要性才自動寫入（門檻 0.85）
-            # 防止 casual chat / tool output / planner state 污染長期記憶
-            if importance >= 0.85:
+            # Layer 2: semantic — 重要訊息寫入長期記憶（門檻 0.4）
+            if importance >= 0.4:
                 self._write_semantic(user_msg, assistant_msg, importance, ts)
 
             # Layer 3: episodic — 含事件關鍵字寫入
