@@ -9,10 +9,11 @@ MemoryManager — 統一三層記憶引擎
   Layer 2: semantic  — 重要事實/任務/知識 (500 條)
   Layer 3: episodic  — 事件記錄 (500 條)
 
-寫入規則：
-  - 永遠寫 working
-  - 重要性 >= 0.6 → 同步寫 semantic
-  - 含事件關鍵字 → 寫 episodic
+寫入規則（Write Policy）：
+  - working：永遠寫（短期緩衝）
+  - semantic：僅當 importance >= 0.85 或透過 remember_fact() 手動寫入
+  - episodic：含事件關鍵字才寫
+  - 禁止 working 自動升級到 semantic（防止 noise 污染長期記憶）
 
 檢索規則：
   - 關鍵字搜 semantic（含重要性門檻）
@@ -76,6 +77,7 @@ class MemoryManager:
             "assistant": assistant_msg[:2000] if assistant_msg else "",
             "time": ts,
             "importance": importance,
+            "source": "conversation",
         }
 
         with self._lock:
@@ -84,8 +86,9 @@ class MemoryManager:
             if len(self.working) > self.max_working:
                 self._compress_working()
 
-            # Layer 2: semantic — 中高重要性寫入
-            if importance >= 0.6:
+            # Layer 2: semantic — 僅高重要性才自動寫入（門檻 0.85）
+            # 防止 casual chat / tool output / planner state 污染長期記憶
+            if importance >= 0.85:
                 self._write_semantic(user_msg, assistant_msg, importance, ts)
 
             # Layer 3: episodic — 含事件關鍵字寫入
