@@ -26,6 +26,7 @@ class Assembler:
         self.base_dir = base_dir
         self.organs: Dict[str, Any] = {}
         self.instantiated_organs: Dict[str, Any] = {}
+        self._loaded_organs: List[tuple] = []
         self.link_map: Dict[str, List[str]] = {}
 
     def load_link_map(self):
@@ -195,11 +196,93 @@ class Assembler:
                     display_name = organ_display_names.get(organ_name, (organ_name, ""))
                     if isinstance(display_name, tuple):
                         name_cn, desc = display_name
-                        print(f"  [✅] {name_cn} — {desc}")
                     else:
-                        print(f"  [✅] 載入 {display_name} ({obj.__name__})")
+                        name_cn = display_name
+                        desc = ""
+                    self.instantiated_organs[organ_name] = instance
+                    self._loaded_organs.append((organ_name, name_cn, desc, obj.__name__))
                 except Exception as e:
                     print(f"  [❌] 實例化 {name} 失敗: {e}")
+
+    def _print_categorized_summary(self):
+        """以分類方式顯示所有已載入器官"""
+        categories = {
+            "🧠 核心引擎": ["brain", "cortex", "hypothalamus", "thalamus", "memory",
+                         "planner", "self_learn", "compass", "models",
+                         "execution_context", "context_assembler"],
+            "🛡️ 防護系統": ["immune", "firewall", "breaker", "circuit_breaker", "circuit",
+                          "contradiction_detector", "input_guard", "crash_recovery",
+                          "self_heal", "health_checker", "contradiction"],
+            "👁️ 感知系統": ["nose", "nose_system", "vision_eye", "voice_ear"],
+            "💪 執行系統": ["muscle", "tool_system", "tool_registry", "tool_creator",
+                         "muscular_executor", "old_executor"],
+            "🔁 生命系統": ["breath", "evolution", "auto_grow", "fallback_chain",
+                         "self_repair", "self_review", "feedback_learn", "evolution_cycle",
+                         "auto_repair", "circulatory", "life_cycle"],
+            "🏭 代理工廠": ["womb", "birth", "agent_template", "placenta", "nursery",
+                        "agent_company", "agent_supervisor", "agents"],
+            "📋 治理系統": ["task_tracker", "registry", "task_planner", "conversation",
+                         "decisions", "perf", "self_awareness", "rebirth", "inheritance"],
+            "📊 商業模組": ["market_analyzer", "portfolio_tracker", "revenue_optimizer",
+                        "customer_persona", "auto_content_creator", "seo_optimizer",
+                        "social_media_manager", "daily_growth_report", "email_marketer"],
+            "🔌 擴充系統": ["plugin_loader", "pluginmanager", "bag", "web_search",
+                         "web_search_plugin", "monitor"],
+            "🌐 區塊鏈": ["crosschainbridge", "nftfloorscanner", "gastracker",
+                       "landingpagecrm", "nftmanager", "nftsniper", "admanager",
+                       "cryptowallet", "nftairdropchecker", "nftmarketmaker",
+                       "marketdata", "nftwhaletracker", "autojobsystem",
+                       "smart_contract_auditor"],
+            "🧹 維護系統": ["waste", "memory_cleaner", "tool_garbage", "log_rotator"],
+            "📡 通訊系統": ["blood", "nerve", "scheduler", "bus", "skin", "face",
+                         "wardrobe", "voice", "vital_monitor", "dashboard",
+                         "event_bus"],
+            "📚 知識系統": ["rule_store", "runtime_update", "learning_engine",
+                         "evolution_engine", "critic", "persona", "runtime"],
+        }
+
+        org_lookup = {}
+        for o_name, o_cn, o_desc, o_cls in self._loaded_organs:
+            org_lookup[o_name] = (o_cn, o_desc)
+
+        cat_map = {}
+        uncategorized = []
+        for org_name in self.instantiated_organs:
+            found = False
+            for cat, orgs in categories.items():
+                if org_name in orgs or any(o in org_name.lower() for o in orgs):
+                    cat_map.setdefault(cat, []).append(org_name)
+                    found = True
+                    break
+            if not found:
+                uncategorized.append(org_name)
+
+        print()
+        print("═" * 50)
+        print("  黑曜器官總覽")
+        print("═" * 50)
+        for cat in categories:
+            orgs = cat_map.get(cat, [])
+            if not orgs:
+                continue
+            print(f"\n{cat} ({len(orgs)})")
+            for org in orgs:
+                cn, desc = org_lookup.get(org, (org, ""))
+                line = f"  ├ {cn}"
+                if desc:
+                    line += f" — {desc}"
+                print(line)
+        if uncategorized:
+            print(f"\n📦 其他 ({len(uncategorized)})")
+            for org in uncategorized:
+                cn, desc = org_lookup.get(org, (org, ""))
+                line = f"  ├ {cn}"
+                if desc:
+                    line += f" — {desc}"
+                print(line)
+        print(f"\n{'═' * 50}")
+        print(f"  總計: {len(self.instantiated_organs)} 個器官就緒")
+        print(f"{'═' * 50}\n")
 
     def connect_all(self):
         """根據 link_map.json 執行器官之間的依賴注入"""
