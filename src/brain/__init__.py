@@ -3,7 +3,13 @@
 """
 黑曜大腦 — 中央處理單元
 所有機組已就緒：骨架、匯流排、防護、執行、運算、介面、工廠、擴充、清理
+
+模式控制：
+  OBSIDIAN_MODE=stable  → 只跑可控核心鏈，停用所有自治模組
+  OBSIDIAN_MODE=full    → 完整自治模式（舊行為）
+  預設為 stable
 """
+import os
 import sys
 import threading
 from pathlib import Path
@@ -96,6 +102,7 @@ from meta import WorldModel, SystemConsciousness, EvolutionGovernor
 from runtime.context import ContextAssembler
 from runtime.rule_store import RuleStore
 from runtime.update_runtime import RuntimeUpdate
+from runtime.execution_context import ExecutionContext
 from brain.critic import Critic
 from brain.learning_engine import LearningEngine
 from brain.evolution_engine import EvolutionEngine
@@ -106,6 +113,10 @@ class Obsidian:
         self.name = DNA["name"]
         self.base_dir = config.base_dir
         self.organs: dict = {}
+
+        # ===== 模式控制 =====
+        self.mode = os.getenv("OBSIDIAN_MODE", "stable")
+        print(f"⚙️ OBSIDIAN_MODE = {self.mode}")
 
         # ===== 骨架：註冊表 =====
         self.registry = Registry()
@@ -185,6 +196,11 @@ class Obsidian:
         print("🧠 Context Layer (組裝器 + 記憶選擇器): 就緒")
         print("📏 Critic + Learning Engine + Rule Store: 就緒")
         print("🔄 Evolution Engine + Runtime Update: 就緒")
+
+        # ===== ExecutionContext — 單一執行權威（stable 模式核心）=====
+        self.execution_context = ExecutionContext(self) if self.mode == "stable" else None
+        if self.execution_context:
+            print("⚡ ExecutionContext (單一控制鏈): 就緒")
 
         self.cortex = self.registry.add(Cortex(
             self.llm, self.memory, self.compass, self.decisions, self.tasks,
@@ -280,19 +296,7 @@ class Obsidian:
         # ===== 將所有註冊的器官同步到 self.organs（LangGraph 依賴此 dict） =====
         self.organs = self.registry.all()
 
-        # ===== 啟動生命週期狀態機 =====
-        self.life_cycle.start()
-
-        # ===== 啟動自主神經與心跳 =====
-        self.hypothalamus.start_autonomous_tasks()
-        threading.Thread(target=self.scheduler.start, daemon=True).start()
-        print(f"⚙️ {self.name} 核心機組已啟動")
-        print(f"📁 工作目錄: {self.base_dir}")
-        print(f"🔧 工具模組: {len(self.tools.registry)} 個")
-        print(f"💾 記憶體: {self.memory.get_stats().get('working_count', 0)} 條")
-        print(f"👥 代理節點: {len(self.agents._agents)}")
-
-        # ===== v2: Wire agent company to LLM so agents actually execute =====
+        # ===== agent executor（僅 full 模式使用）=====
         def _agent_executor(agent, task):
             prompt = agent.get("prompt", "")
             desc = task.get("description", "")
@@ -304,30 +308,58 @@ class Obsidian:
             ]
             result = self.llm.call(messages, temperature=0.3)
             return result if result else f"[agent {agent.get('name','?')} completed task]"
-        self.agents.set_executor(_agent_executor)
 
-        print(f"🛡️ 防護陣列: 防火牆、熔斷器、衝突檢測、自修復")
-        print(f"🏭 模組工廠: 就緒")
-        print(f"🔌 擴充槽: 就緒")
-        print(f"📊 狀態監控: 就緒")
-        print(f"🔄 系統還原: 就緒")
-        print(f"🧬 進化循環: 就緒")
-        print(f"🛡️ 輸入安全: 就緒")
-        print(f"💬 對話管理: 就緒")
-        print(f"📝 回饋學習: 就緒")
-        print(f"⚡ 崩潰恢復: 就緒")
-        print(f"📋 任務規劃: 就緒")
-        print(f"📊 效能監控: 就緒")
-        print(f"🌐 世界模型: 就緒")
-        print(f"🧘 系統意識: 就緒")
-        print(f"🎯 進化治理: 就緒")
-        print("=" * 50)
+        # ===== 模式分歧：stable vs full =====
+        if self.mode != "stable":
+            # ── 自治模式 (full) ──
+            self.life_cycle.start()
+            self.hypothalamus.start_autonomous_tasks()
+            threading.Thread(target=self.scheduler.start, daemon=True).start()
+            print(f"⚙️ {self.name} 核心機組已啟動（自治模式）")
+            print(f"📁 工作目錄: {self.base_dir}")
+            print(f"🔧 工具模組: {len(self.tools.registry)} 個")
+            print(f"💾 記憶體: {self.memory.get_stats().get('working_count', 0)} 條")
+            print(f"👥 代理節點: {len(self.agents._agents)}")
 
-        # ===== 啟動重生自動循環 =====
-        self.rebirth.start_auto_rebirth_loop(interval_seconds=180)
+            self.agents.set_executor(_agent_executor)
 
-        # ===== 啟動進化循環 =====
-        self.evolution_cycle.start_auto_cycle(interval_seconds=180)
+            print(f"🛡️ 防護陣列: 防火牆、熔斷器、衝突檢測、自修復")
+            print(f"🏭 模組工廠: 就緒")
+            print(f"🔌 擴充槽: 就緒")
+            print(f"📊 狀態監控: 就緒")
+            print(f"🔄 系統還原: 就緒")
+            print(f"🧬 進化循環: 就緒")
+            print(f"🛡️ 輸入安全: 就緒")
+            print(f"💬 對話管理: 就緒")
+            print(f"📝 回饋學習: 就緒")
+            print(f"⚡ 崩潰恢復: 就緒")
+            print(f"📋 任務規劃: 就緒")
+            print(f"📊 效能監控: 就緒")
+            print(f"🌐 世界模型: 就緒")
+            print(f"🧘 系統意識: 就緒")
+            print(f"🎯 進化治理: 就緒")
+            print("=" * 50)
+
+        else:
+            # ── 可控模式 (stable) ──
+            # 停用所有自治迴圈，只保留核心 chain
+            self.life_cycle = None
+            self.langgraph = None  # 強制走 cortex 單一路徑
+            self.cortex.langgraph = None
+            self.cortex.execution_context = self.execution_context
+            # critic/learning/evolution 存在但不啟動（cortex 內會檢查 mode）
+            self.cortex.critic = None
+            self.cortex.learning_engine = None
+            self.cortex.evolution_engine = None
+            self.cortex.runtime_update = None
+            print(f"⚙️ {self.name} 核心機組已啟動（可控模式）")
+            print(f"📁 工作目錄: {self.base_dir}")
+            print(f"💾 MemoryManager 記憶引擎: 就緒")
+            print(f"🧠 Cortex (單路徑): 就緒")
+            print(f"📋 ContextAssembler: 就緒")
+            print(f"🛡️ Firewall (只記錄): 就緒")
+            print(f"📝 自治模組: 全部停用")
+            print("=" * 50)
 
         # ── 動態屬性初始化（供 main.py 和 langgraph_executor.py 使用） ──
         self.telegram_token: Optional[str] = None

@@ -60,6 +60,10 @@ class Cortex(BaseOrgan):
         return self.process(user_msg)
     
     def process(self, user_msg: str, send_func=None) -> str:
+        # ===== stable 模式：委派給 ExecutionContext（單一控制鏈）=====
+        if hasattr(self, 'execution_context') and self.execution_context:
+            return self.execution_context.handle(user_msg, send_func)
+
         # ===== 觸發生命週期狀態機 =====
         if self.life_cycle:
             self.life_cycle.trigger(user_msg)
@@ -324,8 +328,9 @@ class Cortex(BaseOrgan):
             if repaired:
                 reply = repaired
         
-        # ===== 不一致自動反省 =====
-        self._auto_reflect(user_msg, reply)
+        # ===== 不一致自動反省（stable 模式跳過）=====
+        if self.critic and self.contradiction:
+            self._auto_reflect(user_msg, reply)
         
         return reply
     
