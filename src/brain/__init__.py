@@ -296,7 +296,7 @@ class Obsidian:
         # ===== 將所有註冊的器官同步到 self.organs（LangGraph 依賴此 dict） =====
         self.organs = self.registry.all()
 
-        # ===== agent executor（僅 full 模式使用）=====
+        # ===== agent executor =====
         def _agent_executor(agent, task):
             prompt = agent.get("prompt", "")
             desc = task.get("description", "")
@@ -309,6 +309,8 @@ class Obsidian:
             result = self.llm.call(messages, temperature=0.3)
             return result if result else f"[agent {agent.get('name','?')} completed task]"
 
+        self.agents.set_executor(_agent_executor)
+
         # ===== 模式分歧：stable vs full =====
         if self.mode != "stable":
             # ── 自治模式 (full) ──
@@ -320,8 +322,6 @@ class Obsidian:
             print(f"🔧 工具模組: {len(self.tools.registry)} 個")
             print(f"💾 記憶體: {self.memory.get_stats().get('working_count', 0)} 條")
             print(f"👥 代理節點: {len(self.agents._agents)}")
-
-            self.agents.set_executor(_agent_executor)
 
             print(f"🛡️ 防護陣列: 防火牆、熔斷器、衝突檢測、自修復")
             print(f"🏭 模組工廠: 就緒")
