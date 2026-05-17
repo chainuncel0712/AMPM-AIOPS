@@ -298,16 +298,53 @@ class Obsidian:
 
         # ===== agent executor =====
         def _agent_executor(agent, task):
+            role = agent.get("role", "")
             prompt = agent.get("prompt", "")
             desc = task.get("description", "")
             tools_list = agent.get("tools", [])
+            capabilities = agent.get("capabilities", set())
             tools_str = ", ".join(tools_list) if tools_list else "無"
+            agent_name = agent.get("name", "?")
+            agent_id = agent.get("id", "")
+
+            # 從黑曜記憶提取相關上下文
+            memory_context = ""
+            if hasattr(self, 'memory') and self.memory:
+                try:
+                    recent = self.memory.query(desc[:80], limit=3)
+                    if recent:
+                        memory_context = "已知相關背景：\n" + "\n".join(
+                            f"  - {r}" for r in recent if r
+                        )[:500]
+                except Exception:
+                    pass
+
+            think_prompt = f"""{prompt}
+你的角色：{role}
+你的技能：{', '.join(capabilities) if capabilities else role}
+可用工具：{tools_str}
+{memory_context}
+
+## 思考規則
+1. 先分析任務需求，決定需要什麼資訊或步驟
+2. 如果有相關工具，說明你會怎麼使用它們
+3. 逐步推理，不要跳躍
+4. 最後給出完整、有用的結果
+
+## 回報格式
+用以下格式回報：
+【分析】<你對任務的理解>
+【步驟】<你的執行計畫>
+【結果】<最終產出>
+"""
             messages = [
-                {"role": "system", "content": f"{prompt}\n你可以使用這些工具: {tools_str}"},
-                {"role": "user", "content": f"執行以下任務並回報結果：{desc}"},
+                {"role": "system", "content": think_prompt},
+                {"role": "user", "content": f"任務：{desc}"},
             ]
             result = self.llm.call(messages, temperature=0.3)
-            return result if result else f"[agent {agent.get('name','?')} completed task]"
+            if not result:
+                return f"[{agent_name}] 任務完成（無詳細結果）"
+            return f"[{agent_name}/{role}]\n{result}"
 
         self.agents.set_executor(_agent_executor)
 
