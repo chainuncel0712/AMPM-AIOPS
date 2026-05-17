@@ -68,7 +68,10 @@ class LLMClient:
 
         print(f"🤖 {len(self.providers)}層: {' → '.join(p['name'] for p in self.providers)}")
         self.rate_limiter = TokenBucket(rate=int(os.getenv("MAX_API_CALLS_PER_MINUTE", "30")), per_seconds=60)
-        self.preferred_model = None  # None = 自動 fallback，設值後優先使用指定模型
+        default_model = os.getenv("DEFAULT_MODEL", "DeepSeek")
+        self.preferred_model = None if default_model.lower() == "auto" else default_model
+        if self.preferred_model:
+            print(f"🎯 預設模型: {self.preferred_model}")
 
     def list_models(self) -> list:
         """列出所有可用模型"""
