@@ -47,8 +47,8 @@ class MemorySelector:
         vector_memory=None,
         episodic_memory=None,
         llm_call: Optional[Callable] = None,
-        max_candidates: int = 30,
-        max_output: int = 5,
+        max_candidates: int = 100,
+        max_output: int = 20,
     ):
         self.memory = memory_organ
         self.vector_memory = vector_memory

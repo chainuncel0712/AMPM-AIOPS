@@ -127,7 +127,7 @@ class ContextAssembler:
             extra_system = self.runtime_update.get_extra_system_prompt() or None
 
         # 5. 对话历史 messages
-        history_messages = self.conversation_window.build_messages(n=5)
+        history_messages = self.conversation_window.build_messages(n=30)
 
         # 6. 组裝
         messages = self.prompt_builder.build(

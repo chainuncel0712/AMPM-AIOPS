@@ -15,7 +15,7 @@ from typing import Any, Dict, List, Optional
 class ConversationWindow:
     """滑動對話視窗 — 管理最近對話歷史"""
 
-    def __init__(self, max_turns: int = 10, max_summary_turns: int = 30):
+    def __init__(self, max_turns: int = 150, max_summary_turns: int = 200):
         self.max_turns = max_turns
         self.max_summary_turns = max_summary_turns
         self.turns: List[Dict[str, Any]] = []

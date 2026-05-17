@@ -23,9 +23,9 @@ try:
     _DEFAULT_HALFLIFE = config.memory_recency_halflife_hours
     _TRANSPARENCY_LOG = config.memory_transparency_log
 except ImportError:
-    _DEFAULT_RELEVANCE = 0.5
-    _DEFAULT_RECENCY = 0.3
-    _DEFAULT_IMPORTANCE = 0.2
+    _DEFAULT_RELEVANCE = 0.3
+    _DEFAULT_RECENCY = 0.2
+    _DEFAULT_IMPORTANCE = 0.5
     _DEFAULT_HALFLIFE = 72.0
     _TRANSPARENCY_LOG = False
 
