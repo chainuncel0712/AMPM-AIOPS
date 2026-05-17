@@ -391,14 +391,17 @@ def main():
                         _sys.stdout.write(f"[Bot] 引擎錯誤: {e}\n")
                         reply = f"⚠️ {translate_error(e)}"
 
-                # ── 子代理任務觸發：掃描使用者訊息，自動開 mission ──
+                # ── 子代理任務觸發：只在明確任務請求時才開 mission ──
                 try:
                     agents = getattr(obsidian, 'agents', None)
                     if agents and hasattr(agents, 'launch_mission'):
-                        mission_id = agents.launch_mission(msg)
-                        if mission_id:
-                            _sys.stdout.write(f"[Bot] 🚀 子代理任務已啟動: {mission_id}\n")
-                            reply += "\n\n[後台任務已啟動，完成後通知你]"
+                        task_keywords = ["幫我", "查", "找", "搜", "分析", "寫", "做", "研究",
+                                         "build", "code", "規劃", "生成", "建立", "設計", "部署",
+                                         "任務", "幫我查", "幫我找", "幫我分析", "幫我寫"]
+                        if any(kw in msg for kw in task_keywords):
+                            mission_id = agents.launch_mission(msg)
+                            if mission_id:
+                                _sys.stdout.write(f"[Bot] 🚀 子代理任務已啟動: {mission_id}\n")
                 except Exception as e:
                     _sys.stdout.write(f"[Bot] 代理任務失敗: {e}\n")
 
