@@ -595,7 +595,6 @@ class AgentTaskRouter(BaseOrgan):
         self._start_execution_thread()
 
     def _start_execution_thread(self):
-        """Auto-start background thread that picks up assigned tasks and runs them"""
         if hasattr(self, '_exec_thread') and self._exec_thread and self._exec_thread.is_alive():
             return
 
@@ -611,15 +610,30 @@ class AgentTaskRouter(BaseOrgan):
                         last_progress = time.time()
                 except Exception as e:
                     print(f"[AgentCompany] exec loop error: {e}")
+                # heartbeat 給 supervisor
+                try:
+                    from core.agent_supervisor import supervisor
+                    supervisor.heartbeat("agent_company")
+                except Exception:
+                    pass
                 time.sleep(3)
 
-        self._exec_thread = threading.Thread(target=_loop, daemon=True)
+        self._exec_thread = threading.Thread(target=_loop, daemon=True,
+                                             name="agent-company-exec")
         self._exec_thread.start()
         status = f"progress every {interval}s" if interval > 0 else "on-demand only"
         print(f"[AgentCompany] Execution engine started ({status})")
 
+        try:
+            from core.agent_supervisor import supervisor
+            supervisor.register("agent_company", thread=self._exec_thread,
+                                hb_interval=3, hb_timeout=30,
+                                is_restartable=False, is_critical=False)
+            print(f"[AgentCompany] 已註冊到 AgentSupervisor ({len(self._agents)} agents)")
+        except Exception:
+            pass
+
     def execute_assigned_tasks(self) -> int:
-        """Pick up all assigned tasks and execute them via the registered executor"""
         if not hasattr(self, '_executor_fn') or not self._executor_fn:
             return 0
 
@@ -635,13 +649,19 @@ class AgentTaskRouter(BaseOrgan):
                     continue
 
                 try:
-                    print(f"[AgentCompany] {agent['name']} executing: {task['description'][:80]}")
+                    agent_name = agent.get('name', aid)
+                    print(f"[AgentCompany] {agent_name} executing: {task['description'][:80]}")
+                    try:
+                        from core.agent_supervisor import supervisor
+                        supervisor.heartbeat(f"sub_{aid}")
+                    except Exception:
+                        pass
                     result = self._executor_fn(agent, task)
                     self.complete_task(task_id, True, result)
-                    print(f"[AgentCompany] {agent['name']} done: {str(result)[:100]}")
+                    print(f"[AgentCompany] {agent_name} done: {str(result)[:100]}")
                     executed += 1
                 except Exception as e:
-                    print(f"[AgentCompany] {agent['name']} failed: {e}")
+                    print(f"[AgentCompany] {agent_name} failed: {e}")
                     self.complete_task(task_id, False, str(e))
                     executed += 1
 
