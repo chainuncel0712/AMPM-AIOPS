@@ -1,4 +1,4 @@
-import os, time, threading, requests, json
+import os, time, threading, requests, json, base64
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -96,6 +96,64 @@ class LLMClient:
 
         return f"找不到 {name}，可用: {', '.join(p['name'] for p in self.providers)}"
 
+    def register_model(self, name: str, key: str, endpoint: str, model: str) -> str:
+        """動態註冊新模型 — 黑曜可以自己擴充能力"""
+        for p in self.providers:
+            if p["name"].lower() == name.lower():
+                p["model"] = model
+                p["key"] = key
+                return f"已更新 {name} ({model})"
+        self.providers.append({
+            "name": name, "key": key, "ep": endpoint, "model": model
+        })
+        print(f"📡 動態註冊模型: {name} ({model})")
+        return f"已註冊 {name} ({model})"
+
+    def discover_models(self, limit: int = 10) -> list:
+        """從 OpenRouter 探索可用模型 — 黑曜自主擴充能力"""
+        or_key = os.getenv("OPENROUTER_API_KEY")
+        if not or_key:
+            return []
+        try:
+            r = requests.get(
+                "https://openrouter.ai/api/v1/models",
+                headers={"Authorization": f"Bearer {or_key}"},
+                timeout=10
+            )
+            if r.status_code == 200:
+                data = r.json()
+                items = data if isinstance(data, list) else data.get("data", [])
+                models = []
+                for m in items[:limit * 3]:
+                    model_id = m.get("id", "")
+                    name = m.get("name", model_id)
+                    if any(kw in model_id.lower() for kw in ["free", "flash", "nano", "mini", "8b", "7b", "1b"]):
+                        models.append({
+                            "id": model_id,
+                            "name": name,
+                            "context_length": m.get("context_length", 0),
+                            "pricing": m.get("pricing", {}),
+                        })
+                        if len(models) >= limit:
+                            break
+                return models
+        except Exception as e:
+            print(f"⚠️ 探索模型失敗: {e}")
+        return []
+
+    def add_openrouter_model(self, model_id: str, label: str = None) -> str:
+        """從 OpenRouter 動態加入一個模型"""
+        or_key = os.getenv("OPENROUTER_API_KEY")
+        if not or_key:
+            return "需要 OPENROUTER_API_KEY"
+        name = label or model_id.split("/")[-1][:20]
+        return self.register_model(
+            name=f"OR-{name}",
+            key=or_key,
+            endpoint="https://openrouter.ai/api/v1/chat/completions",
+            model=model_id,
+        )
+
     def current_model(self) -> str:
         """取得目前模型"""
         if self.preferred_model:
@@ -157,3 +215,57 @@ class LLMClient:
             except Exception as e:
                 print(f"⚠️ {p['name']}: {str(e)[:30]}")
         return "⚠️ 錯誤：所有模型不可用"
+
+    def call_vision(self, prompt: str, image_url: str = None, image_path: str = None) -> str:
+        """視覺理解 — 傳圖片給模型分析
+
+        Args:
+            prompt: 文字提示
+            image_url: 圖片網址
+            image_path: 本地圖片路徑（會轉 base64）
+
+        Returns:
+            模型分析結果
+        """
+        # 準備圖片內容
+        if image_path:
+            try:
+                with open(image_path, "rb") as f:
+                    b64 = base64.b64encode(f.read()).decode()
+                ext = image_path.rsplit(".", 1)[-1].lower()
+                mime = f"image/{ext}" if ext in ("png","jpg","jpeg","gif","webp") else "image/png"
+                image_content = {"type": "image_url", "image_url": {"url": f"data:{mime};base64,{b64}"}}
+            except Exception:
+                return "⚠️ 無法讀取圖片"
+        elif image_url:
+            image_content = {"type": "image_url", "image_url": {"url": image_url}}
+        else:
+            return "⚠️ 請提供圖片網址或路徑"
+
+        messages = [{
+            "role": "user",
+            "content": [
+                {"type": "text", "text": prompt},
+                image_content,
+            ]
+        }]
+
+        # 用 Gemini 處理視覺（透過 OpenRouter）
+        vision_providers = [p for p in self.providers if "gemini" in p["name"].lower() or "4o" in p.get("model", "").lower()]
+        if not vision_providers:
+            return "⚠️ 沒有視覺模型可用（需 Gemini 或 GPT-4o）"
+
+        for p in vision_providers:
+            try:
+                r = requests.post(
+                    p["ep"],
+                    headers={"Authorization": f"Bearer {p['key']}", "Content-Type": "application/json"},
+                    json={"model": p["model"], "messages": messages, "max_tokens": 2000},
+                    timeout=60
+                )
+                if r.status_code == 200:
+                    return r.json().get("choices", [{}])[0].get("message", {}).get("content", "⚠️ 無回應")
+                print(f"⚠️ vision {p['name']} {r.status_code}")
+            except Exception as e:
+                print(f"⚠️ vision {p['name']}: {str(e)[:30]}")
+        return "⚠️ 所有視覺模型不可用"

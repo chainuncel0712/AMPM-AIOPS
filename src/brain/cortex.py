@@ -118,7 +118,31 @@ class Cortex(BaseOrgan):
         # 3. 🔥 系統指令直接執行
         sys_cmds = {"硬碟":"df -h","磁碟":"df -h","記憶體":"free -h","cpu":"top -bn1 | head -5","系統":"uname -a"}
 
-        # ===== 模型切換指令 =====
+        # ===== 視覺分析指令 =====
+        if "看圖" in user_msg or "分析圖片" in user_msg or "這張圖" in user_msg:
+            import re
+            url_match = re.search(r'https?://\S+\.(?:jpg|jpeg|png|gif|webp)(?:\?\S*)?', user_msg)
+            if url_match:
+                image_url = url_match.group()
+                prompt = user_msg.replace(image_url, "").strip() or "請描述這張圖片的內容"
+                return "🔍 正在分析圖片...\n\n" + self.llm.call_vision(prompt=prompt, image_url=image_url)
+            return "請提供圖片網址（例如：看圖 https://example.com/photo.jpg）"
+
+        # ===== 模型擴充指令 (黑曜自主進化) =====
+        if "找模型" in user_msg or "探索模型" in user_msg or "新模型" in user_msg:
+            models = self.llm.discover_models(limit=8)
+            if models:
+                lines = "\n".join(f"  {m['name']}: {m['id']} (context: {m.get('context_length', '?')})" for m in models)
+                return f"🔍 找到 {len(models)} 個可用模型：\n{lines}\n\n輸入「加入模型 XXX」來啟用。"
+            return "找不到可用模型。檢查 OPENROUTER_API_KEY 是否設定。"
+        if "加入模型" in user_msg or "加模型" in user_msg:
+            import re
+            match = re.search(r'[\w.-]+/[\w.-]+', user_msg)
+            if match:
+                model_id = match.group()
+                result = self.llm.add_openrouter_model(model_id)
+                return f"📡 {result}\n目前共 {len(self.llm.list_models())} 個模型"
+            return "請提供模型 ID（例如：加入模型 google/gemini-2.0-flash-001）"
         if "切換模型" in user_msg or "換模型" in user_msg or "模型" in user_msg:
             if "有哪些" in user_msg or "列表" in user_msg or "可用" in user_msg:
                 models = self.llm.list_models()
