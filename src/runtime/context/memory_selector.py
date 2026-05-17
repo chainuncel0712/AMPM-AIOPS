@@ -53,11 +53,7 @@ class MemorySelector:
         self.memory = memory_organ
         self.vector_memory = vector_memory
         self.episodic_memory = episodic_memory
-        self.scorer = PriorityScorer(
-            relevance_weight=0.5,
-            recency_weight=0.3,
-            importance_weight=0.2,
-        )
+        self.scorer = PriorityScorer()  # 權重讀取 config，可由 RuntimeUpdate 覆寫
         self.summarizer = Summarizer(llm_call=llm_call)
         self.max_candidates = max_candidates
         self.max_output = max_output
@@ -74,21 +70,21 @@ class MemorySelector:
             self.scorer.importance_weight = weights["importance"]
 
     def select(self, query: str, top_n: int = None) -> str:
-        """核心方法：记忆 → 选择 → 压缩 → 输出摘要
-
-        Args:
-            query: 使用者当前输入，用于检索相关记忆
-            top_n: 最终取几条记忆，默认用 max_output
-
-        Returns:
-            精选压缩后的记忆摘要字串，可直接注入 prompt
-        """
+        """核心方法：记忆 → 选择 → 压缩 → 输出摘要"""
         if top_n is None:
             top_n = self.max_output
 
         candidates = self._retrieve_all(query)
+        total = len(candidates)
         scored = self._score_and_filter(candidates, query, top_n)
         summary = self._compress(scored, query)
+
+        if self.scorer.transparency_log and total > 0:
+            sources = {}
+            for item in scored:
+                src = item.get("_source", "?")
+                sources[src] = sources.get(src, 0) + 1
+            print(f"🔍 [MemorySelector] {total} candidates → {len(scored)} selected → sources={sources}")
 
         return summary
 

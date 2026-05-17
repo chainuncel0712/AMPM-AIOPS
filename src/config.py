@@ -61,6 +61,13 @@ class Config:
         self.max_depth = int(os.getenv("MAX_DEPTH", "5"))
         self.max_api_calls_per_minute = int(os.getenv("MAX_API_CALLS_PER_MINUTE", "30"))
         self.honest_mode = os.getenv("HONEST_MODE", "true").lower() == "true"
+
+        # ========== Memory Scoring 權重 (Phase 8: 透明化隱性決策) ==========
+        self.memory_relevance_weight = float(os.getenv("MEMORY_RELEVANCE_WEIGHT", "0.5"))
+        self.memory_recency_weight = float(os.getenv("MEMORY_RECENCY_WEIGHT", "0.3"))
+        self.memory_importance_weight = float(os.getenv("MEMORY_IMPORTANCE_WEIGHT", "0.2"))
+        self.memory_recency_halflife_hours = float(os.getenv("MEMORY_RECENCY_HALFLIFE_HOURS", "72"))
+        self.memory_transparency_log = os.getenv("MEMORY_TRANSPARENCY_LOG", "false").lower() == "true"
     
     def get_bot_token(self, bot_name: str) -> str:
         return self.bots.get(bot_name, "")
