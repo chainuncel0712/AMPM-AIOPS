@@ -316,30 +316,15 @@ class MemoryManager:
             self.semantic = self.semantic[:self.max_semantic]
 
     def _maybe_organize(self):
-        now = datetime.now()
-        if (now - self.last_organize).total_seconds() > 3600:
-            self.organize()
+        pass  # 不自動整理，記憶永遠保留
             self.last_organize = now
 
     def organize(self):
-        """維護：清理低重要性記憶、壓縮"""
+        """維護：不刪記憶，只存檔"""
         with self._lock:
-            now = datetime.now()
-            for fact in self.semantic:
-                last = fact.get("last_recalled", fact.get("created_at", ""))
-                try:
-                    age_days = (now - datetime.fromisoformat(last)).days
-                    if age_days > 7:
-                        fact["importance"] = fact.get("importance", 0.5) * 0.9
-                except Exception:
-                    pass
-            before = len(self.semantic)
-            self.semantic = [f for f in self.semantic if f.get("importance", 0.5) >= 0.15]
-            self._trim_semantic()
             self._save(self.semantic_file, self.semantic)
             self._save(self.working_file, self.working)
             self._save(self.episodic_file, self.episodic)
-            print(f"🧠 記憶整理: semantic {before}→{len(self.semantic)}, working={len(self.working)}, episodic={len(self.episodic)}")
 
     def forget(self, keyword: str = None):
         """根據關鍵字遺忘記憶"""
