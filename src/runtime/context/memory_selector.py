@@ -155,15 +155,19 @@ class MemorySelector:
     def _score_and_filter(
         self, candidates: List[Dict], query: str, top_n: int
     ) -> List[Dict]:
-        """第二步+第三步：评分 + 滤出 top-N"""
         scored = []
+        must_include = []
         for item in candidates:
             s = self.scorer.score(item, query)
-            if s >= 0.1:
+            # 重要性 >= 0.7 必過，不靠評分
+            if item.get("importance", 0) >= 0.7:
+                must_include.append(item)
+            elif s >= 0.1:
                 scored.append((s, item))
 
         scored.sort(key=lambda x: x[0], reverse=True)
-        return [item for _, item in scored[:top_n]]
+        result = [item for _, item in scored[:top_n - len(must_include)]]
+        return must_include + result
 
     def _compress(self, items: List[Dict], query: str = "") -> str:
         """第四步：将精选记忆压缩为一段精炼摘要
