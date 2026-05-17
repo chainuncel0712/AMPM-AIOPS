@@ -341,20 +341,62 @@ class ExecutionContext:
         if not self.llm:
             sandbox.response = "⚠️ LLM 不可用"
             return sandbox
-        name = sandbox.intent_params.get("model_name", "")
-        action = sandbox.intent_params.get("action", "switch")
+        action = sandbox.intent_params.get("action", "list")
         if action == "list":
             models = self.llm.list_models()
             lines = "\n".join(f"  {m['name']}: {m['model']}" for m in models)
-            sandbox.response = f"可用模型：\n{lines}\n\n目前使用：{self.llm.current_model()}"
+            sandbox.response = f"可用模型：\n{lines}\n\n目前使用：{self.llm.current_model()}\n輸入「切換到 XXX」來切換"
         elif action == "switch":
+            name = sandbox.intent_params.get("model_name", "")
             result = self.llm.switch_model(name)
             sandbox.response = f"🔄 {result}\n目前模型：{self.llm.current_model()}"
+        elif action == "smart":
+            task = sandbox.intent_params.get("task_type", "reasoning")
+            best = self._pick_best_model(task)
+            if best:
+                self.llm.switch_model(best)
+                sandbox.response = f"🧠 已自動切換到最強 {task} 模型：{best}\n目前：{self.llm.current_model()}"
+            else:
+                sandbox.response = "找不到合適模型，目前：" + self.llm.current_model()
         elif action == "auto":
             self.llm.switch_model("auto")
             sandbox.response = "🔄 已恢復自動 fallback"
-        self.tracer.decision(sandbox, "route:model_switch", action, result if 'result' in dir() else "")
+        self.tracer.decision(sandbox, "route:model_switch", action, sandbox.response[:50])
         return sandbox
+
+    def _pick_best_model(self, task_type: str) -> str:
+        """根據任務類型 + 成本優先級選擇最佳模型
+
+        優先級：免費 API > 付費 API > 本地模型
+        """
+        models = self.llm.list_models()
+        model_names = [m["name"] for m in models]
+
+        def has(name): return any(name.lower() in n.lower() for n in model_names)
+
+        if task_type == "reasoning":
+            # 1. 免費推理模型優先
+            for name in ["NV-Llama"]:
+                if has(name): return name
+            # 2. 付費高階推理
+            for name in ["DeepSeek", "ATXP", "OR-DeepSeek"]:
+                if has(name): return name
+            # 3. 本地
+            if has("Ollama"): return "Ollama"
+
+        if task_type == "vision":
+            for name in ["OR-Gemini"]:
+                if has(name): return name
+            for name in ["DeepSeek", "ATXP"]:
+                if has(name): return name
+
+        # 通用：免費優先
+        for name in ["NV-Llama"]:
+            if has(name): return name
+        for name in ["DeepSeek", "ATXP", "OR-DeepSeek"]:
+            if has(name): return name
+        if has("Ollama"): return "Ollama"
+        return model_names[0] if model_names else ""
 
     def _route_vision(self, sandbox: RequestSandbox) -> RequestSandbox:
         import re
@@ -429,13 +471,19 @@ class ExecutionContext:
     # ===== Intent Detection =====
 
     def _is_model_switch(self, msg: str) -> bool:
-        return any(kw in msg for kw in [
+        keywords = [
             "模型", "切換", "換模型", "改用", "換成", "用",
-        ]) and not self._is_vision(msg) and not self._is_system_cmd(msg)
+            "切模型", "思考", "邏輯", "想辦法",
+        ]
+        return any(kw in msg for kw in keywords) and not self._is_vision(msg) and not self._is_system_cmd(msg)
 
     def _parse_model_switch(self, msg: str) -> Dict:
-        if "有哪些" in msg or "列表" in msg or "可用" in msg or "什麼模型" in msg or "哪个" in msg:
+        # 列出可用模型
+        if any(k in msg for k in ["有哪些", "列表", "可用", "什麼模型", "哪个", "切模型", "換模型"]):
             return {"action": "list"}
+        # 自動切換到最強推理模型
+        if any(k in msg for k in ["思考", "邏輯", "想辦法"]):
+            return {"action": "smart", "task_type": "reasoning"}
         if "auto" in msg.lower() or "自動" in msg:
             return {"action": "auto"}
         for kw in ["切換到", "換到", "改用", "換成", "切換成", "用"]:
