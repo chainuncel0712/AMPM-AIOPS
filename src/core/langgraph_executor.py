@@ -721,22 +721,70 @@ class LangGraphExecutor:
         回傳 Returns:
             工具呼叫資訊 Tool call info，如果沒有則回傳 None
         """
-        # 嘗試解析 JSON 格式的 tool call（使用非貪婪匹配）
-        json_match = re.search(r'\{.*?"tool".*?\}', text, re.DOTALL)
-        if json_match:
+        import re, json
+
+        # 1. 用 stack 方式找到完整的 JSON object（處理巢狀括號）
+        for m in re.finditer(r'\{', text):
+            start = m.start()
+            depth = 0
+            end = -1
+            for i in range(start, len(text)):
+                if text[i] == '{':
+                    depth += 1
+                elif text[i] == '}':
+                    depth -= 1
+                    if depth == 0:
+                        end = i + 1
+                        break
+            if end > start:
+                candidate = text[start:end]
+                if '"tool"' in candidate:
+                    try:
+                        call_info = json.loads(candidate)
+                        if "tool" in call_info:
+                            return call_info
+                    except:
+                        continue
+        
+        # 2. 嘗試解析 <tool_call> 包裹的 JSON
+        tc_match = re.search(r'<tool_call>\s*(.*?)\s*</tool_call>', text, re.DOTALL)
+        if tc_match:
+            inner = tc_match.group(1).strip()
             try:
-                call_info = json.loads(json_match.group())
+                call_info = json.loads(inner)
                 if "tool" in call_info:
                     return call_info
             except:
                 pass
+            # inner 可能包了多行，試著再找一次 JSON
+            for m in re.finditer(r'\{', inner):
+                start = m.start()
+                depth = 0
+                end = -1
+                for i in range(start, len(inner)):
+                    if inner[i] == '{':
+                        depth += 1
+                    elif inner[i] == '}':
+                        depth -= 1
+                        if depth == 0:
+                            end = i + 1
+                            break
+                if end > start:
+                    candidate = inner[start:end]
+                    if '"tool"' in candidate:
+                        try:
+                            call_info = json.loads(candidate)
+                            if "tool" in call_info:
+                                return call_info
+                        except:
+                            continue
         
-        # 嘗試解析 "使用工具: xxx" 格式
+        # 3. 嘗試解析 "使用工具: xxx" 格式
         tool_match = re.search(r'使用工具[：:]\s*(\S+)', text)
         if tool_match:
             return {"tool": tool_match.group(1), "args": {}}
         
-        # 嘗試解析 "執行: xxx" 格式
+        # 4. 嘗試解析 "執行: xxx" 格式
         exec_match = re.search(r'執行[：:]\s*(\S+)', text)
         if exec_match:
             return {"tool": exec_match.group(1), "args": {}}
