@@ -197,7 +197,7 @@ class MemorySelector:
 
         for src, texts in by_source.items():
             label = labels.get(src, src)
-            combined = "；".join(texts[:3])
+            combined = "；".join(texts[:15])
             parts.append(f"[{label}] {combined}")
 
         result = "\n".join(parts)

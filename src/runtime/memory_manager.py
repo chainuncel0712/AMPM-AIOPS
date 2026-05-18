@@ -298,11 +298,18 @@ class MemoryManager:
         overflow = self.working[:20]
         self.working = self.working[20:]
         if overflow:
+            user_msgs = [e.get("user", "")[:80] for e in overflow if e.get("user")]
+            assistant_msgs = [e.get("assistant", "")[:80] for e in overflow if e.get("assistant")]
+            all_msgs = user_msgs + assistant_msgs
+            context_summary = "；".join(all_msgs[:10])
             summary = {
                 "type": "compressed",
+                "summary": context_summary[:500],
                 "count": len(overflow),
                 "range": f"{overflow[0].get('time','?')} ~ {overflow[-1].get('time','?')}",
                 "compressed_at": datetime.now().isoformat(),
+                "importance": 0.5,
+                "tags": ["对话", "conversation"],
             }
             self.episodic.append(summary)
             if len(self.episodic) > self.max_episodic:
@@ -324,6 +331,23 @@ class MemoryManager:
             self._save(self.semantic_file, self.semantic)
             self._save(self.working_file, self.working)
             self._save(self.episodic_file, self.episodic)
+
+    def recall_by_tags(self, tags: List[str] = None, limit: int = 20) -> List[Dict]:
+        """按標籤檢索 episodic 記憶（供 MemorySelector 調用）"""
+        tags = tags or []
+        results = []
+        with self._lock:
+            for ep in reversed(self.episodic):
+                ep_tags = [t.lower() for t in ep.get("tags", [])]
+                ep_type = ep.get("type", "").lower()
+                if any(t.lower() in ep_tags or t.lower() == ep_type for t in tags):
+                    results.append(ep)
+                elif any(t.lower() in ep.get("summary", "").lower() for t in tags if t):
+                    results.append(ep)
+                if len(results) >= limit * 2:
+                    break
+        results.sort(key=lambda e: e.get("importance", 0.3), reverse=True)
+        return results[:limit]
 
     def forget(self, keyword: str = None):
         """根據關鍵字遺忘記憶"""

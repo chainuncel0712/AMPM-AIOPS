@@ -57,8 +57,8 @@ class ContextAssembler:
             vector_memory=vector_memory,
             episodic_memory=episodic_memory,
             llm_call=llm_call,
-            max_candidates=30,
-            max_output=5,
+            max_candidates=200,
+            max_output=50,
         )
         self.prompt_builder = PromptBuilder()
         self.compass = compass_organ

@@ -185,7 +185,8 @@ class Obsidian:
             compass_organ=self.compass,
             llm_call=self._call_ai,
             runtime_update=self.runtime_update,
-            max_conversation_turns=20,
+            max_conversation_turns=200,
+            max_summary_turns=200,
         )
         self.critic = Critic()
         self.learning_engine = LearningEngine(
