@@ -185,21 +185,7 @@ class LangGraphExecutor:
             except Exception as e:
                 print(f"[LangGraphExecutor] ⚠️ 器官 {name} 載入失敗: {e}")
         
-        # ===== 定義所有器官名稱與對應類別（使用英文名稱，顯示時再用機械零組件代號） =====
-        organ_classes = [
-            ("planner", PlannerOrgan),
-            ("self_learn", SelfLearnOrgan),
-            ("daily_growth_report", DailyGrowthReportOrgan),
-            ("market_analyzer", MarketAnalyzerOrgan),
-            ("customer_persona", CustomerPersonaOrgan),
-            ("email_marketer", EmailMarketerOrgan),
-            ("portfolio_tracker", PortfolioTrackerOrgan),
-            ("revenue_optimizer", RevenueOptimizerOrgan),
-            ("auto_content_creator", AutoContentCreatorOrgan),
-            ("seo_optimizer", SEOOptimizerOrgan),
-            ("social_media_manager", SocialMediaManagerOrgan),
-            ("smart_contract_auditor", SmartContractAuditorOrgan),
-        ]
+        # ===== organ_classes 已在上面動態載入，直接使用 =====
         
         # ===== 註冊每個器官的所有公開方法 =====
         # 定義 ToolWrapper 類別在迴圈外部，避免重複定義
