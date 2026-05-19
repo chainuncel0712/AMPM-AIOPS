@@ -30,10 +30,10 @@
       "description": "接續已完成的第一、二章，依次生成第三章到第十章。每章包含：主題介紹、實戰步驟、截圖腳本、總結。完成後存到 outputs/ebook_ai_tools/ 目錄下，每章一個 .md 檔案。",
       "priority": 1,
       "deadline": null,
-      "status": "pending",
+      "status": "completed",
       "created_at": "2026-05-19T14:45:56.854309",
-      "updated_at": "2026-05-19T14:45:56.854328",
-      "completed_at": null,
+      "updated_at": "2026-05-19T14:48:23.960520",
+      "completed_at": "2026-05-19T14:48:23.960520",
       "overdue_warned": false
     },
     "T0004-b2e3": {
@@ -42,10 +42,10 @@
       "description": "搜尋目前童書市場熱門主題（學齡前 3-6 歲），分析 TOP10 童書的主題、風格、定價。做出選題建議：主題、年齡層、頁數、插圖風格描述。結果存入 outputs/children_book/research.md",
       "priority": 1,
       "deadline": null,
-      "status": "pending",
+      "status": "completed",
       "created_at": "2026-05-19T14:45:56.854346",
-      "updated_at": "2026-05-19T14:45:56.854347",
-      "completed_at": null,
+      "updated_at": "2026-05-19T14:51:55.760270",
+      "completed_at": "2026-05-19T14:51:55.760270",
       "overdue_warned": false
     },
     "T0005-7b88": {
@@ -54,10 +54,10 @@
       "description": "建立一個專業的服務網站首頁 HTML，內容包含：1.AMPM-AIOPS 品牌介紹 2.三大服務：電子工具書、童書、AI代理服務 3.聯絡方式。使用現代簡潔風格，存到 outputs/website/index.html。同時建立 outputs/website/css/style.css。",
       "priority": 2,
       "deadline": null,
-      "status": "pending",
+      "status": "completed",
       "created_at": "2026-05-19T14:45:56.854356",
-      "updated_at": "2026-05-19T14:45:56.854357",
-      "completed_at": null,
+      "updated_at": "2026-05-19T14:55:27.625855",
+      "completed_at": "2026-05-19T14:55:27.625855",
       "overdue_warned": false
     },
     "T0006-f0b1": {
@@ -66,10 +66,10 @@
       "description": "根據童書市場研究結果，為第一本童書建立：故事大綱、主角設定（名字、性格、外觀）、配角設定、故事結構（起承轉合）。存入 outputs/children_book/book1_outline.md",
       "priority": 2,
       "deadline": null,
-      "status": "pending",
+      "status": "completed",
       "created_at": "2026-05-19T14:45:56.854370",
-      "updated_at": "2026-05-19T14:45:56.854371",
-      "completed_at": null,
+      "updated_at": "2026-05-19T20:55:29.687983",
+      "completed_at": "2026-05-19T20:55:29.687983",
       "overdue_warned": false
     },
     "T0007-f938": {
@@ -78,36 +78,12 @@
       "description": "定期檢查 outputs/ 目錄下的產出品質，檢查完成的檔案數量。如果有檔案內容不完整，自動補齊。記錄每次檢查結果到 outputs/quality_log.md。",
       "priority": 3,
       "deadline": null,
-      "status": "pending",
+      "status": "in_progress",
       "created_at": "2026-05-19T14:45:56.854379",
-      "updated_at": "2026-05-19T14:45:56.854380",
-      "completed_at": null,
-      "overdue_warned": false
-    },
-    "T0008-9c0b": {
-      "id": "T0008-9c0b",
-      "title": "回測任務優化 - 響應時間提升至 1 秒級",
-      "description": "針對回測任務進行效能分析與優化，將響應時間從目前水準降低至 1 秒級。步驟：1. 分析現有回測任務瓶頸。2. 調整資源配置或程式碼。3. 測試並驗證優化成果。",
-      "priority": 1,
-      "deadline": null,
-      "status": "pending",
-      "created_at": "2026-05-19T14:47:17.543408",
-      "updated_at": "2026-05-19T14:47:17.543408",
-      "completed_at": null,
-      "overdue_warned": false
-    },
-    "T0009-7f81": {
-      "id": "T0009-7f81",
-      "title": "撰写电子书第二章草稿",
-      "description": "根据之前确定的主题，实际生成第二章的完整草稿，并写入文件。",
-      "priority": 1,
-      "deadline": null,
-      "status": "pending",
-      "created_at": "2026-05-19T16:06:12.508699",
-      "updated_at": "2026-05-19T16:06:12.508699",
+      "updated_at": "2026-05-19T20:56:00.612809",
       "completed_at": null,
       "overdue_warned": false
     }
   },
-  "counter": 9
+  "counter": 7
 }
