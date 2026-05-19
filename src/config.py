@@ -48,6 +48,7 @@ class Config:
         
         # ========== Cloudflare 設定 ==========
         self.cf_api_token = os.getenv("CLOUDFLARE_API_TOKEN", "")
+        self.cf_api_token_2 = os.getenv("CLOUDFLARE_API_TOKEN_2", "")
         self.cf_global_key = os.getenv("CLOUDFLARE_GLOBAL_KEY", "")
         self.cf_dnskey = os.getenv("CLOUDFLARE_DNSKEY", "")
         self.cf_account_id = os.getenv("CLOUDFLARE_ACCOUNT_ID", "")
