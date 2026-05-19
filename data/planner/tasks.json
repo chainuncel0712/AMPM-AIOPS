@@ -42,10 +42,10 @@
       "description": "搜尋目前童書市場熱門主題（學齡前 3-6 歲），分析 TOP10 童書的主題、風格、定價。做出選題建議：主題、年齡層、頁數、插圖風格描述。結果存入 outputs/children_book/research.md",
       "priority": 1,
       "deadline": null,
-      "status": "in_progress",
+      "status": "completed",
       "created_at": "2026-05-19T14:45:56.854346",
-      "updated_at": "2026-05-19T14:48:54.856323",
-      "completed_at": null,
+      "updated_at": "2026-05-19T14:51:55.760270",
+      "completed_at": "2026-05-19T14:51:55.760270",
       "overdue_warned": false
     },
     "T0005-7b88": {
@@ -54,9 +54,9 @@
       "description": "建立一個專業的服務網站首頁 HTML，內容包含：1.AMPM-AIOPS 品牌介紹 2.三大服務：電子工具書、童書、AI代理服務 3.聯絡方式。使用現代簡潔風格，存到 outputs/website/index.html。同時建立 outputs/website/css/style.css。",
       "priority": 2,
       "deadline": null,
-      "status": "pending",
+      "status": "in_progress",
       "created_at": "2026-05-19T14:45:56.854356",
-      "updated_at": "2026-05-19T14:45:56.854357",
+      "updated_at": "2026-05-19T14:52:26.723699",
       "completed_at": null,
       "overdue_warned": false
     },

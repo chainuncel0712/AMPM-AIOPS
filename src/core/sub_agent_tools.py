@@ -17,11 +17,21 @@ OUTPUT_ROOT.mkdir(parents=True, exist_ok=True)
 FORBIDDEN_COMMANDS = ["rm -rf", "mkfs", "dd if=", "> /dev/", ":(){", "chmod 777", "wget", "curl"]
 
 
-def write_file(filepath: str, content: str) -> str:
-    """寫入檔案。路徑相對於 outputs/ 目錄，或給絕對路徑。"""
+def _resolve_path(filepath: str) -> Path:
+    """智慧路徑解析：去掉多餘的 outputs/ 前綴，統一到 OUTPUT_ROOT 下。"""
     path = Path(filepath)
-    if not path.is_absolute():
-        path = OUTPUT_ROOT / path
+    if path.is_absolute():
+        return path
+    # 去掉可能重複的 "outputs" 或 "outputs/" 前綴
+    parts = path.parts
+    if parts and parts[0] in ("outputs", "output"):
+        path = Path(*parts[1:]) if len(parts) > 1 else Path(".")
+    return OUTPUT_ROOT / path
+
+
+def write_file(filepath: str, content: str) -> str:
+    """寫入檔案。路徑自動放在 outputs/ 目錄下。"""
+    path = _resolve_path(filepath)
     path.parent.mkdir(parents=True, exist_ok=True)
     try:
         path.write_text(content, encoding="utf-8")
@@ -33,9 +43,7 @@ def write_file(filepath: str, content: str) -> str:
 
 def read_file(filepath: str) -> str:
     """讀取檔案內容。"""
-    path = Path(filepath)
-    if not path.is_absolute():
-        path = OUTPUT_ROOT / path
+    path = _resolve_path(filepath)
     try:
         content = path.read_text(encoding="utf-8")
         if len(content) > 3000:
@@ -49,14 +57,14 @@ def read_file(filepath: str) -> str:
 
 def list_dir(dirpath: str = ".") -> str:
     """列出目錄內容。"""
-    path = Path(dirpath)
-    if not path.is_absolute():
-        path = OUTPUT_ROOT / path
+    path = _resolve_path(dirpath)
     if not path.exists():
-        return f"❌ 目錄不存在: {path}"
+        return f"❌ 目錄不存在: {path}（可用 mkdir 建立，或直接用 write_file 會自動建立）"
     try:
         items = sorted(path.iterdir(), key=lambda x: (not x.is_dir(), x.name))
         lines = [f"📁 {path}/"]
+        if not items:
+            lines.append("  （空目錄）")
         for item in items:
             typ = "📁" if item.is_dir() else "📄"
             size = ""
@@ -72,18 +80,19 @@ def list_dir(dirpath: str = ".") -> str:
         return f"❌ 列目錄失敗: {e}"
 
 
-def run_command(cmd: str) -> str:
-    """執行 shell 指令。有安全限制。"""
+def run_command(cmd: str, cwd: str = None) -> str:
+    """執行 shell 指令。有安全限制。預設工作目錄為 outputs/。"""
     # 安全檢查
     cmd_lower = cmd.lower()
     for forbidden in FORBIDDEN_COMMANDS:
         if forbidden in cmd_lower:
             return f"❌ 拒絕執行危險指令（包含 '{forbidden}'）"
 
+    work_dir = str(_resolve_path(cwd)) if cwd else str(OUTPUT_ROOT)
     try:
         result = subprocess.run(
             cmd, shell=True, capture_output=True, text=True,
-            timeout=30, cwd=str(OUTPUT_ROOT),
+            timeout=30, cwd=work_dir,
             env={**os.environ, "PATH": os.environ.get("PATH", "/usr/bin:/bin")}
         )
         output = result.stdout
@@ -126,11 +135,12 @@ def web_search(query: str) -> str:
 
 # 工具定義（傳給 LLM 的格式）
 TOOL_DEFINITIONS = """
-## 可用工具（你必須使用這些工具來完成任務，不只是想）
+## 可用工具（⚠️ 你必須呼叫工具來實際操作，禁止只回文字說「已完成」）
 
 1. write_file — 寫入檔案
-   格式：{"tool": "write_file", "args": {"filepath": "路徑", "content": "內容"}}
-   說明：將內容寫入指定檔案。路徑可用相對路徑（自動放在 outputs/ 下）。
+   格式：{"tool": "write_file", "args": {"filepath": "路徑", "content": "完整內容"}}
+   範例路徑：ebooks/chapter-03.md, children_book/research.md, website/index.html
+   ⚠️ 產出的內容必須用 write_file 寫入檔案，路徑不要加 outputs/
 
 2. read_file — 讀取檔案
    格式：{"tool": "read_file", "args": {"filepath": "路徑"}}
@@ -140,16 +150,17 @@ TOOL_DEFINITIONS = """
 
 4. run_command — 執行指令
    格式：{"tool": "run_command", "args": {"cmd": "指令"}}
-   說明：執行 shell 指令。可用 mkdir、cp、python3、git 等。
+   可用：mkdir, ls, cat, echo, python3, git, cp, mv 等。
 
 5. web_search — 搜尋網頁
    格式：{"tool": "web_search", "args": {"query": "搜尋關鍵字"}}
 
-⚠️ 鐵則：
-- 需要寫檔案時必須用 write_file，不能只說「我寫好了」
-- 需要查資料時必須用 web_search，不能編造
-- 需要執行操作時必須用 run_command，不能假裝做了
-- 每次回覆最多呼叫一個工具。如果收到工具結果後還需要更多工具，可以再次呼叫。
+⚠️ 鐵則（違反視為任務失敗）：
+- 必須先搜尋再寫內容（web_search → write_file）
+- 寫檔案時 content 必須是完整內容，不能寫「此處省略」
+- 每章獨立一個檔案，不要把所有章節塞進一個檔案
+- 路徑範例：ebooks/ch03_xxx.md、children_book/research.md、website/index.html
+- 路徑不要加 outputs/ 前綴
 """
 
 
