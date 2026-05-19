@@ -62,6 +62,30 @@ class ToolSystem:
             "created_at": datetime.now().isoformat(),
             "use_count": 0
         }
+        # 5. write_file 工具 — 寫入內容到檔案（用於產生電子書章節）
+        self.registry["write_file"] = {
+            "description": "將文字內容寫入指定的檔案路徑，可用於儲存電子書章節、網站頁面等",
+            "type": "builtin",
+            "code": "def execute(path, content):\n import os\n os.makedirs(os.path.dirname(path) or '.', exist_ok=True)\n with open(path, 'w', encoding='utf-8') as f:\n  f.write(content)\n return f'已寫入 {len(content)} 字元到 {path}'",
+            "created_at": datetime.now().isoformat(),
+            "use_count": 0
+        }
+        # 6. check_cloudflare 工具 — 驗證 Cloudflare API 金鑰是否可用
+        self.registry["check_cloudflare"] = {
+            "description": "檢查 Cloudflare API 金鑰是否有效，可用於確認 DNS 管理、Email Routing、Workers 等服務的連線狀態",
+            "type": "builtin",
+            "code": "def execute():\n import os, json, urllib.request\n token = os.getenv('CLOUDFLARE_API_TOKEN', '')\n if not token:\n  return json.dumps({'status': 'error', 'message': '未設定 CLOUDFLARE_API_TOKEN'}, ensure_ascii=False)\n req = urllib.request.Request('https://api.cloudflare.com/client/v4/user/tokens/verify', headers={'Authorization': f'Bearer {token}', 'Content-Type': 'application/json'})\n try:\n  resp = urllib.request.urlopen(req, timeout=10)\n  data = json.loads(resp.read())\n  return json.dumps(data, ensure_ascii=False, indent=2)\n except Exception as e:\n  return json.dumps({'status': 'error', 'message': str(e)}, ensure_ascii=False)",
+            "created_at": datetime.now().isoformat(),
+            "use_count": 0
+        }
+        # 7. list_memory 工具 — 查詢黑曜的記憶內容
+        self.registry["list_memory"] = {
+            "description": "列出黑曜的記憶內容（working/semantic/episodic），可指定記憶類型和數量",
+            "type": "builtin",
+            "code": "def execute(memory_type='semantic', count=10):\n import json\n from pathlib import Path\n base = Path.home() / '.ampm_brain' / 'memory'\n file_map = {'working': base/'working.json', 'semantic': base/'semantic.json', 'episodic': base/'episodic.json'}\n path = file_map.get(memory_type)\n if not path or not path.exists():\n  return f'找不到記憶檔案: {memory_type}'\n data = json.loads(path.read_text())\n if isinstance(data, list):\n  items = data[-count:]\n  lines = []\n  for e in items:\n   fact = e.get('fact', e.get('user', ''))[:120]\n   imp = e.get('importance', 0)\n   lines.append(f'[imp={imp}] {fact}')\n  return '\\n'.join(lines)\n return str(data)[:2000]",
+            "created_at": datetime.now().isoformat(),
+            "use_count": 0
+        }
         self._save_registry()
         print(f"✅ 已成功組裝 {len(self.registry)} 個核心工具")
 

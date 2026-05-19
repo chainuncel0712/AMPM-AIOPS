@@ -124,6 +124,8 @@ class Obsidian:
         # ===== 舊器官初始化 =====
         self.memory = self.registry.add(MemoryManager(self.base_dir))
         self.tools = self.registry.add(ToolSystem(str(self.base_dir / "data" / "tools" / "registry.json")))
+        from tools import set_tool_system
+        set_tool_system(self.tools)
         self.agents = self.registry.add(AgentManager(self.base_dir))
         self.models = self.registry.add(ModelCapability(self.base_dir))
         self.breath = self.registry.add(BreathSystem(call_ai_func=self._call_ai))
