@@ -300,10 +300,13 @@ class Obsidian:
         # ===== 將所有註冊的器官同步到 self.organs（LangGraph 依賴此 dict） =====
         self.organs = self.registry.all()
 
-        # ===== agent executor =====
+        # ===== agent executor（支援工具呼叫） =====
         def _agent_executor(agent, task):
+            import json as _json
+            import re as _re
+
             role = agent.get("role", "")
-            prompt = agent.get("prompt", "")
+            prompt_text = agent.get("prompt", "")
             desc = task.get("description", "")
             tools_list = agent.get("tools", [])
             capabilities = agent.get("capabilities", set())
@@ -323,6 +326,13 @@ class Obsidian:
                 except Exception:
                     pass
 
+            # 載入子代理工具定義
+            try:
+                from core.sub_agent_tools import TOOL_DEFINITIONS, execute_tool
+            except ImportError:
+                TOOL_DEFINITIONS = ""
+                execute_tool = None
+
             think_prompt = f"""你是 AMPM-AIOPS 黑曜的 {role} 子代理，代號 {agent_name}。
 嚴禁罐頭話、客服模板、道歉句。語氣像真人，直接給答案。
 
@@ -332,23 +342,94 @@ class Obsidian:
 {desc}
 
 ## 角色能力
-{prompt}
+{prompt_text}
 技能：{', '.join(capabilities) if capabilities else role}
-工具：{tools_str}
+
+{TOOL_DEFINITIONS}
 
 ## 規則
 - 不編造數據，不知道就說不知道
 - 不問「需要我繼續嗎？」「這樣可以嗎？」
 - 不回「再跟我說」「請告訴我」等罐頭句
-- 完成後直接用【結果】給出最終答案"""
+- 需要實際操作（寫檔、搜尋、執行指令）時，必須用 JSON 格式呼叫工具
+- 如果你需要使用工具，輸出：{{"tool": "工具名稱", "args": {{"參數": "值"}}}}
+- 收到工具執行結果後，繼續思考或給出最終答案
+- 完成後用【結果】標記最終答案"""
+
             messages = [
                 {"role": "system", "content": think_prompt},
                 {"role": "user", "content": f"任務：{desc}"},
             ]
-            result = self.llm.call(messages, temperature=0.3)
-            if not result:
-                return f"[{agent_name}] 任務完成（無詳細結果）"
-            return f"[{agent_name}/{role}]\n{result}"
+
+            # 多輪工具呼叫（最多 5 輪）
+            final_result = None
+            for round_num in range(5):
+                try:
+                    result = self.llm.call(messages, temperature=0.3)
+                except Exception as e:
+                    print(f"[AgentCompany] {agent_name} LLM 呼叫失敗 (round {round_num}): {e}")
+                    if round_num == 0:
+                        return f"[{agent_name}] LLM 呼叫失敗: {e}"
+                    break
+
+                if not result:
+                    break
+
+                # 嘗試解析工具呼叫
+                tool_call = None
+                # 格式 1: {"tool": "...", "args": {...}}
+                for m in _re.finditer(r'\{', result):
+                    start = m.start()
+                    depth = 0
+                    end = -1
+                    for i in range(start, len(result)):
+                        if result[i] == '{': depth += 1
+                        elif result[i] == '}':
+                            depth -= 1
+                            if depth == 0:
+                                end = i + 1
+                                break
+                    if end > start:
+                        candidate = result[start:end]
+                        if '"tool"' in candidate:
+                            try:
+                                call_info = _json.loads(candidate)
+                                if "tool" in call_info:
+                                    tool_call = call_info
+                                    break
+                            except Exception:
+                                continue
+
+                # 格式 2: <tool_call> 包裹
+                if not tool_call:
+                    tc = _re.search(r'<tool_call>\s*(.*?)\s*</tool_call>', result, _re.DOTALL)
+                    if tc:
+                        try:
+                            tool_call = _json.loads(tc.group(1).strip())
+                        except Exception:
+                            pass
+
+                if tool_call and execute_tool:
+                    tool_name = tool_call.get("tool", "")
+                    tool_args = tool_call.get("args", {})
+                    print(f"[AgentCompany] {agent_name} 🔧 呼叫工具: {tool_name} {str(tool_args)[:80]}")
+
+                    tool_output = execute_tool(tool_name, tool_args)
+                    print(f"[AgentCompany] {agent_name} 工具結果: {tool_output[:150]}")
+
+                    # 將工具結果附加到對話中
+                    messages.append({"role": "assistant", "content": result})
+                    messages.append({"role": "user", "content": f"工具執行結果：\n{tool_output}\n\n請根據此結果繼續思考或給出最終答案。"})
+                    final_result = None  # 還沒完，繼續
+                else:
+                    # 沒有工具呼叫，這就是最終答案
+                    final_result = result
+                    break
+
+            if not final_result:
+                final_result = result or "（無回應）"
+
+            return f"[{agent_name}/{role}]\n{final_result}"
 
         self.agents.set_executor(_agent_executor)
 
