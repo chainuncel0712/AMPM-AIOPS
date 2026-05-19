@@ -275,8 +275,9 @@ class Cortex(BaseOrgan):
         # 呼叫 LLM 取得回覆
         reply = self.llm.call(messages)
 
-        # ===== Critic + Learning 閉環 =====
-        if self.critic:
+        # ===== [已禁用] Critic + Learning 閉環 — 每訊息消耗 5-10x token 做自我反省 =====
+        ENABLE_SELF_REFLECTION = False
+        if ENABLE_SELF_REFLECTION and self.critic:
             critic_result = self.critic.evaluate(
                 user_msg=user_msg,
                 assistant_msg=reply or "",
@@ -322,14 +323,14 @@ class Cortex(BaseOrgan):
             self.life_cycle.context["reply"] = reply
             self.life_cycle.context["pending_reflect"] = True
         
-        # ===== 失敗自動修復 =====
-        if not reply or "錯誤" in reply or "失敗" in reply or "不可用" in str(reply):
+        # ===== [已禁用] 失敗自動修復 — 不能再浪費 token 自我修復 =====
+        if False and (not reply or "錯誤" in reply or "失敗" in reply or "不可用" in str(reply)):
             repaired = self._auto_repair(user_msg, reply)
             if repaired:
                 reply = repaired
         
-        # ===== 不一致自動反省（stable 模式跳過）=====
-        if self.critic and self.contradiction:
+        # ===== [已禁用] 不一致自動反省 =====
+        if False and self.critic and self.contradiction:
             self._auto_reflect(user_msg, reply)
         
         return reply
