@@ -18,10 +18,10 @@
       "description": "使用auto_content_creator生成第二章草稿，topic:AI工具实战第二章选择你的第一个AI助手",
       "priority": 1,
       "deadline": null,
-      "status": "in_progress",
+      "status": "completed",
       "created_at": "2026-05-19T12:14:59.609730",
-      "updated_at": "2026-05-19T14:32:49.596524",
-      "completed_at": null,
+      "updated_at": "2026-05-19T14:35:20.526508",
+      "completed_at": "2026-05-19T14:35:20.526508",
       "overdue_warned": false
     }
   },
