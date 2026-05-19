@@ -6,9 +6,9 @@
       "description": "從TOP10網站前30熱門關鍵字選題，AI自動生成章節、內容、插圖腳本，產出新手電子工具書並準備上架。",
       "priority": 1,
       "deadline": null,
-      "status": "pending",
+      "status": "in_progress",
       "created_at": "2026-05-19T04:02:13.501711",
-      "updated_at": "2026-05-19T04:02:13.501711",
+      "updated_at": "2026-05-19T14:29:47.710041",
       "completed_at": null,
       "overdue_warned": false
     },
