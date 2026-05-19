@@ -11,7 +11,19 @@
       "updated_at": "2026-05-19T04:02:13.501711",
       "completed_at": null,
       "overdue_warned": false
+    },
+    "T0002-c2ca": {
+      "id": "T0002-c2ca",
+      "title": "生成AI电子书第二章草稿",
+      "description": "使用auto_content_creator生成第二章草稿，topic:AI工具实战第二章选择你的第一个AI助手",
+      "priority": 1,
+      "deadline": null,
+      "status": "pending",
+      "created_at": "2026-05-19T12:14:59.609730",
+      "updated_at": "2026-05-19T12:14:59.609730",
+      "completed_at": null,
+      "overdue_warned": false
     }
   },
-  "counter": 1
+  "counter": 2
 }
