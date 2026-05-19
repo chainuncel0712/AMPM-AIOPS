@@ -134,6 +134,10 @@ class ProactiveExecutor:
         if not planner or not agents:
             return
 
+        # 一次只跑一個任務，避免塞爆
+        if self._pending_missions:
+            return
+
         # 如果 agent_company 正在忙，等一下
         stats = agents.get_global_stats() if hasattr(agents, "get_global_stats") else {}
         busy_agents = stats.get("agents_busy", 0)
@@ -144,7 +148,6 @@ class ProactiveExecutor:
         pending = [
             t for t in planner.tasks.values()
             if t.get("status") == "pending"
-            and t.get("id") not in self._pending_missions
         ]
         if not pending:
             return
