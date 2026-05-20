@@ -17,31 +17,31 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>黑曜作品集</title>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0a0a0a; color: #e0e0e0; min-height: 100vh; }
-.header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 24px; text-align: center; border-bottom: 2px solid #7c3aed; }
-.header h1 { font-size: 1.5em; color: #a78bfa; }
-.header .stats { color: #888; font-size: 0.9em; margin-top: 8px; }
-.container { max-width: 800px; margin: 0 auto; padding: 16px; }
-.breadcrumb { padding: 12px 0; font-size: 0.85em; color: #666; }
-.breadcrumb a { color: #a78bfa; text-decoration: none; }
-.breadcrumb a:hover { color: #c4b5fd; }
-.file-list { list-style: none; }
-.file-item { display: flex; align-items: center; padding: 10px 12px; margin: 2px 0; border-radius: 6px; transition: background 0.2s; }
-.file-item:hover { background: rgba(124, 58, 237, 0.1); }
-.file-item.dir { border-left: 3px solid #7c3aed; }
-.file-item .icon { margin-right: 12px; font-size: 1.3em; }
-.file-item .name { flex: 1; }
-.file-item .name a { color: #e0e0e0; text-decoration: none; }
-.file-item .name a:hover { color: #a78bfa; }
-.file-item .size { color: #666; font-size: 0.85em; min-width: 80px; text-align: right; }
-.file-item .preview { color: #666; font-size: 0.8em; margin-left: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px; }
-.empty { text-align: center; padding: 40px; color: #555; }
-.refresh { text-align: center; padding: 10px; }
-.refresh a { color: #a78bfa; font-size: 0.85em; }
+* {{ box-sizing: border-box; margin: 0; padding: 0; }}
+body {{ font-family: 'Segoe UI', system-ui, sans-serif; background: #0a0a0a; color: #e0e0e0; min-height: 100vh; }}
+.header {{ background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 24px; text-align: center; border-bottom: 2px solid #7c3aed; }}
+.header h1 {{ font-size: 1.5em; color: #a78bfa; }}
+.header .stats {{ color: #888; font-size: 0.9em; margin-top: 8px; }}
+.container {{ max-width: 800px; margin: 0 auto; padding: 16px; }}
+.breadcrumb {{ padding: 12px 0; font-size: 0.85em; color: #666; }}
+.breadcrumb a {{ color: #a78bfa; text-decoration: none; }}
+.breadcrumb a:hover {{ color: #c4b5fd; }}
+.file-list {{ list-style: none; }}
+.file-item {{ display: flex; align-items: center; padding: 10px 12px; margin: 2px 0; border-radius: 6px; transition: background 0.2s; }}
+.file-item:hover {{ background: rgba(124, 58, 237, 0.1); }}
+.file-item.dir {{ border-left: 3px solid #7c3aed; }}
+.file-item .icon {{ margin-right: 12px; font-size: 1.3em; }}
+.file-item .name {{ flex: 1; }}
+.file-item .name a {{ color: #e0e0e0; text-decoration: none; }}
+.file-item .name a:hover {{ color: #a78bfa; }}
+.file-item .size {{ color: #666; font-size: 0.85em; min-width: 80px; text-align: right; }}
+.file-item .preview {{ color: #666; font-size: 0.8em; margin-left: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px; }}
+.empty {{ text-align: center; padding: 40px; color: #555; }}
+.refresh {{ text-align: center; padding: 10px; }}
+.refresh a {{ color: #a78bfa; font-size: 0.85em; }}
 </style>
 <script>
-setTimeout(function(){location.reload();}, 60000);
+setTimeout(function(){{location.reload();}}, 60000);
 </script>
 </head>
 <body>
