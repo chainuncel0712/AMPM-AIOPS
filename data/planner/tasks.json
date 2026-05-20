@@ -42,9 +42,9 @@
       "description": "1. 用 check_cloudflare 工具驗證 API Token 是否有效 2. 用 Cloudflare API 檢查 AMPM-AIOPS.COM 網域的 DNS 設定 3. 設定 Email Routing（如 admin@ampm-aiops.com → 你的信箱）4. 結果記錄到 outputs/research/cloudflare_setup.md。",
       "priority": 1,
       "deadline": null,
-      "status": "pending",
+      "status": "in_progress",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T10:44:41.350768",
+      "updated_at": "2026-05-20T10:45:11.352936",
       "completed_at": null,
       "overdue_warned": false
     },
@@ -54,9 +54,9 @@
       "description": "建立專業服務網站：1. outputs/website/index.html（品牌介紹、三大服務、聯絡方式）2. outputs/website/style.css（現代簡潔風格）3. 用 Cloudflare Pages API 或 Wrangler 部署到 ampm-aiops.com。",
       "priority": 2,
       "deadline": null,
-      "status": "in_progress",
+      "status": "pending",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T10:42:09.520576",
+      "updated_at": "2026-05-20T10:47:13.076995",
       "completed_at": null,
       "overdue_warned": false
     },
