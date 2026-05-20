@@ -3,7 +3,7 @@
     "B001": {
       "id": "B001",
       "title": "建立 outputs 目錄結構",
-      "description": "建立 outputs/ 下的完整目錄：outputs/ebooks/, outputs/children_book/, outputs/website/, outputs/research/。每個目錄下放一個 .gitkeep 檔案。",
+      "description": "建立 outputs/ 下的完整目錄：ebooks/, children_book/, website/, research/。用 write_file 工具在每個目錄下建一個 .gitkeep。",
       "priority": 1,
       "deadline": null,
       "status": "pending",
@@ -14,8 +14,8 @@
     },
     "B002": {
       "id": "B002",
-      "title": "電子工具書：第一章寫作",
-      "description": "選擇一個工具書主題（建議：AI 工具入門指南），撰寫第一章完整內容。包含：標題、引言、主內容（至少800字）、實戰步驟、本章總結。存入 outputs/ebooks/ch01_intro.md。",
+      "title": "電子書：第一章寫作",
+      "description": "選一個熱門工具書主題（建議：AI入門指南），撰寫第一章。含標題、引言、主內容至少800字、實戰步驟、總結。用 write_file 寫入 outputs/ebooks/ch01_intro.md。",
       "priority": 1,
       "deadline": null,
       "status": "pending",
@@ -26,8 +26,8 @@
     },
     "B003": {
       "id": "B003",
-      "title": "電子書市場研究",
-      "description": "搜尋並整理 Amazon KDP、Apple Books、Google Play Books 三個平台的註冊流程、費用、抽成比例、上架規格要求。寫成報告存入 outputs/research/platform_research.md。每個平台至少 200 字。",
+      "title": "電子書上架平台研究報告",
+      "description": "用 web_search 搜尋 Amazon KDP、Apple Books、Google Play Books、Kobo Writing Life 四個平台的：註冊流程、費用、抽成比例、檔案格式要求、上架時間。整理成報告，用 write_file 存入 outputs/research/platform_research.md，至少 800 字。",
       "priority": 1,
       "deadline": null,
       "status": "pending",
@@ -38,9 +38,9 @@
     },
     "B004": {
       "id": "B004",
-      "title": "建立 AMPM-AIOPS 網站首頁",
-      "description": "建立 outputs/website/index.html，內容包含：1.AMPM-AIOPS 品牌介紹 2.三大服務（電子工具書、童書、AI代理） 3.聯絡方式。使用現代簡潔 HTML+CSS 風格，同時建立 outputs/website/style.css。",
-      "priority": 2,
+      "title": "Cloudflare 網路身分建立",
+      "description": "1. 用 check_cloudflare 工具驗證 API Token 是否有效 2. 用 Cloudflare API 檢查 AMPM-AIOPS.COM 網域的 DNS 設定 3. 設定 Email Routing（如 admin@ampm-aiops.com → 你的信箱）4. 結果記錄到 outputs/research/cloudflare_setup.md。",
+      "priority": 1,
       "deadline": null,
       "status": "pending",
       "created_at": "2026-05-20T00:00:00",
@@ -50,8 +50,8 @@
     },
     "B005": {
       "id": "B005",
-      "title": "童書市場研究",
-      "description": "搜尋目前學齡前（3-6歲）童書熱門主題，分析 Amazon、博客來 TOP20 童書的主題、風格、定價。寫出選題建議（主題、年齡層、頁數、插圖風格），存入 outputs/children_book/research.md。至少 500 字。",
+      "title": "AMPM-AIOPS 品牌網站建立與部署",
+      "description": "建立專業服務網站：1. outputs/website/index.html（品牌介紹、三大服務、聯絡方式）2. outputs/website/style.css（現代簡潔風格）3. 用 Cloudflare Pages API 或 Wrangler 部署到 ampm-aiops.com。",
       "priority": 2,
       "deadline": null,
       "status": "pending",
@@ -62,8 +62,8 @@
     },
     "B006": {
       "id": "B006",
-      "title": "童書第一本：大綱與角色設定",
-      "description": "根據市場研究結果，為第一本童書建立完整設定：故事大綱、主角（名字、性格、外觀）、配角、故事結構（起承轉合）。存入 outputs/children_book/book1_outline.md。至少 500 字。",
+      "title": "童書市場研究",
+      "description": "用 web_search 搜尋學齡前（3-6歲）童書熱門主題，分析 Amazon、博客來 TOP20 童書的主題、風格、定價、頁數。寫選題建議，用 write_file 存入 outputs/children_book/research.md，至少 500 字。",
       "priority": 2,
       "deadline": null,
       "status": "pending",
@@ -74,8 +74,8 @@
     },
     "B007": {
       "id": "B007",
-      "title": "品質檢查：所有 output 檔案",
-      "description": "掃描 outputs/ 下所有 .md 檔案，檢查：1.檔案是否存在 2.內容是否超過 500 字 3.格式是否完整。不合格的檔案標記並自動補齊。結果記錄到 outputs/quality_log.md。",
+      "title": "童書第一本：完整創作",
+      "description": "根據市場研究結果，創作第一本童書：1. 故事大綱與角色設定（book1_outline.md）2. 完整故事內容至少 1000 字（book1_story.md）3. 插圖描述與分頁規劃（book1_illustrations.md）。全部存入 outputs/children_book/。",
       "priority": 2,
       "deadline": null,
       "status": "pending",
@@ -86,8 +86,44 @@
     },
     "B008": {
       "id": "B008",
-      "title": "透過 Telegram 向老大回報進度",
-      "description": "彙整目前 outputs/ 目錄下所有已完成的檔案清單，計算總字數，透過 Telegram 發送進度摘要給老大。格式：📊 黑曜進度報告 \\n 已完成檔案：X 個 \\n 總字數：Y 字 \\n 進行中任務：Z 個。",
+      "title": "電子書第二章～第五章寫作",
+      "description": "接續第一章，依序寫第二章到第五章。每章至少 800 字，含主題介紹、實戰步驟、截圖腳本、總結。用 write_file 分別存入 outputs/ebooks/ch02.md ~ ch05.md。",
+      "priority": 2,
+      "deadline": null,
+      "status": "pending",
+      "created_at": "2026-05-20T00:00:00",
+      "updated_at": "2026-05-20T00:00:00",
+      "completed_at": null,
+      "overdue_warned": false
+    },
+    "B009": {
+      "id": "B009",
+      "title": "商業策略：定價與行銷規劃",
+      "description": "用 web_search 研究電子書和童書的市場定價策略、Amazon KDP 抽成結構、促銷方案。制定：1. 定價策略（電子書、童書各一本的建議售價）2. 初期行銷方案（免費宣傳管道、社群推廣方式）3. 寫成報告存入 outputs/research/business_strategy.md，至少 600 字。",
+      "priority": 3,
+      "deadline": null,
+      "status": "pending",
+      "created_at": "2026-05-20T00:00:00",
+      "updated_at": "2026-05-20T00:00:00",
+      "completed_at": null,
+      "overdue_warned": false
+    },
+    "B010": {
+      "id": "B010",
+      "title": "自動化客服與銷售流程設計",
+      "description": "設計一條龍 AI 代理服務的：1. 客戶自助選購流程（網頁表單 → AI 評估需求 → 報價 → 付款 → 自動安裝）2. 客服對話腳本（常見問題、技術支援、退款政策）3. 用 write_file 存入 outputs/research/service_flow.md，至少 800 字。",
+      "priority": 3,
+      "deadline": null,
+      "status": "pending",
+      "created_at": "2026-05-20T00:00:00",
+      "updated_at": "2026-05-20T00:00:00",
+      "completed_at": null,
+      "overdue_warned": false
+    },
+    "B011": {
+      "id": "B011",
+      "title": "品質檢查與進度回報",
+      "description": "1. 用 list_dir 掃描 outputs/ 目錄下所有檔案 2. 用 read_file 檢查每個 .md 檔案內容是否超過 500 字且格式完整 3. 不合格的標記並自動補齊 4. 彙整進度透過 Telegram 發送給老大。格式：📊 黑曜進度 \\n 已完成 X 個檔案 \\n 總字數 Y 字 \\n 下一任務 Z。",
       "priority": 3,
       "deadline": null,
       "status": "pending",
@@ -97,5 +133,5 @@
       "overdue_warned": false
     }
   },
-  "counter": 8
+  "counter": 11
 }

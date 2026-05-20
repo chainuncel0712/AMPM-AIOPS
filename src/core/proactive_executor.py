@@ -151,55 +151,63 @@ class ProactiveExecutor:
         # 按優先級排序（數字越小越優先）
         pending.sort(key=lambda t: (t["priority"], t["created_at"]))
 
-        # 一次拿一個最高優先級任務
         task = pending[0]
-
-        # 標記為 in_progress
         task["status"] = "in_progress"
         task["updated_at"] = datetime.now().isoformat()
         planner._save_to_disk()
 
-        desc = f"{task['title']}"
-        if task.get("description"):
-            desc += f"：{task['description'][:200]}"
+        desc = self._build_agent_prompt(task)
 
         print(f"[ProactiveExecutor] 🚀 自動執行: {task['id']} - {task['title']} (優先級={task['priority']})")
 
-        # 先嘗試直接執行（內容生成類型任務直接用 LLM）
-        direct_result = self._try_direct_execute(task)
-        if direct_result:
-            return
-
-        # 如果直接執行不適用，走 agent_company 路徑
+        # 優先走 agent_company 子代理路線
         agents = self.agents
-        if not agents:
-            planner.update_task_status(task["id"], "pending")
+        if agents:
+            stats = agents.get_global_stats() if hasattr(agents, "get_global_stats") else {}
+            busy_agents = stats.get("agents_busy", 0)
+            if busy_agents <= 10:
+                try:
+                    mission_id = agents.launch_mission(desc)
+                    if mission_id:
+                        self._pending_missions[task["id"]] = mission_id
+                        self._current_task_id = task["id"]
+                        self._current_mission_id = mission_id
+                        self._notify_user(
+                            f"🚀 黑曜派工\n"
+                            f"📋 {task['title']}\n"
+                            f"👥 子代理已出動"
+                        )
+                        print(f"[ProactiveExecutor] → mission {mission_id}")
+                        return
+                except Exception as e:
+                    print(f"[ProactiveExecutor] agent_company 失敗: {e}")
+
+        # 備援：子代理不可用或失敗，直接 LLM 生成
+        if self._try_direct_execute(task):
             return
 
-        stats = agents.get_global_stats() if hasattr(agents, "get_global_stats") else {}
-        busy_agents = stats.get("agents_busy", 0)
-        if busy_agents > 10:
-            planner.update_task_status(task["id"], "pending")
-            return
+        # 都失敗，恢復 pending
+        planner.update_task_status(task["id"], "pending")
 
-        try:
-            mission_id = agents.launch_mission(desc)
-            if mission_id:
-                self._pending_missions[task["id"]] = mission_id
-                self._current_task_id = task["id"]
-                self._current_mission_id = mission_id
-                self._notify_user(
-                    f"🚀 黑曜自主啟動任務\n"
-                    f"📋 {task['title']}\n"
-                    f"🆔 {task['id']}\n"
-                    f"🔢 優先級: {'🔥' * (6 - task['priority'])}"
-                )
-                print(f"[ProactiveExecutor] → mission {mission_id}")
-            else:
-                planner.update_task_status(task["id"], "pending")
-        except Exception as e:
-            print(f"[ProactiveExecutor] 啟動 mission 失敗: {e}")
-            planner.update_task_status(task["id"], "pending")
+    def _build_agent_prompt(self, task: dict) -> str:
+        """為子代理建立明確的任務指示，包含輸出路徑要求"""
+        title = task.get("title", "")
+        desc = task.get("description", "")
+
+        # 找出輸出路徑
+        output_path = None
+        for keyword in ["存入 ", "存到 "]:
+            idx = desc.find(keyword)
+            if idx >= 0:
+                path_str = desc[idx + len(keyword):].strip().split()[0].rstrip("。.")
+                if path_str:
+                    output_path = path_str
+                    break
+
+        if output_path:
+            return f"【任務】{title}\n{desc}\n\n⚠️ 關鍵指令：完成後必須用 write_file 工具將內容寫入 {output_path}。不只要回覆文字，必須實際建立檔案。"
+        else:
+            return f"【任務】{title}\n{desc}\n\n⚠️ 關鍵指令：完成後如有產出內容，必須用 write_file 工具實際寫入檔案。不只要回覆文字。"
 
     # ── 0.5 直接執行內容生成任務 ───────────────────────────
 
@@ -315,7 +323,20 @@ class ProactiveExecutor:
             status = mission.get("status", "")
 
             if status == "completed":
-                # 完成！
+                # 驗證：任務是否真的產出了檔案？
+                task = planner.tasks.get(task_id, {})
+                task_desc = task.get("description", "")
+                output_verified = self._verify_output_exists(task_desc)
+
+                if not output_verified:
+                    # 子代理回報完成但沒產出檔案 → 標記失敗，重試
+                    print(f"[ProactiveExecutor] ⚠️ 任務 {task_id} 回報完成但無產出檔案，重試中...")
+                    planner.update_task_status(task_id, "pending")
+                    completed_ids.append(task_id)
+                    self._current_task_id = None
+                    self._current_mission_id = None
+                    continue
+
                 results = mission.get("results", {})
                 success_count = sum(1 for r in results.values() if r.get("success"))
                 total = len(mission.get("sub_tasks", []))
@@ -323,7 +344,6 @@ class ProactiveExecutor:
                 planner.complete_task(task_id)
                 completed_ids.append(task_id)
 
-                task = planner.tasks.get(task_id, {})
                 self._notify_user(
                     f"✅ 黑曜完成任務\n"
                     f"📋 {task.get('title', task_id)}\n"
@@ -345,6 +365,22 @@ class ProactiveExecutor:
 
         for tid in completed_ids:
             self._pending_missions.pop(tid, None)
+
+    def _verify_output_exists(self, desc: str) -> bool:
+        """檢查任務描述中指定的輸出路徑是否真的有檔案產生。"""
+        import os
+        for keyword in ["存入 ", "存到 ", "outputs/"]:
+            idx = desc.find(keyword)
+            if idx >= 0:
+                path_str = desc[idx + len(keyword):].strip().split()[0].rstrip("。.,")
+                if path_str:
+                    full_path = Path(__file__).parent.parent.parent / path_str
+                    if full_path.exists():
+                        return True
+                    # 也檢查 outputs/ 下的同名檔案
+                    alt_path = Path(__file__).parent.parent.parent / "outputs" / path_str.replace("outputs/", "")
+                    return alt_path.exists()
+        return True  # 如果任務描述沒指定路徑，先信任子代理回報
 
     # ── 0. 確保永遠有商業任務 ──────────────────────────────
 
