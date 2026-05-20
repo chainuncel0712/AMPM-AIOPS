@@ -212,7 +212,7 @@ class ProactiveExecutor:
         task = pending[0]
         task["status"] = "in_progress"
         task["updated_at"] = datetime.now().isoformat()
-        planner._save_to_disk()
+        planner.tasks._save_to_disk()
 
         desc = self._build_agent_prompt(task)
 
@@ -248,7 +248,7 @@ class ProactiveExecutor:
             return
 
         # 都失敗，恢復 pending
-        planner.update_task_status(task["id"], "pending")
+        planner.tasks.update_task_status(task["id"], "pending")
 
     def _cancel_stale_missions(self, timeout_seconds: int = 300):
         """取消超過 timeout 還沒完成的 mission，改用直接執行"""
@@ -273,7 +273,7 @@ class ProactiveExecutor:
             task = planner.tasks.get(task_id, {})
             task["status"] = "pending"
             task["updated_at"] = datetime.now().isoformat()
-            planner._save_to_disk()
+            planner.tasks._save_to_disk()
 
             # 強制重置 agent_company 中對應的僵屍代理
             agents = self.agents
@@ -322,7 +322,7 @@ class ProactiveExecutor:
             task["status"] = "completed"
             task["completed_at"] = datetime.now().isoformat()
             task["updated_at"] = datetime.now().isoformat()
-            planner._save_to_disk()
+            planner.tasks._save_to_disk()
             self._current_task_id = None
             return True
 
@@ -432,7 +432,7 @@ class ProactiveExecutor:
                 task["status"] = "completed"
                 task["completed_at"] = datetime.now().isoformat()
                 task["updated_at"] = datetime.now().isoformat()
-                planner._save_to_disk()
+                planner.tasks._save_to_disk()
 
                 self._notify_user(
                     f"✅ 任務完成\n"
@@ -484,7 +484,7 @@ class ProactiveExecutor:
                 if not output_verified:
                     # 子代理回報完成但沒產出檔案 → 標記失敗，重試
                     print(f"[ProactiveExecutor] ⚠️ 任務 {task_id} 回報完成但無產出檔案，重試中...")
-                    planner.update_task_status(task_id, "pending")
+                    planner.tasks.update_task_status(task_id, "pending")
                     completed_ids.append(task_id)
                     self._current_task_id = None
                     self._current_mission_id = None
@@ -494,7 +494,7 @@ class ProactiveExecutor:
                 success_count = sum(1 for r in results.values() if r.get("success"))
                 total = len(mission.get("sub_tasks", []))
 
-                planner.complete_task(task_id)
+                planner.tasks.complete_task(task_id)
                 completed_ids.append(task_id)
 
                 self._notify_user(
@@ -509,7 +509,7 @@ class ProactiveExecutor:
                 self._current_mission_id = None
 
             elif status == "failed":
-                planner.update_task_status(task_id, "pending")
+                planner.tasks.update_task_status(task_id, "pending")
                 completed_ids.append(task_id)
                 print(f"[ProactiveExecutor] ❌ 任務失敗: {task_id}")
 
@@ -564,7 +564,7 @@ class ProactiveExecutor:
         if cf_token:
             cf_check_file = research_dir / "cloudflare_setup.md"
             if not cf_check_file.exists():
-                planner.add_task(
+                planner.tasks.add_task(
                     title="Cloudflare 網路身分建立",
                     description="1. 用 run_command 執行 curl 驗證 Cloudflare API Token 2. 查詢 AMPM-AIOPS.COM DNS 設定 3. 記錄結果用 write_file 存入 outputs/research/cloudflare_setup.md。",
                     priority=1,
@@ -575,7 +575,7 @@ class ProactiveExecutor:
         # 管線階段 3：平台研究
         platform_file = research_dir / "platform_research.md"
         if not platform_file.exists():
-            planner.add_task(
+            planner.tasks.add_task(
                 title="電子書上架平台研究報告",
                 description="用 web_search 搜尋 Amazon KDP、Apple Books、Google Play Books、Kobo 四個平台的註冊流程、費用、抽成、檔案格式。用 write_file 存入 outputs/research/platform_research.md，至少 800 字。",
                 priority=1,
@@ -586,7 +586,7 @@ class ProactiveExecutor:
         # 管線階段 4：電子書第一章
         ebook_files = list(ebooks_dir.glob("ch*.md")) if ebooks_dir.exists() else []
         if len(ebook_files) < 1:
-            planner.add_task(
+            planner.tasks.add_task(
                 title="電子書：第一章寫作",
                 description="以 AI 入門指南為主題，撰寫第一章。先用 web_search 搜尋最新 AI 工具、新手入門知識、常見問題。含標題、引言、800+字內容、實戰步驟、總結。用 write_file 寫入 outputs/ebooks/ch01_intro.md。",
                 priority=1,
@@ -597,7 +597,7 @@ class ProactiveExecutor:
         # 管線階段 5：童書研究
         children_research = children_dir / "research.md" if children_dir.exists() else None
         if not children_research or not children_research.exists():
-            planner.add_task(
+            planner.tasks.add_task(
                 title="童書市場研究",
                 description="用 web_search 搜尋學齡前（3-6歲）童書熱門主題，分析 TOP20 童書風格、定價。用 write_file 存入 outputs/children_book/research.md，至少 500 字。",
                 priority=2,
@@ -608,7 +608,7 @@ class ProactiveExecutor:
         # 管線階段 6：品牌網站
         website_index = website_dir / "index.html" if website_dir.exists() else None
         if not website_index or not website_index.exists():
-            planner.add_task(
+            planner.tasks.add_task(
                 title="AMPM-AIOPS 品牌網站建立",
                 description="建立專業服務網站：1. outputs/website/index.html（品牌、三大服務、聯絡）2. outputs/website/style.css。用 write_file 寫入。現代簡潔風格。",
                 priority=2,
@@ -619,7 +619,7 @@ class ProactiveExecutor:
         # 管線階段 7：電子書第二章～第五章
         if len(ebook_files) < 5 and len(ebook_files) >= 1:
             next_ch = len(ebook_files) + 1
-            planner.add_task(
+            planner.tasks.add_task(
                 title=f"電子書第{next_ch}章寫作",
                 description=f"延續前章 AI 入門指南，寫第{next_ch}章。{ {2:'AI 工具介紹與比較',3:'Prompt 技巧實戰',4:'AI 實戰案例',5:'進階應用與變現'}.get(next_ch, '更多內容')}。至少 800 字，含實戰步驟和總結。先用 web_search 搜尋相關資訊。用 write_file 寫入 outputs/ebooks/ch{next_ch:02d}.md。",
                 priority=2,
@@ -630,7 +630,7 @@ class ProactiveExecutor:
         # 管線階段 8：童書第一本
         children_files = list(children_dir.glob("book1_*.md")) if children_dir.exists() else []
         if len(children_files) < 1:
-            planner.add_task(
+            planner.tasks.add_task(
                 title="童書第一本：完整創作",
                 description="創作第一本童書：故事大綱+角色設定、完整故事1000+字、插圖描述和分頁。用 write_file 分別寫入 outputs/children_book/book1_outline.md, book1_story.md, book1_illustrations.md。",
                 priority=2,
@@ -641,7 +641,7 @@ class ProactiveExecutor:
         # 管線階段 9：商業策略
         biz_strategy = research_dir / "business_strategy.md" if research_dir.exists() else None
         if not biz_strategy or not biz_strategy.exists():
-            planner.add_task(
+            planner.tasks.add_task(
                 title="商業策略：定價與行銷規劃",
                 description="用 web_search 研究電子書/童書定價策略、Amazon KDP 抽成、促銷方案。制定定價和行銷計畫。用 write_file 存入 outputs/research/business_strategy.md，至少 600 字。",
                 priority=2,
@@ -652,7 +652,7 @@ class ProactiveExecutor:
         # 管線階段 10：服務流程設計
         service_flow = research_dir / "service_flow.md" if research_dir.exists() else None
         if not service_flow or not service_flow.exists():
-            planner.add_task(
+            planner.tasks.add_task(
                 title="一條龍 AI 代理服務流程設計",
                 description="設計自動化服務流程：客戶選購→AI評估→報價→付款→安裝→客服→升級。含對話腳本、退款政策。用 write_file 存入 outputs/research/service_flow.md，至少 800 字。",
                 priority=3,
@@ -663,7 +663,7 @@ class ProactiveExecutor:
         # 管線階段 11：電子書第六章~第十章
         if len(ebook_files) < 10 and len(ebook_files) >= 5:
             next_ch = len(ebook_files) + 1
-            planner.add_task(
+            planner.tasks.add_task(
                 title=f"電子書第{next_ch}章寫作",
                 description=f"延續前面章節，寫第{next_ch}章。至少 800 字。用 write_file 寫入 outputs/ebooks/ch{next_ch:02d}.md。",
                 priority=3,
@@ -672,7 +672,7 @@ class ProactiveExecutor:
             return
 
         # 管線階段 12：品質檢查
-        planner.add_task(
+        planner.tasks.add_task(
             title="品質檢查與進度回報",
             description="1. 用 list_dir 和 read_file 檢查所有 outputs/ 檔案 2. 確認每個 .md 超過 500 字且格式完整 3. 不合格自動補齊 4. 透過 Telegram 回報進度給老大。",
             priority=3,
@@ -750,7 +750,7 @@ class ProactiveExecutor:
             if existing:
                 continue
 
-            planner.add_task(
+            planner.tasks.add_task(
                 title=problem["title"],
                 description=problem["description"],
                 priority=problem["priority"],
