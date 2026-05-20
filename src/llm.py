@@ -30,10 +30,12 @@ class TokenBucket:
 
 
 class LLMClient:
-    def __init__(self, breath_system=None):
+    def __init__(self, breath_system=None, thalamus=None):
         self.breath = breath_system
+        self.thalamus = thalamus
         self.providers = []
         self.rate_limiter = TokenBucket(rate=30, per_seconds=60)  # 每分鐘 30 次
+        self._last_user_msg = ""  # 供 router 分類用
 
         # 🥇 DeepSeek（文字主力，先用自己的 API）
         ds_key = os.getenv("DEEPSEEK_API_KEY")
