@@ -103,6 +103,9 @@ class ProactiveExecutor:
             try:
                 self._last_scan_time = time.time()
 
+                # 0. 確保永遠有商業任務可做
+                self._ensure_business_tasks()
+
                 # 1. 檢查並執行 pending 任務
                 self._execute_pending_tasks()
 
