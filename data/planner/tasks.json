@@ -131,7 +131,19 @@
       "updated_at": "2026-05-20T15:43:58.724606",
       "completed_at": null,
       "overdue_warned": false
+    },
+    "T0012-18f3": {
+      "id": "T0012-18f3",
+      "title": "產出電子工具書第二章初稿",
+      "description": "根據第二章大綱，實際生成完整的初稿文本。這是一個被用戶明確指正後的真實任務，必須實際執行。",
+      "priority": 1,
+      "deadline": "2026-05-20T18:00:00",
+      "status": "completed",
+      "created_at": "2026-05-20T15:45:16.057199",
+      "updated_at": "2026-05-20T15:46:50.695254",
+      "completed_at": "2026-05-20T15:46:50.695254",
+      "overdue_warned": false
     }
   },
-  "counter": 11
+  "counter": 12
 }

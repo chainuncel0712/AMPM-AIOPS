@@ -3,7 +3,7 @@ import http.server
 import os
 import socket
 
-PORT = 8080
+PORT = 80
 DIR = "/home/pop5057273712_gmail_com/AMPM-AIOPS/outputs"
 
 class UTF8Handler(http.server.SimpleHTTPRequestHandler):
