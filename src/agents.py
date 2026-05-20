@@ -54,6 +54,26 @@ AGENT_TEMPLATES = {
         "prompt": "你是一個執行代理。執行具體操作、部署、安裝。回報執行結果。",
         "capabilities": ["execution", "deployment", "operations"],
     },
+    "content_writer": {
+        "tools": ["write_file", "read_file", "web_search"],
+        "prompt": "你是內容創作代理。搜尋素材後撰寫完整內容，用 write_file 寫入 outputs/。內容至少800字，要能賣錢的品質。不閒聊、不道歉、不問要不要繼續。",
+        "capabilities": ["writing", "content_creation", "file_output", "research"],
+    },
+    "engineer": {
+        "tools": ["write_file", "run_command", "web_search"],
+        "prompt": "你是工程代理。建立網站、部署服務、寫程式。用 write_file 寫入 outputs/website/。用 run_command 執行部署指令。不閒聊。",
+        "capabilities": ["coding", "web_dev", "deployment", "file_output"],
+    },
+    "marketer": {
+        "tools": ["write_file", "web_search", "read_file"],
+        "prompt": "你是行銷代理。研究市場、制定定價策略、撰寫行銷文案。用 write_file 寫入 outputs/research/。產出要能直接用的行銷方案。",
+        "capabilities": ["marketing", "pricing", "research", "file_output"],
+    },
+    "business_strategist": {
+        "tools": ["write_file", "web_search", "read_file"],
+        "prompt": "你是商業策略代理。設計商業模式、服務流程、變現方案。用 write_file 寫入 outputs/research/。目標是幫老大賺錢。",
+        "capabilities": ["business", "strategy", "monetization", "file_output"],
+    },
 }
 
 
@@ -81,15 +101,53 @@ class AgentTaskRouter(BaseOrgan):
     # ═══════════════════════════════════════════════════════
 
     def _auto_spawn_departments(self):
-        """On init, create a single general pool. User defines departments via conversation."""
+        """建立公司部門架構：研究部、內容部、工程部、行銷部、客服部"""
         if not self._departments:
             self._departments["general_pool"] = {
                 "name": "general_pool",
                 "role": "general",
-                "description": "Default agent pool. User can create specialized departments.",
+                "description": "通用代理池，處理未分類任務",
                 "agent_ids": [],
-                "target_count": 3,
+                "target_count": 2,
             }
+        
+        # 確保各商業部門存在
+        default_depts = {
+            "research_dept": {
+                "role": "research",
+                "description": "市場研究部：搜尋、分析、報告。用 web_search 找資料，用 write_file 寫研究報告。",
+                "count": 2,
+            },
+            "content_dept": {
+                "role": "content",
+                "description": "內容創作部：寫電子書、童書、文章。必須用 write_file 將成品寫入 outputs/ 目錄。",
+                "count": 3,
+            },
+            "engineering_dept": {
+                "role": "engineering",
+                "description": "工程部：做網站、寫程式、部署。用 write_file 寫 HTML/CSS，用 run_command 部署。",
+                "count": 2,
+            },
+            "marketing_dept": {
+                "role": "marketing",
+                "description": "行銷部：定價策略、廣告文案、社群推廣。用 write_file 寫行銷方案。",
+                "count": 1,
+            },
+            "business_dept": {
+                "role": "business",
+                "description": "商業策略部：商業模式設計、服務流程規劃、定價與變現策略。用 write_file 寫策略報告。",
+                "count": 1,
+            },
+        }
+        for dept_name, cfg in default_depts.items():
+            if dept_name not in self._departments:
+                self._departments[dept_name] = {
+                    "name": dept_name,
+                    "role": cfg["role"],
+                    "description": cfg["description"],
+                    "agent_ids": [],
+                    "target_count": cfg["count"],
+                }
 
     def create_department(self, name: str, role: str, description: str = "",
                           target_count: int = 2) -> str:
@@ -244,39 +302,37 @@ class AgentTaskRouter(BaseOrgan):
         return mission_id
 
     def _decompose_task(self, description: str, context: Dict) -> List[Dict]:
-        """Decompose into sub-tasks. Uses existing dept roles if defined, else defaults."""
+        """根據任務類型分解為子任務並分配到對應部門"""
         desc_lower = description.lower()
 
-        # Get available roles from existing departments
-        available_roles = [d.get("role", n) for n, d in self._departments.items()]
-        if not available_roles:
-            available_roles = ["think", "do"]
-
-        # Pick a decomposition pattern based on task type
-        if any(kw in desc_lower for kw in ["code", "程式", "寫", "bug", "fix", "debug"]):
-            roles = ["research", "design", "implement", "test"]
+        # 商業內容任務 → 研究 + 寫作 + 存檔
+        if any(kw in desc_lower for kw in ["電子書", "章", "ebook", "chapter", "ch0", "ch1"]):
+            roles = [("research", "research_dept"), ("write", "content_dept"), ("save", "content_dept")]
+        elif any(kw in desc_lower for kw in ["童書", "children", "故事", "story"]):
+            roles = [("research", "research_dept"), ("write", "content_dept"), ("save", "content_dept")]
+        elif any(kw in desc_lower for kw in ["網站", "website", "html", "部署", "deploy", "cloudflare"]):
+            roles = [("research", "research_dept"), ("build", "engineering_dept"), ("save", "engineering_dept")]
+        elif any(kw in desc_lower for kw in ["研究報告", "research", "市場", "平台"]):
+            roles = [("search", "research_dept"), ("write", "research_dept"), ("save", "research_dept")]
+        elif any(kw in desc_lower for kw in ["策略", "定價", "行銷", "business", "marketing", "商業"]):
+            roles = [("research", "research_dept"), ("write", "business_dept"), ("save", "business_dept")]
+        elif any(kw in desc_lower for kw in ["品質檢查", "進度回報", "quality", "檢查"]):
+            roles = [("check", "general_pool"), ("report", "general_pool")]
+        elif any(kw in desc_lower for kw in ["code", "程式", "寫", "bug", "fix", "debug"]):
+            roles = [("research", "general_pool"), ("design", "engineering_dept"), ("implement", "engineering_dept"), ("test", "general_pool")]
         elif any(kw in desc_lower for kw in ["分析", "analyze", "report", "報告"]):
-            roles = ["research", "analyze", "write"]
-        elif any(kw in desc_lower for kw in ["search", "搜", "找", "find"]):
-            roles = ["search", "evaluate"]
+            roles = [("research", "research_dept"), ("analyze", "research_dept"), ("write", "research_dept")]
         elif any(kw in desc_lower for kw in ["deploy", "部署", "install", "安裝"]):
-            roles = ["research", "execute", "verify"]
-        elif any(kw in desc_lower for kw in ["monitor", "監控", "status", "狀態"]):
-            roles = ["check", "report"]
+            roles = [("research", "research_dept"), ("execute", "engineering_dept"), ("verify", "general_pool")]
         else:
-            roles = ["research", "execute", "summarize"]
+            roles = [("research", "research_dept"), ("execute", "general_pool"), ("summarize", "general_pool")]
 
-        return self._build_subtasks(description, roles)
+        return self._build_subtasks_from_pairs(description, roles)
 
-    def _build_subtasks(self, description: str, roles: List[str]) -> List[Dict]:
-        """Build sub-task list from role list (roles defined by user/dynamic depts)."""
-        role_to_dept = {}
-        for dept_name, dept in self._departments.items():
-            role_to_dept[dept.get("role", dept_name)] = dept_name
-
+    def _build_subtasks_from_pairs(self, description: str, role_pairs: List[tuple]) -> List[Dict]:
+        """從 (role, dept) 配對建立子任務"""
         result = []
-        for i, role in enumerate(roles):
-            dept = role_to_dept.get(role, "general_pool")
+        for i, (role, dept) in enumerate(role_pairs):
             result.append({
                 "id": role,
                 "description": f"[{role}] {description[:80]}",
