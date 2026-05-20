@@ -384,11 +384,16 @@ def main():
                     else:
                         raise StopIteration("fallthrough")
                 except StopIteration:
+                    # ── 反饋偵測：覺得產出不對，說「重做/改/不是我要的」──
+                    feedback_kw = ["不對", "重做", "不是我要的", "修改", "改一下", "這個不行",
+                                   "redo", "fix", "改", "不是這樣", "錯了", "quality"]
+                    is_feedback = any(kw in msg for kw in feedback_kw)
+
                     # ── 判斷是否為任務請求 ──
                     task_keywords = ["幫我", "查", "找", "搜", "分析", "寫", "做", "研究",
                                      "build", "code", "規劃", "生成", "建立", "設計", "部署",
                                      "任務", "幫我查", "幫我找", "幫我分析", "幫我寫"]
-                    is_task = any(kw in msg for kw in task_keywords)
+                    is_task = any(kw in msg for kw in task_keywords) or is_feedback
 
                     if is_task:
                         # ── 任務路徑：不聊天，直接執行 ──

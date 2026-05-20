@@ -37,12 +37,18 @@ class LLMClient:
         self.rate_limiter = TokenBucket(rate=30, per_seconds=60)  # 每分鐘 30 次
         self._last_user_msg = ""  # 供 router 分類用
 
-        # 🥇 DeepSeek（主回覆用，高品質）
+        # 🥇 OpenRouter 免費模型（優先，不燒錢）
+        or_key = os.getenv("OPENROUTER_API_KEY")
+        if or_key:
+            self.providers.append({"name":"OR-Gemini","key":or_key,"ep":"https://openrouter.ai/api/v1/chat/completions","model":"google/gemini-2.0-flash-001"})
+            self.providers.append({"name":"OR-DeepSeek","key":or_key,"ep":"https://openrouter.ai/api/v1/chat/completions","model":"deepseek/deepseek-v4-pro"})
+
+        # 🥈 DeepSeek 直連（備援）
         ds_key = os.getenv("DEEPSEEK_API_KEY")
         if ds_key:
             self.providers.append({"name":"DeepSeek","key":ds_key,"ep":"https://api.deepseek.com/v1/chat/completions","model":"deepseek-v4-pro"})
 
-        # 🏠 Ollama 本機（備援＋子代理免費使用）
+        # 🥉 Ollama 本機（免費備援）
         import socket
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         ollama_ok = sock.connect_ex(('127.0.0.1', 11434)) == 0
@@ -51,28 +57,10 @@ class LLMClient:
             ollama_model = os.getenv("OLLAMA_MODEL", "qwen2.5:7b")
             self.providers.append({"name":"Ollama","key":"ollama","ep":"http://localhost:11434/v1/chat/completions","model":ollama_model})
 
-        # 🥈 ATXP LLM Gateway（付費線路，視覺/備援用）
-        atxp_conn = os.getenv("ATXP_CONNECTION_STRING")
-        if atxp_conn:
-            atxp_model = os.getenv("ATXP_MODEL", "gpt-4.1")
-            self.providers.append({"name":"ATXP","key":atxp_conn,"ep":"https://llm.atxp.ai/v1/chat/completions","model":atxp_model})
-
-        # 🥈 OpenRouter
-        or_key = os.getenv("OPENROUTER_API_KEY")
-        if or_key:
-            self.providers.append({"name":"OR-DeepSeek","key":or_key,"ep":"https://openrouter.ai/api/v1/chat/completions","model":"deepseek/deepseek-v4-pro"})
-            self.providers.append({"name":"OR-Gemini","key":or_key,"ep":"https://openrouter.ai/api/v1/chat/completions","model":"google/gemini-2.0-flash-001"})
-
-        # 🥇 NVIDIA（優先使用）
-        nv = os.getenv("NVIDIA_API_KEY")
-        if nv:
-            self.providers.append({"name":"NV-Llama","key":nv,"ep":"https://integrate.api.nvidia.com/v1/chat/completions","model":"meta/llama-3.1-8b-instruct"})
-
-        # 🤗 HuggingFace（備援）
+        # 🤗 HuggingFace（最終備援）
         hf_key = os.getenv("HUGGINGFACE_TOKEN")
         if hf_key:
             self.providers.append({"name":"HF-Qwen14B","key":hf_key,"ep":"https://api-inference.huggingface.co/v1/chat/completions","model":"deepseek-ai/DeepSeek-R1-Distill-Qwen-14B"})
-            self.providers.append({"name":"HF-Llama8B","key":hf_key,"ep":"https://api-inference.huggingface.co/v1/chat/completions","model":"deepseek-ai/DeepSeek-R1-Distill-Llama-8B"})
 
         print(f"🤖 {len(self.providers)}層: {' → '.join(p['name'] for p in self.providers)}")
         self.rate_limiter = TokenBucket(rate=int(os.getenv("MAX_API_CALLS_PER_MINUTE", "30")), per_seconds=60)
