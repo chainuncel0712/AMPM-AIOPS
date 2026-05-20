@@ -68,7 +68,7 @@
       "deadline": null,
       "status": "in_progress",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T15:33:52.837240",
+      "updated_at": "2026-05-20T15:37:26.302213",
       "completed_at": null,
       "overdue_warned": false
     },
@@ -104,7 +104,7 @@
       "deadline": null,
       "status": "in_progress",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T15:34:23.752860",
+      "updated_at": "2026-05-20T15:37:57.261960",
       "completed_at": null,
       "overdue_warned": false
     },
@@ -114,9 +114,9 @@
       "description": "設計一條龍 AI 代理服務的：1. 客戶自助選購流程（網頁表單 → AI 評估需求 → 報價 → 付款 → 自動安裝）2. 客服對話腳本（常見問題、技術支援、退款政策）3. 用 write_file 存入 outputs/research/service_flow.md，至少 800 字。",
       "priority": 3,
       "deadline": null,
-      "status": "in_progress",
+      "status": "pending",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T15:32:21.928284",
+      "updated_at": "2026-05-20T15:39:58.159329",
       "completed_at": null,
       "overdue_warned": false
     },
