@@ -507,6 +507,61 @@ class EvolutionCycleOrgan(BaseOrgan):
     # 步驟 7：執行完整循環
     # =========================================
 
+    def _calculate_business_score(self) -> int:
+        """
+        計算商業產出分數（取代原有的內部進化分數）
+        
+        分數組成：
+        - 每產出一個檔案 +5
+        - 每 1000 字內容 +3
+        - 每完成一個商業管線階段 +10
+        - 網站已部署 +15
+        - Cloudflare 已設定 +10
+        """
+        score = 0
+        outputs_dir = self.base_dir / "outputs"
+
+        if not outputs_dir.exists():
+            return 0
+
+        # 掃描所有產出檔案
+        total_files = 0
+        total_size = 0
+        pipeline_stages = set()
+
+        for f in outputs_dir.rglob("*"):
+            if f.is_file() and f.suffix not in (".gitkeep",):
+                total_files += 1
+                try:
+                    content = f.read_text(encoding="utf-8")
+                    total_size += len(content)
+
+                    # 辨識管線階段
+                    rel = str(f.relative_to(outputs_dir))
+                    if "ebooks/ch" in rel:
+                        pipeline_stages.add("ebook")
+                    if "children_book" in rel:
+                        pipeline_stages.add("children")
+                    if "research/platform" in rel:
+                        pipeline_stages.add("platform_research")
+                    if "research/cloudflare" in rel:
+                        pipeline_stages.add("cloudflare")
+                    if "website/index.html" in rel:
+                        pipeline_stages.add("website")
+                    if "research/business_strategy" in rel:
+                        pipeline_stages.add("business_strategy")
+                    if "research/service_flow" in rel:
+                        pipeline_stages.add("service_flow")
+                except:
+                    pass
+
+        # 計分
+        score += total_files * 5  # 每個檔案 5 分
+        score += (total_size // 1000) * 3  # 每 1000 字 3 分
+        score += len(pipeline_stages) * 10  # 每個完成階段 10 分
+
+        return score
+
     def run_cycle(self) -> Dict:
         """執行一次完整進化循環，回傳結果摘要"""
         with self._lock:
@@ -533,8 +588,9 @@ class EvolutionCycleOrgan(BaseOrgan):
             # ← 排除
             self.exclude(bad)
 
-            # 計算進化分數
-            self.state["evolution_score"] += len(good) - len(bad)
+            # 計算進化分數（以商業產出為核心指標）
+            business_score = self._calculate_business_score()
+            self.state["evolution_score"] = business_score
 
             result = {
                 "cycle": self.state["cycle_count"],
@@ -544,6 +600,7 @@ class EvolutionCycleOrgan(BaseOrgan):
                 "bad": len(bad),
                 "enhanced": enhanced_count,
                 "score": self.state["evolution_score"],
+                "business_output": business_score,
             }
 
             self.state["cycle_history"].append({
@@ -568,11 +625,11 @@ class EvolutionCycleOrgan(BaseOrgan):
             while True:
                 try:
                     result = self.run_cycle()
-                    msg = (f"🧬 進化循環 #{result['cycle']}: "
+                    msg = (f"🧬 進化 #{result['cycle']}: "
+                           f"產出分數 {result.get('business_output', result['score'])} → "
                            f"吸收{result['absorbed']}條 → "
                            f"學習{result['learned']}條 → "
-                           f"取{result['good']}捨{result['bad']} → "
-                           f"增強{result['enhanced']}項")
+                           f"取{result['good']}捨{result['bad']}")
                     print(msg)
                 except Exception as e:
                     print(f"[進化循環] 錯誤: {e}")
@@ -587,18 +644,29 @@ class EvolutionCycleOrgan(BaseOrgan):
     # =========================================
 
     def get_summary(self) -> str:
-        """進化摘要報告"""
+        """進化摘要報告（以商業產出為核心）"""
         with self._lock:
             s = self.state
+        # 計算當前商業產出
+        biz_score = self._calculate_business_score()
+        outputs_dir = self.base_dir / "outputs"
+        file_count = 0
+        total_chars = 0
+        if outputs_dir.exists():
+            for f in outputs_dir.rglob("*"):
+                if f.is_file() and f.suffix not in (".gitkeep",):
+                    file_count += 1
+                    try:
+                        total_chars += len(f.read_text(encoding="utf-8"))
+                    except:
+                        pass
         return (
-            f"🧬 進化循環摘要:\n"
+            f"🧬 黑曜進化報告:\n"
             f"  循環次數: {s['cycle_count']}\n"
-            f"  吸收總量: {s['total_absorbed']}\n"
-            f"  學習總量: {s['total_learned']}\n"
-            f"  增強次數: {s['total_enhanced']}\n"
-            f"  排除次數: {s['total_excluded']}\n"
-            f"  進化分數: {s['evolution_score']}\n"
-            f"  上次循環: {s['last_cycle']}"
+            f"  商業分數: {biz_score}\n"
+            f"  產出檔案: {file_count} 個\n"
+            f"  總字數: {total_chars:,} 字\n"
+            f"  進化目標: 幫老大賺錢"
         )
 
     def status(self) -> dict:

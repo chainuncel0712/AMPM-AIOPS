@@ -389,77 +389,142 @@ class ProactiveExecutor:
         if not planner:
             return
 
-        # 檢查當前有沒有 pending 任務
+        # 檢查當前有沒有 pending/in_progress 任務
         pending = [t for t in planner.tasks.values() if t.get("status") == "pending"]
         in_progress = [t for t in planner.tasks.values() if t.get("status") == "in_progress"]
 
-        # 如果已經有任務在執行或排隊，不塞新任務
         if pending or in_progress:
             return
 
-        # 檢查 output 目錄，自動生成缺少的任務
+        # 如果沒有任務在跑，看整個商業管線缺什麼
         import os
         outputs_dir = Path(__file__).parent.parent.parent / "outputs"
 
-        # 檢查是否有電子書內容
+        # 管線階段 1：目錄結構
         ebooks_dir = outputs_dir / "ebooks"
+        children_dir = outputs_dir / "children_book"
+        research_dir = outputs_dir / "research"
+        website_dir = outputs_dir / "website"
+
+        # 管線階段 2：雲端資源驗證
+        cf_token = os.getenv("CLOUDFLARE_API_TOKEN", "")
+        if cf_token:
+            cf_check_file = research_dir / "cloudflare_setup.md"
+            if not cf_check_file.exists():
+                planner.add_task(
+                    title="Cloudflare 網路身分建立",
+                    description="1. 用 run_command 執行 curl 驗證 Cloudflare API Token 2. 查詢 AMPM-AIOPS.COM DNS 設定 3. 記錄結果用 write_file 存入 outputs/research/cloudflare_setup.md。",
+                    priority=1,
+                )
+                print("[ProactiveExecutor] 🌐 自動建立：Cloudflare 身分驗證任務")
+                return
+
+        # 管線階段 3：平台研究
+        platform_file = research_dir / "platform_research.md"
+        if not platform_file.exists():
+            planner.add_task(
+                title="電子書上架平台研究報告",
+                description="用 web_search 搜尋 Amazon KDP、Apple Books、Google Play Books、Kobo 四個平台的註冊流程、費用、抽成、檔案格式。用 write_file 存入 outputs/research/platform_research.md，至少 800 字。",
+                priority=1,
+            )
+            print("[ProactiveExecutor] 📝 自動建立：上架平台研究任務")
+            return
+
+        # 管線階段 4：電子書第一章
         ebook_files = list(ebooks_dir.glob("ch*.md")) if ebooks_dir.exists() else []
         if len(ebook_files) < 1:
             planner.add_task(
-                title="電子工具書：第一章寫作",
-                description="選擇一個工具書主題（建議：AI 工具入門指南），撰寫第一章完整內容。包含：標題、引言、主內容（至少800字）、實戰步驟、本章總結。存入 outputs/ebooks/ch01_intro.md。",
+                title="電子書：第一章寫作",
+                description="選熱門工具書主題（AI入門指南），撰寫第一章。含標題、引言、800+字內容、實戰步驟、總結。用 write_file 寫入 outputs/ebooks/ch01_intro.md。",
                 priority=1,
             )
-            print("[ProactiveExecutor] 📝 自動建立：電子書第一章任務")
+            print("[ProactiveExecutor] 📝 自動建立：電子書第一章")
             return
 
-        # 檢查是否有童書研究
-        children_dir = outputs_dir / "children_book"
-        research_file = children_dir / "research.md" if children_dir.exists() else None
-        if not research_file or not research_file.exists():
+        # 管線階段 5：童書研究
+        children_research = children_dir / "research.md" if children_dir.exists() else None
+        if not children_research or not children_research.exists():
             planner.add_task(
                 title="童書市場研究",
-                description="搜尋目前學齡前（3-6歲）童書熱門主題，分析 Amazon、博客來 TOP20 童書的主題、風格、定價。寫出選題建議，存入 outputs/children_book/research.md。至少 500 字。",
+                description="用 web_search 搜尋學齡前（3-6歲）童書熱門主題，分析 TOP20 童書風格、定價。用 write_file 存入 outputs/children_book/research.md，至少 500 字。",
                 priority=2,
             )
-            print("[ProactiveExecutor] 📝 自動建立：童書市場研究任務")
+            print("[ProactiveExecutor] 📝 自動建立：童書市場研究")
             return
 
-        # 檢查是否有平台研究
-        research_dir = outputs_dir / "research"
-        platform_file = research_dir / "platform_research.md" if research_dir.exists() else None
-        if not platform_file or not platform_file.exists():
+        # 管線階段 6：品牌網站
+        website_index = website_dir / "index.html" if website_dir.exists() else None
+        if not website_index or not website_index.exists():
             planner.add_task(
-                title="電子書平台研究",
-                description="搜尋 Amazon KDP、Apple Books、Google Play Books 的註冊流程、費用、抽成、上架規格，寫成報告存入 outputs/research/platform_research.md。",
-                priority=1,
+                title="AMPM-AIOPS 品牌網站建立",
+                description="建立專業服務網站：1. outputs/website/index.html（品牌、三大服務、聯絡）2. outputs/website/style.css。用 write_file 寫入。現代簡潔風格。",
+                priority=2,
             )
-            print("[ProactiveExecutor] 📝 自動建立：平台研究任務")
+            print("[ProactiveExecutor] 🌐 自動建立：品牌網站任務")
             return
 
-        # 如果基本任務都完成了，生成下一章
-        if len(ebook_files) >= 1:
+        # 管線階段 7：電子書第二章～第五章
+        if len(ebook_files) < 5 and len(ebook_files) >= 1:
             next_ch = len(ebook_files) + 1
-            if next_ch <= 10:
-                planner.add_task(
-                    title=f"電子工具書：第{next_ch}章寫作",
-                    description=f"延續前面章節，撰寫第{next_ch}章完整內容。至少 800 字，含實戰步驟和總結。存入 outputs/ebooks/ch{next_ch:02d}_content.md。",
-                    priority=2,
-                )
-                print(f"[ProactiveExecutor] 📝 自動建立：電子書第{next_ch}章任務")
-                return
+            planner.add_task(
+                title=f"電子書第{next_ch}章寫作",
+                description=f"延續前面章節，寫第{next_ch}章。至少 800 字，含實戰步驟和總結。用 write_file 寫入 outputs/ebooks/ch{next_ch:02d}.md。",
+                priority=2,
+            )
+            print(f"[ProactiveExecutor] 📝 自動建立：電子書第{next_ch}章")
+            return
 
-        # 如果電子書章節都完成了，生成童書第一本
-        if len(ebook_files) >= 10:
-            children_files = list(children_dir.glob("book1_*.md")) if children_dir.exists() else []
-            if len(children_files) < 1:
-                planner.add_task(
-                    title="童書第一本：故事內容",
-                    description="根據童書大綱和角色設定，撰寫完整童書故事內容（至少 1000 字），包含對話、場景描述、教育意義。存入 outputs/children_book/book1_story.md。",
-                    priority=2,
-                )
-                print("[ProactiveExecutor] 📝 自動建立：童書第一本任務")
-                return
+        # 管線階段 8：童書第一本
+        children_files = list(children_dir.glob("book1_*.md")) if children_dir.exists() else []
+        if len(children_files) < 1:
+            planner.add_task(
+                title="童書第一本：完整創作",
+                description="創作第一本童書：故事大綱+角色設定、完整故事1000+字、插圖描述和分頁。用 write_file 分別寫入 outputs/children_book/book1_outline.md, book1_story.md, book1_illustrations.md。",
+                priority=2,
+            )
+            print("[ProactiveExecutor] 📝 自動建立：童書第一本")
+            return
+
+        # 管線階段 9：商業策略
+        biz_strategy = research_dir / "business_strategy.md" if research_dir.exists() else None
+        if not biz_strategy or not biz_strategy.exists():
+            planner.add_task(
+                title="商業策略：定價與行銷規劃",
+                description="用 web_search 研究電子書/童書定價策略、Amazon KDP 抽成、促銷方案。制定定價和行銷計畫。用 write_file 存入 outputs/research/business_strategy.md，至少 600 字。",
+                priority=2,
+            )
+            print("[ProactiveExecutor] 📝 自動建立：商業策略任務")
+            return
+
+        # 管線階段 10：服務流程設計
+        service_flow = research_dir / "service_flow.md" if research_dir.exists() else None
+        if not service_flow or not service_flow.exists():
+            planner.add_task(
+                title="一條龍 AI 代理服務流程設計",
+                description="設計自動化服務流程：客戶選購→AI評估→報價→付款→安裝→客服→升級。含對話腳本、退款政策。用 write_file 存入 outputs/research/service_flow.md，至少 800 字。",
+                priority=3,
+            )
+            print("[ProactiveExecutor] 📝 自動建立：服務流程設計")
+            return
+
+        # 管線階段 11：電子書第六章~第十章
+        if len(ebook_files) < 10 and len(ebook_files) >= 5:
+            next_ch = len(ebook_files) + 1
+            planner.add_task(
+                title=f"電子書第{next_ch}章寫作",
+                description=f"延續前面章節，寫第{next_ch}章。至少 800 字。用 write_file 寫入 outputs/ebooks/ch{next_ch:02d}.md。",
+                priority=3,
+            )
+            print(f"[ProactiveExecutor] 📝 自動建立：電子書第{next_ch}章")
+            return
+
+        # 管線階段 12：品質檢查
+        planner.add_task(
+            title="品質檢查與進度回報",
+            description="1. 用 list_dir 和 read_file 檢查所有 outputs/ 檔案 2. 確認每個 .md 超過 500 字且格式完整 3. 不合格自動補齊 4. 透過 Telegram 回報進度給老大。",
+            priority=3,
+        )
+        print("[ProactiveExecutor] 📊 自動建立：品質檢查任務")
 
     # ── 3. 主動找問題 ───────────────────────────────────────
 
