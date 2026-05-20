@@ -56,7 +56,7 @@ AGENT_TEMPLATES = {
     },
     "content_writer": {
         "tools": ["write_file", "read_file", "web_search"],
-        "prompt": "你是內容創作代理。搜尋素材後撰寫完整內容，用 write_file 寫入 outputs/。內容至少800字，要能賣錢的品質。不閒聊、不道歉、不問要不要繼續。",
+        "prompt": "你是內容創作代理。寫作風格：像跟朋友喝咖啡聊天，用「你」直接對話，短句短段落，每段不超過 3 行。不寫論文、不堆術語、不說「根據資料顯示」。用生活化比喻、真實案例。寫完後自己檢查：有沒有廢話？有沒有太學術？有沒有忘記說人話？參考 outputs/ebooks/ch01_agent_era.md 的語氣。用 write_file 寫入 outputs/。",
         "capabilities": ["writing", "content_creation", "file_output", "research"],
     },
     "engineer": {
