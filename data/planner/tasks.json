@@ -68,7 +68,7 @@
       "deadline": null,
       "status": "in_progress",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T14:54:12.884621",
+      "updated_at": "2026-05-20T14:59:51.134115",
       "completed_at": null,
       "overdue_warned": false
     },
@@ -90,10 +90,10 @@
       "description": "接續第一章新手工具書，依序寫第二章（AI 工具介紹與比較）、第三章（Prompt 技巧實戰）、第四章（新手常見錯誤與解法）、第五章（從入門到變現）。每章至少 800 字，含主題介紹、實戰步驟、總結。先用 web_search 搜尋相關資訊。用 write_file 分別存入 outputs/ebooks/ch02.md ~ ch05.md。",
       "priority": 2,
       "deadline": null,
-      "status": "in_progress",
+      "status": "completed",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T14:54:44.807748",
-      "completed_at": null,
+      "updated_at": "2026-05-20T14:57:17.561485",
+      "completed_at": "2026-05-20T14:57:17.561485",
       "overdue_warned": false
     },
     "B009": {
@@ -102,9 +102,9 @@
       "description": "用 web_search 研究電子書和童書的市場定價策略、Amazon KDP 抽成結構、促銷方案。制定：1. 定價策略（電子書、童書各一本的建議售價）2. 初期行銷方案（免費宣傳管道、社群推廣方式）3. 寫成報告存入 outputs/research/business_strategy.md，至少 600 字。",
       "priority": 3,
       "deadline": null,
-      "status": "pending",
+      "status": "in_progress",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T11:06:51.689021",
+      "updated_at": "2026-05-20T14:57:48.479075",
       "completed_at": null,
       "overdue_warned": false
     },
@@ -114,9 +114,9 @@
       "description": "設計一條龍 AI 代理服務的：1. 客戶自助選購流程（網頁表單 → AI 評估需求 → 報價 → 付款 → 自動安裝）2. 客服對話腳本（常見問題、技術支援、退款政策）3. 用 write_file 存入 outputs/research/service_flow.md，至少 800 字。",
       "priority": 3,
       "deadline": null,
-      "status": "pending",
+      "status": "in_progress",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T12:59:17.054404",
+      "updated_at": "2026-05-20T14:58:19.468542",
       "completed_at": null,
       "overdue_warned": false
     },

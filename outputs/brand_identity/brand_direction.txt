@@ -1,0 +1,1614 @@
+/
+自動化出版助手
+
+幫我執行自動化出版助手
+上午12:20
+思考完畢
+你目前這個「自動化出版助手」只有一個入口：在 Notion 任何頁面 @ 提及（mention）我，就會觸發執行（notion.agent.mentioned 已啟用）。
+要「執行」有 3 種最順的測試方式，你選一個我就照那條路帶你跑：
+我貼一個 Notion 頁面連結給你（希望你在那頁被 @ 後開始整理/產出出版素材）
+上午12:21
+思考完畢
+可以，請直接把那個 Notion 頁面連結貼在這裡。
+你貼上後，照這樣做就會「在那頁被 @ 後開始整理/產出出版素材」：
+1) 你打開那個頁面  
+2) 在頁面內輸入 @自動化出版助手（或用 @ 提及我）並送出留言/段落  
+3) 你在 @ 的同一句話裡，補一句你要我「這次先產出什麼」（例如：商品頁文案 / 書名與副標 / 上架關鍵字 / 出版前檢查清單）
+只要你把連結貼來，我也可以先快速看一下那頁內容結構，然後告訴你在 @ 時建議貼的「最短指令」長什麼樣子，確保我一跑就能產出你要的交付物。
+我現在貼頁面連結（請直接回覆貼上 URL）
+上午12:21
+思考完畢
+請直接貼上 Notion 頁面 URL：
+
+
+這是形象
+上午12:22
+我看到了，你的形象主視覺是 「AM&PM ADVENTURE」（黑白圓形徽章風），主角是兩隻貓（其中一隻像黑貓、另一隻有虎斑條紋），整體很適合做成「品牌章／封面角標／系列識別」。  
+不過你前面說要「貼 Notion 頁面連結」，這則訊息目前是形象圖，還沒收到你要我被 @ 的那個頁面 URL。
+另外確認一下：你希望我把這個形象套用到「自動化出版助手」的圖示（icon）嗎？  
+如果是要改 agent icon：我需要一個可直接存取的圖片網址（https://...），或你把圖上傳到 Notion 頁面裡，讓我拿到圖片的公開連結/檔案連結後才能設定成 icon。  
+如果只是當作書/系列品牌形象：你可以繼續把「要上架的平台、書的類型（工具書/童書）、目前稿件頁面連結」貼來，我就能在你 @ 我之後開始產出出版素材。
+先用這個品牌形象來產出上架用素材（請用繁中），作品類型是：工具書/童書；平台是：；目前進度是：；主題/內容摘要：
+上午12:22
+思考完畢
+可以。我會先用你這個 AM&PM ADVENTURE（黑白徽章、雙貓） 的品牌調性來寫「上架用素材」（繁中、可直接貼上）。
+但你這次的關鍵欄位都還沒填（作品類型 / 平台 / 進度 / 摘要）。你只要先回我一段，把下面 4 個欄位補上，我就能立刻產出一整包上架文案（書名候選、短標/副標、商品頁賣點、章節導覽、關鍵字、分類、作者簡介、FAQ、上架檢查清單）：
+作品類型：工具書 或 童書（擇一；如果兩個都要做，請說「先做哪一本」）
+平台：（例如 KDP / Readmoo / Google Play Books / 博客來 / 通用）
+目前進度：（大綱 / 初稿 / 完稿 / 已上架）
+主題/內容摘要：（3–8 句即可：要解決誰的什麼問題、讀者看完能做到什麼、內容範圍）
+兩個都要做
+上午12:22
+思考完畢
+可以，兩本都做。為了讓我「一次產出可直接上架」的素材，我需要你先決定先做哪一本（因為平台/讀者/語氣會完全不同），另一本文案我再接著做。
+我會把整個計畫拆解成大白話，讓您感覺這不是一個技術專案，而是一個**「從零到一，自動化內容創作和商業化的全流程系統」**。---###  核心理念：這是一個「自動發印機」我們不只是建一個網站，我們是在設計一套**完整的「自動化內容製造工廠」**。它由三個主要部分組成：1.  **內容製造端 (Content Factory)：** 負責創意和撰寫。2.  **產品銷售端 (Sales Engine)：** 負責接單和展示。3.  **自動化流程 (Automation Flow)：** 負責從A點到Z點不需人工干預。---###  將計畫拆解成「大白話」的步驟#### 第一階段：建構「自動化內容創作工廠」 (Content Factory)**目標：讓系統自己能「想」和「寫」出內容。***   **我們要做什麼？** 讓 AI 不只是聊天，而是能像人一樣，規劃一個完整的故事、一次專業的課程大綱，或一本小讀書。*   **比喻：** 我們給 AI 一套標準作業流程（SOP）。例如：「請以科學家角度，為新手撰寫一篇關於黑洞的科普文，結構必須是引言-本體-結論。」*   **成果：** 一個能穩定輸出高品質、結構完整內容的引擎。#### 第二階段：建構「產品銷售與優化引擎」 (Sales Engine)**目標：把「內容」變成「可以收錢的產品」。***   **我們要做什麼？** 讓 AI 不只寫文，還要幫我們做「商品設計」。它要把一篇科普文章，轉化成：    1.  一個付費的 PDF 電子書。    2.  一個可重複使用的 PPT 模板。    3.  一個課程大綱。*   **比喻：** 我們的系統會自己偵測：「這篇內容很有價值，我可以把它賣成一個『電子學習包』。」*   **成果：** 一套能自動將「內容」轉化成「產品」並展示售賣介面的系統。#### 第三階段：實現「全自動營運迴圈」 (Automation Flow)**目標：讓系統自己動起來，不需要您全天候監控。***   **我們要做什麼？** 結合所有組件。系統會**自行觸發**流程：    1.  **觸發：** 系統根據市場數據（或我們輸入的關鍵字），決定「今天應該寫什麼主題」。    2.  **執行：** 內容工廠自動生成草稿。    3.  **優化：** 產品引擎接手，自動把草稿包裝成電子書。    4.  **銷售：** 系統將電子書自動上傳到我們的銷售頁面。*   **比喻：** 就像一個小型、全自動化的出版社和銷售門市，只要我們開機，它就能運作。---###  總結：我們賣的是什麼？**我們賣的不是「程式碼」，我們賣的是一套「時間與人力成本的極度節省方案」。**透過這個系統，我們可以：*   **極速複製：** 將一個產品的知識，快速複製成上百個不同的知識產品。*   **規模化：** 一個創作者的努力，可以變成一個團隊的產能。###  您現在只需要知道的：我們需要一個**穩定的計畫路線**，而不是一個寫滿術語的方案。
+上午12:23
+你貼的這段「大白話」其實已經很接近工具書的商品頁主文了；我先把它整理成一份「可直接上架」的文案骨架（繁中、偏商用敘事、保留你原本的比喻：自動發印機/工廠/引擎/迴圈），讓你可以先拿去放到平台上。
+工具書上架用素材（可直接貼）
+1) 書名候選（10）
+自動發印機：從零到一的 AI 內容創作與商業化全流程
+內容工廠：打造自動化內容製造與變現系統
+AI 內容生產線：從靈感到上架的自動化營運迴圈
+自動化出版系統：把內容變成可收錢的產品
+Sales Engine：讓內容自動變現的產品化方法
+從 A 到 Z 的自動化：內容生成、包裝、上架一次打通
+一人出版社：用 AI 建立可規模化的內容與產品系統
+內容×變現：用系統取代人力的自動化工作流
+AI 商業化路線圖：內容工廠、銷售引擎與自動化流程
+開機就能運作：打造全自動內容與產品迴圈
+2) 副標候選（5）
+不只是做網站，而是打造一套「內容生成 → 產品化 → 自動上架」的全流程系統  
+用 SOP 讓 AI 能規劃、能撰寫、能包裝，把內容變成可販售的商品  
+把時間與人力成本降到最低，讓創作者產能可複製、可規模化  
+從關鍵字到成品：讓系統決定寫什麼、寫出來、包裝好、上架賣  
+用「內容工廠 + 銷售引擎 + 自動化流程」做出一台自動發印機
+3) 商品頁短介紹（3 種長度）
+超短版（適合首屏）  
+這不是技術專案，而是一套「自動化內容創作與商業化」的全流程系統：內容工廠負責寫、銷售引擎負責賣、自動化流程負責從 A 到 Z 自己跑。
+短版（80–120 字）  
+我們不只是建一個網站，而是在設計一套完整的「自動化內容製造工廠」。它包含內容製造端（能規劃、能撰寫、能穩定輸出）、產品銷售端（把內容轉成可收錢的產品）、自動化流程（從觸發到上架幾乎不需人工干預）。你得到的不是程式碼，而是一套極度節省時間與人力的方案。
+長版（商品頁主文）  
+你即將打造的，不是一個「聊天用 AI」，而是一台可以開機運作的「自動發印機」：  
+內容工廠（Content Factory）：用 SOP 讓 AI 像人一樣規劃、撰寫，產出結構完整的文章、故事、課程大綱或小書。  
+銷售引擎（Sales Engine）：把內容轉成可以收錢的產品，例如付費 PDF 電子書、可重複使用的簡報模板、或課程大綱，並準備好展示與銷售所需的包裝。  
+自動化流程（Automation Flow）：把所有組件串起來，從主題觸發、草稿生成、產品包裝到上架發布，形成「全自動營運迴圈」。  
+你買到的不是「程式碼」，而是一套把時間與人力成本壓到最低、能把創作者努力規模化的全流程系統。
+4) 賣點（Bullet Points）
+用 SOP 讓 AI 不只聊天，而是能「規劃 + 撰寫 + 穩定輸出」
+內容不再只是文章：可被產品化成 PDF、模板、課程等可販售形式
+全流程串接：從主題到上架，打造可長期運作的自動化迴圈
+極速複製與規模化：把 1 份知識快速延伸成多個產品與系列
+你需要的是穩定路線，而不是一堆術語：用大白話掌控全局
+5) 關鍵字（可先用通用版）
+AI 自動化、內容變現、數位產品、電子書、內容行銷、自動化工作流、SOP、產品化、創作者經營、商業化、被動收入、知識產品、銷售漏斗、內容工廠、Automation Flow、Sales Engine
+6) FAQ（先給 6 題通用版）
+Q1：這本在賣什麼？  
+賣的是一套可落地的「自動化內容創作 + 商業化」全流程系統，不是單一工具或單一網站。
+Q2：需要很強的技術背景嗎？  
+不必。核心是用清楚的流程與 SOP，把複雜系統拆成能一步步執行的模組。
+Q3：成果會是什麼？  
+你會得到能穩定輸出內容的引擎、把內容產品化的包裝方法，以及從觸發到上架的自動化流程設計。
+Q4：內容可以做成哪些商品？  
+常見包含付費 PDF 電子書、簡報/模板、課程大綱與學習包等。
+Q5：這套系統能做到完全不需要人工嗎？  
+目標是把人工降到最低；關鍵決策（定位、品牌、品質門檻）仍建議保留人審。
+Q6：適合誰？  
+創作者、個人工作室、小團隊、想把內容規模化並降低時間成本的人。
+我需要你補的「最少資訊」（用來完成 兩本 的上架素材）
+你說工具書/童書都要做，但你目前提供的內容明顯是工具書方向。要同時把童書也做出上架素材，我至少需要兩項資訊：
+1) 平台：你要先上哪裡？（KDP / Readmoo / Google Play Books / 博客來 / 通用）  
+2) 童書主題摘要：一句話故事梗概 + 年齡層（例如 3–6 / 6–9）  
+（工具書這本，我已用你貼的內容先產出一版通用上架包。）
+錢時電子書平台
+上午12:24
+前10
+上午12:24
+了解：平台用Readmoo（讀墨）電子書；你說「前10」我就先給你前 10 個書名候選（工具書這本、繁中、搭配 AM&PM ADVENTURE 的「探險／日夜／雙貓」品牌感）。
+自動發印機：從零到一的 AI 內容創作與商業化全流程  
+內容工廠：打造自動化內容製造與變現系統  
+AI 內容生產線：從靈感到上架的自動化營運迴圈  
+自動化出版系統：把內容變成可收錢的產品  
+Sales Engine：讓內容自動變現的產品化方法  
+從 A 到 Z 的自動化：內容生成、包裝、上架一次打通  
+一人出版社：用 AI 建立可規模化的內容與產品系統  
+內容×變現：用系統取代人力的自動化工作流  
+AI 商業化路線圖：內容工廠、銷售引擎與自動化流程  
+開機就能運作：打造全自動內容與產品迴圈
+如果你要我把這 10 個再「更貼近讀墨的讀者語氣」或更靠「工具書 vs 童書」其中一本，我需要你再補：讀者對象（例如：獨立創作者／小團隊／行銷人／一般上班族）以及你想偏「實作教程」還是「策略框架」。
+世界
+上午12:24
+思考完畢
+了解，你的意思我先當作是「上架要面向全世界市場」（全球讀者 / 可跨區販售）。
+在 Readmoo 主要是繁中市場的前提下，我先把「前 10」書名做一版 更帶『世界觀／全球化』語感 的改寫（仍維持工具書方向）：
+自動發印機：打造面向世界的 AI 內容創作與商業化系統  
+全球內容工廠：用 AI 把知識產品規模化  
+AI 內容生產線：從靈感到上架，走向世界市場  
+自動化出版系統：把內容變成可跨區販售的產品  
+Sales Engine：讓內容商品化，走向全球的變現方法  
+從 A 到 Z 的自動化：內容生成、包裝、上架一次打通（全球版）  
+一人出版社・世界版：用 AI 建立可複製的內容與產品系統  
+內容×變現×全球：用系統取代人力的自動化工作流  
+AI 商業化路線圖：內容工廠、銷售引擎與自動化流程（跨市場）  
+開機就能運作：打造可規模化、可跨區的內容變現迴圈
+為了把「世界」落到更精準（尤其是你也要做童書），你回我一句就好（二選一即可）：
+你說的「世界」是 A. 全球販售（跨區） 還是 B. 童書的世界觀（故事舞台）？
+中英 兩個版本
+上午12:24
+童書3-6 稅
+上午12:24
+了解：你要 中英兩個版本；另外童書目標讀者是 3–6 歲。（你打的「稅」我先當作是「歲」）
+下面我先把「工具書」的前 10 個書名做成 中英雙語（偏全球/國際語氣）；再給你一組「童書（3–6 歲）」的前 10 個書名中英雙語（走 AM&PM ADVENTURE 的日夜探險、雙貓品牌感）。
+A) 工具書（前 10）｜中英雙語書名
+自動發印機：從零到一的 AI 內容創作與商業化全流程  
+The Auto Publishing Machine: An End-to-End System for AI Content Creation & Monetization
+內容工廠：打造自動化內容製造與變現系統  
+The Content Factory: Build an Automated System to Produce & Monetize Content
+AI 內容生產線：從靈感到上架的自動化營運迴圈  
+The AI Content Pipeline: From Ideas to Launch with an Automated Operating Loop
+自動化出版系統：把內容變成可收錢的產品  
+The Automated Publishing System: Turn Content into Products People Pay For
+Sales Engine：讓內容自動變現的產品化方法  
+The Sales Engine: Productize Content and Monetize on Autopilot
+從 A 到 Z 的自動化：內容生成、包裝、上架一次打通  
+Automation from A to Z: Create, Package, and Launch Content as Products
+一人出版社：用 AI 建立可規模化的內容與產品系統  
+One-Person Publishing: Scale Content and Products with AI Systems
+內容×變現：用系統取代人力的自動化工作流  
+Content × Monetization: Replace Manual Work with Automated Workflows
+AI 商業化路線圖：內容工廠、銷售引擎與自動化流程  
+The AI Monetization Roadmap: Content Factory, Sales Engine & Automation Flow
+開機就能運作：打造全自動內容與產品迴圈  
+Just Turn It On: Build a Fully Automated Content-to-Product Loop
+B) 童書（3–6 歲）（前 10）｜中英雙語書名
+AM&PM 的日夜探險  
+AM & PM’s Day-and-Night Adventure
+早安，晚安，小貓探險隊！  
+Good Morning, Good Night, Kitty Adventure Team!
+兩隻小貓的 24 小時大冒險  
+Two Kitties’ 24-Hour Big Adventure
+太陽先生和月亮小姐去哪了？  
+Where Did Mr. Sun and Ms. Moon Go?
+跟著 AM&PM 找星星  
+Star Hunting with AM & PM
+白天的秘密，夜晚的驚喜  
+Daytime Secrets, Nighttime Surprises
+AM&PM：勇敢出發！  
+AM & PM: Let’s Be Brave!
+小小探險家：今天我不怕黑  
+Little Adventurer: I’m Not Afraid of the Dark Today
+日與夜的朋友  
+Friends of Day and Night
+月亮下的喵喵約定  
+A Meow Promise Under the Moon
+我還需要你補「最少 1 句」才能把童書上架文案也一次做完
+請回我一句：童書主題/內容摘要（例如：兩隻貓晚上怕黑，出門找月亮，最後學會安心睡覺／或任何你想講的核心情節）。  
+有了這一句，我就能直接產出童書的：商品頁介紹、賣點、親子共讀引導、FAQ、關鍵字（同樣中英雙語）。
+童書的話 慘 考 前TOP 銷售100 去 選擇題材
+上午12:25
+思考完畢
+可以，我懂你的意思：童書題材你想用「市場驗證」的方式，參考平台/市場上銷售前段班（Top）的方向，先用選擇題快速定題材，再往下產出上架素材。
+我先給你一組「3–6 歲、最常見也最容易賣」的題材方向（都能套進 AM&PM ADVENTURE 的日夜/探險/雙貓形象）。你只要選 1 個主題 + 1 個核心情緒/品格，我就能直接把中英雙語的：書名、短介、商品頁文案、賣點、關鍵字、FAQ、親子共讀引導一次做出來。
+差不多
+上午12:26
+看還可不可以優化
+上午12:26
+思考完畢
+好，我用三個選擇題把童書題材定下來，選完我就直接產出童書上架文案（中英雙語）。
+童書要選哪個主題框架？
+情緒辨識與表達
+童書想主打哪個核心品格/能力？
+生活習慣
+童書希望更像什麼形式？
+概念學習（顏色/時間）
+可以優化，而且你剛選的方向很適合做成「3–6 歲情緒＋生活習慣＋時間概念」的系列：AM&PM 用白天/夜晚帶孩子認識情緒，並把情緒安放進作息。下面先給你一套可直接上架的「童書」素材（中英雙語），並把敘事更貼近 3–6 歲可理解的句型。
+童書（3–6 歲）上架用素材｜中英雙語（AM&PM ADVENTURE）
+1) 書名（10 組中英）
+AM&PM 的情緒時鐘：早上是勇敢，晚上是安心  
+AM & PM’s Feelings Clock: Brave in the Morning, Calm at Night
+今天我是哪一種心情？AM&PM 的日夜情緒書  
+What Do I Feel Today? AM & PM’s Day-and-Night Feelings Book
+早安心情、晚安心情：跟著小貓學作息  
+Morning Feelings, Goodnight Feelings: Routines with Two Kitties
+情緒有顏色：AM&PM 的一天  
+Feelings Have Colors: A Day with AM & PM
+不生氣也可以：AM&PM 的小小冷靜法  
+It’s Okay to Be Mad: Little Calm-Down Tricks with AM & PM
+我想睡了，但我還有點怕：晚安情緒練習  
+I Want to Sleep, But I’m a Little Scared: A Goodnight Feelings Practice
+早上做什麼？晚上做什麼？AM&PM 的時間習慣書  
+What Do We Do in the Morning & at Night? AM & PM’s Time & Routine Book
+我的心情要去哪裡：AM&PM 的抱抱作息  
+Where Do My Feelings Go? AM & PM’s Cozy Routine
+日與夜的心情朋友：學會說「我需要」  
+Day-and-Night Feeling Friends: Learning to Say “I Need…”
+AM&PM：把心情放回口袋，再出發  
+AM & PM: Put Your Feelings in Your Pocket, Then Go
+2) 商品頁短標 / 一句話（中英）
+中：用「白天／夜晚」帶孩子認識心情，並練習簡單作息與安撫。  
+EN: A day-and-night story that helps kids name feelings and build gentle routines.
+3) 商品頁介紹（中英，可直接貼 Readmoo）
+中文（主文）  
+白天，AM 和 PM 出發去探險；晚上，他們回到家，準備說晚安。  
+可是有時候，心情會跑出來：開心、緊張、生氣、委屈、害怕……心情不是壞孩子，只是來提醒我們「我需要幫忙」。
+《AM&PM 的情緒時鐘》用孩子最熟悉的「早上／晚上」做成一套溫柔的練習：  
+認識情緒：把心情說出來（我現在是___）。  
+建立習慣：用固定的小步驟安頓自己（喝水、深呼吸、抱抱、收玩具、刷牙、說晚安）。  
+時間概念：知道什麼時候做什麼（早上出發、晚上回家、睡前放鬆）。  
+適合 3–6 歲親子共讀、幼兒園老師帶讀，也適合當作睡前安撫小書。
+English (blurb)  
+AM and PM go exploring in the daytime—and come home at night to say goodnight.  
+Sometimes feelings show up: happy, nervous, angry, sad, or scared. Feelings aren’t “bad”—they’re messages.
+This book uses a simple day-and-night rhythm to help kids:
+Name feelings (“I feel ___.”)  
+Build gentle routines (water, breathing, hugs, tidy up, brush teeth, bedtime calm)  
+Learn time concepts (morning vs. night, what we do before sleep)
+Perfect for ages 3–6, bedtime reading, and classroom read-aloud.
+4) 賣點（中英）
+中
+情緒辨識：用簡單句型讓孩子說得出心情  
+生活習慣：把「安撫」融入作息，不靠說教  
+時間概念：早上/晚上、睡前/睡後的基本理解  
+親子共讀好用：每一段都能停下來問孩子「你呢？」  
+角色友善：雙貓探險隊＋日夜意象，系列感強
+EN
+Helps kids label emotions with simple phrases  
+Builds routines through story, not lectures  
+Introduces basic time concepts (morning/night, before bed)  
+Great for interactive read-aloud (“What about you?” moments)  
+Strong series branding with two-kitty adventure + day/night theme
+5) 關鍵字（中英）
+中文：童書、繪本、情緒教育、情緒管理、生活習慣、睡前故事、作息、幼兒、親子共讀、幼兒園、時間概念、日夜  
+English: kids book, picture book, emotions, feelings, bedtime routine, daily routine, calming, preschool, read aloud, morning night, time concepts
+6) FAQ（中英）
+Q（中）：這本適合幾歲？  
+A：建議 3–6 歲；也適合 2–3 歲在大人引導下共讀。  
+EN: Best for ages 3–6 (also works for 2–3 with support).
+Q（中）：會不會太「教小孩」？  
+A：不會，以情境＋可模仿的小步驟帶過，不用說教。  
+EN: It teaches through story and gentle steps—no lectures.
+Q（中）：可以當睡前書嗎？  
+A：可以，內容設計就是「晚安情緒＋睡前流程」。  
+EN: Yes—built for bedtime calming and routines.
+你要的「優化」我已先做到兩件事
+1) 題材更聚焦：情緒（辨識/表達）＋生活習慣（作息）＋時間概念（日夜）  
+2) 更好系列化：之後可延伸成 6 冊（生氣、害怕、緊張、委屈、想念、開心），每冊都用 AM/PM 的日夜節奏收尾
+如果你要我再「更像市場 Top 的系列商品」，我只需要你選一個系列走向（回我一個字母即可）：
+A：偏「睡前安撫」  
+B：偏「情緒管理工具」  
+C：偏「時間概念學習（早晚/作息）」
+可以延伸  各種 不同動物 當作不同主題  LOGO 不同的動物 當IP 當題材
+上午12:29
+可以，這個方向很適合把 「LOGO＝動物角色＝IP」 做成可長期擴張的系列宇宙：每一本/每個主題都有一隻代表動物（辨識度高、好做周邊/封面角標），但整體仍維持同一套品牌系統（黑白徽章、AM&PM ADVENTURE 語氣、日夜/探險感）。
+下面給你一套「可直接拿去開系列」的設計方法＋題材清單（繁中為主，含英文命名格式），你照這個框架填，就能持續生出新書名/商品頁。
+1) 系列架構（建議你固定住的 4 個元素）
+A. 系列母品牌（不變）  
+AM&PM ADVENTURE（黑白徽章風）
+B. 角色徽章（每本變）  
+徽章中央動物換角色（例：熊貓、狐狸、兔子…）  
+徽章下方固定一條系列字（例：ADVENTURE / FEELINGS / ROUTINES）
+C. 主題欄位（每本變）  
+情緒主題（害怕/生氣/緊張/想念/害羞/開心）  
+習慣主題（刷牙/收玩具/洗手/睡前/起床/吃飯）  
+時間概念（早上/下午/晚上/睡前/週末/雨天）
+D. 命名公式（固定）  
+中文：（動物名/角色名）的（主題） 或 AM&PM × （動物名）：（主題）  
+英文：(Animal Name)’s (Theme) 或 AM & PM x (Animal): (Theme)
+2) 動物 IP × 題材配對（3–6 歲，市場常見又好延伸）
+每個動物我都給你一個「最順的主題定位」，之後可做成一套 6–12 本的系列：
+兔子：睡前安撫／怕黑  
+小熊：生氣管理／冷靜方法  
+狐狸：好奇探索／提問與觀察  
+貓咪：安全感／分離焦慮（上學、睡自己床）  
+小狗：交朋友／分享與輪流  
+熊貓：慢慢來／耐心與等待  
+刺蝟：害羞／界線與社交勇氣  
+小象：記得帶什麼／生活自理（整理書包、收納）  
+小鳥：表達需求／說出「我需要」  
+海龜：放慢呼吸／情緒調節（呼吸、數數）
+3) 直接可用：10 組「中英雙語」系列書名（示範）
+兔兔的晚安任務：我不怕黑  
+Bunny’s Goodnight Mission: I’m Not Afraid of the Dark
+小熊生氣了：我的冷靜小方法  
+Bear Got Mad: My Little Calm-Down Tricks
+狐狸的好奇時間：為什麼是白天？為什麼是晚上？  
+Fox’s Curious Time: Why Day? Why Night?
+貓咪想媽媽：上學也可以很安心  
+Kitty Misses Home: Feeling Safe at School
+小狗的輪流遊戲：一起玩更開心  
+Puppy’s Turn-Taking Game: Sharing Makes Play Fun
+熊貓慢慢來：等一等也沒關係  
+Panda Takes It Slow: It’s Okay to Wait
+刺蝟躲起來：我想說你好  
+Hedgehog Hides: I Want to Say Hello
+小象收收歌：玩具回家了  
+Elephant’s Tidy-Up Song: Toys Go Home
+小鳥說一說：我需要抱抱  
+Little Bird Speaks Up: I Need a Hug
+海龜呼吸課：一二三，心情回來了  
+Turtle’s Breathing Lesson: 1-2-3, I Feel Better
+4) 讓「不同動物 LOGO」看起來像同一個品牌：3 條規則
+同一個徽章外框（圓形/盾形固定），只換中間角色  
+同一套字體與構圖（AM&PM/ADVENTURE 的字都固定位置）  
+同一個日夜符號語彙（星星/月亮/太陽/雲，作為系列識別小元素）
+5) 你只要回我 2 個決策，我就能把「系列第一本」的上架素材整包（中英）做完
+請回覆兩項即可：  
+1) 你想先做哪個動物當第一隻 IP？（例如：兔子/小熊/狐狸/自訂）  
+2) 第一本文案主題要先跑哪個？（怕黑睡前／生氣冷靜／收玩具作息／上學分離焦慮／其他）
+我收到後會直接輸出：書名最終版（中英）＋商品頁短中長文案（中英）＋賣點＋關鍵字＋FAQ＋親子共讀引導。
+圖上的兩隻小貓
+上午12:31
+好，那我們就把圖上的兩隻小貓定成系列的主角 IP（不換動物），並把牠們分工成「AM / PM」的日夜搭檔，整個系列都用這組雙主角延伸。
+下面先給你一套可直接上架的「系列定位 + 第一本候選」中英文案骨架（你回我一個選項，我就把整包內容寫到完稿）。
+系列 IP 設定（固定不變）
+角色：兩隻小貓（AM & PM）
+系列主軸：日與夜的探險 → 把孩子的情緒放進每天的作息裡（3–6 歲）
+每本書固定結構（家長會覺得很「可用」）  
+1) 白天遇到一個情緒/情境  
+2) 學一句「我現在覺得___」  
+3) 做一個小小安撫/作息步驟  
+4) 晚上收尾：晚安儀式（刷牙/收玩具/抱抱/深呼吸）
+第一本（你選 1 個方向，我就直接寫完整上架素材：中英書名+短中長文案+賣點+關鍵字+FAQ+親子共讀引導）
+A. 怕黑／睡前安心（最容易做睡前系列）  
+B. 生氣／冷靜小方法（情緒管理需求最大）  
+C. 分離焦慮／上學安心（入園/上學超常見）  
+D. 收玩具／生活自理（作息習慣導向）  
+E. 情緒辨識／今天我是什麼心情（入門百科型）
+你回我一個字母（A–E）就好。
+D
+上午12:31
+收到，選 D：收玩具／生活自理。以下是一整包「可直接上架 Readmoo」的童書素材（中英雙語），主角固定是 AM & PM 兩隻小貓，調性延續 AM&PM ADVENTURE 的日夜探險。
+1) 書名（中英）—先給你 5 組可選
+AM&PM 的收收探險：玩具回家了！  
+AM & PM’s Tidy-Up Adventure: Toys Go Home!
+收玩具也能很開心：AM&PM 的收收小任務  
+Tidy-Up Can Be Fun: AM & PM’s Little Mission
+玩具迷路了：AM&PM 幫玩具找家  
+Toys Got Lost: AM & PM Help Them Find Home
+收收歌：跟著 AM&PM 把房間變乾淨  
+The Tidy-Up Song: Clean Up with AM & PM
+白天玩、晚上收：AM&PM 的作息小故事  
+Play by Day, Tidy by Night: A Routine Story with AM & PM
+（若你要我直接定稿，我建議 #1 或 #3 最好賣、畫面感最強。）
+2) 短標／一句話（中英）
+中：用一場「玩具回家」的探險，讓孩子學會收玩具的 3 步驟。  
+EN: A “toys go home” adventure that teaches kids a simple 3-step tidy-up routine.
+3) 商品頁介紹（中英｜可直接貼 Readmoo）
+中文（短版）
+今天，AM 和 PM 玩得好開心！可是要睡覺了，房間還是亂亂的。  
+於是，兩隻小貓決定出發：幫玩具找到回家的路。
+這本書用孩子聽得懂的方式，把收玩具變成一個小遊戲：  
+找到 → 分類 → 放回家。  
+最後再一起完成晚安流程，讓「收收」變成每天都做得到的好習慣。
+適合 3–6 歲親子共讀、幼兒園帶讀與睡前儀式。
+English (short)
+AM and PM had so much fun playing—until bedtime arrives and the room is messy.  
+So they go on a mission: help every toy find its way home.
+Kids learn a simple tidy-up routine:  
+Find → Sort → Put away—then finish with a cozy bedtime wind-down.  
+Perfect for ages 3–6, read-aloud, classrooms, and bedtime routines.
+4) 賣點（中英）
+中文
+把「收玩具」變成故事任務，不用碎念也願意做  
+3 步驟超好記：找到→分類→放回家  
+自然帶入作息：玩耍結束、收拾、洗手/刷牙、晚安  
+每頁都能互動問答：這個玩具要回哪裡呢？  
+適合 3–6 歲：句子短、指令清楚、節奏明快
+English
+Turns clean-up time into a fun story mission (less nagging)  
+Easy 3-step routine: Find → Sort → Put away  
+Gently supports daily routines and bedtime transitions  
+Built-in interaction prompts for read-aloud  
+Short sentences and clear cues for ages 3–6
+5) 關鍵字（中英）
+中文：童書、繪本、生活習慣、收玩具、整理、收納、幼兒自理、親子共讀、睡前、作息、情緒安撫  
+English: kids book, picture book, tidy up, clean up, routine, bedtime routine, preschool, life skills, organization, read aloud
+6) FAQ（中英）
+Q1（中）：適合幾歲？  
+A：3–6 歲最剛好；2–3 歲也可在大人引導下共讀。  
+EN: Best for ages 3–6 (also works for 2–3 with adult help).
+Q2（中）：孩子會不會聽完還是不收？  
+A：這本設計成「可照做」的 3 步驟＋固定口訣，家長照著唸，孩子比較願意配合。  
+EN: It offers a repeatable 3-step routine and simple phrases kids can follow.
+Q3（中）：可以當睡前書嗎？  
+A：可以，故事收尾會把房間收好、心情放鬆，銜接晚安。  
+EN: Yes—ends with a calm tidy room and a gentle bedtime wind-down.
+7) 親子共讀引導（中英）
+中文
+讀到「玩具迷路」時問：你覺得它的家在哪？  
+用口訣一起做：找到、分類、放回家  
+結尾可以做 30 秒小儀式：抱抱 + 深呼吸 3 下 + 說晚安
+English
+Ask: “Where is this toy’s home?”  
+Repeat the chant: Find, Sort, Put away  
+End with a 30-second calm ritual: hug + 3 deep breaths + goodnight
+8) 你要我「更貼近你的品牌徽章」只差一個決定
+你希望兩隻貓的命名固定為哪一種？
+方案 1：直接叫 AM（白天貓）與 PM（夜晚貓）  
+方案 2：你自訂兩隻貓的名字（例如：阿姆/阿潘，或任何你喜歡的）
+你回「1」或「2 + 名字」，我就把以上文案全部統一用最終角色名，並把書名定稿成你要的那一組。
+PANEY 跟 MONEY
+上午12:32
+好，主角就定名為 PANEY 跟 MONEY。我把童書（D：收玩具／生活自理）那套上架素材，全部統一改成這兩個名字，並幫你把書名先定稿成最強辨識的一版：
+書名定稿（中英）
+中文：PANEY & MONEY 的收收探險：玩具回家了！  
+English: PANEY & MONEY’s Tidy-Up Adventure: Toys Go Home!
+商品頁短標／一句話（中英）
+中：跟著 PANEY 和 MONEY 出發，幫玩具找到回家的路，學會收玩具 3 步驟。  
+EN: Join PANEY and MONEY on a mission to send every toy home—learn a simple 3-step tidy-up routine.
+商品頁介紹（中英｜可直接貼 Readmoo）
+中文
+今天，PANEY 和 MONEY 玩得好開心！可是要睡覺了，房間還是亂亂的。  
+於是，兩隻小貓決定出發：幫玩具找到回家的路。
+這本書用孩子聽得懂的方式，把收玩具變成一個小遊戲：  
+找到 → 分類 → 放回家。  
+最後再一起完成晚安流程，讓「收收」變成每天都做得到的好習慣。
+適合 3–6 歲親子共讀、幼兒園帶讀與睡前儀式。
+English
+PANEY and MONEY had so much fun playing—until bedtime arrives and the room is messy.  
+So they go on a mission: help every toy find its way home.
+Kids learn a simple tidy-up routine:  
+Find → Sort → Put away—then finish with a cozy bedtime wind-down.  
+Perfect for ages 3–6, read-aloud, classrooms, and bedtime routines.
+如果你希望更貼近「AM/PM（日夜）」的設定，我可以再幫你加一句角色小設定（例如：PANEY 負責白天任務、MONEY 負責晚安儀式），讓系列一致性更強。
+可以
+上午12:33
+好，我把「日／夜」的設定補進系列角色定位，並把它自然嵌到商品頁文案裡（中英都補），讓品牌一致性更強、也更好做系列延伸。
+角色日夜設定（固定）
+PANEY（AM／白天貓）：負責「出發、探索、開始做」的白天任務（收拾、整理、準備）。  
+MONEY（PM／夜晚貓）：負責「收尾、安撫、說晚安」的夜晚儀式（放回家、放鬆、睡前流程）。
+更新後商品頁短標／一句話（中英）
+中：PANEY（白天）帶你出發收收探險，MONEY（夜晚）陪你把玩具送回家、安心說晚安。  
+EN: PANEY (daytime) leads the tidy-up adventure; MONEY (nighttime) helps every toy go home—then it’s goodnight time.
+更新後商品頁介紹（中英｜可直接貼 Readmoo）
+中文
+白天，PANEY 最喜歡出發探險；晚上，MONEY 最會把一切收得剛剛好，準備說晚安。  
+今天，他們玩得好開心！可是要睡覺了，房間還是亂亂的。於是兩隻小貓決定合作：  
+PANEY 負責找一找、分一分；MONEY 負責放回家、慢慢收尾。
+這本書用孩子聽得懂的方式，把收玩具變成一個小遊戲：  
+找到 → 分類 → 放回家。  
+最後再一起完成晚安流程，讓「收收」變成每天都做得到的好習慣。
+English
+By day, PANEY loves to explore and get things started. By night, MONEY knows how to wrap things up and say goodnight.  
+Today, they played so much—but bedtime arrives and the room is messy. So they team up:  
+PANEY helps find and sort. MONEY helps put away and wind down.
+Kids learn a simple tidy-up routine:  
+Find → Sort → Put away—then finish with a cozy bedtime wind-down, making clean-up a habit kids can actually do.
+如果你願意，我也可以幫你把系列的「每本固定結尾一句」定下來（像口號一樣，家長會很愛重複唸），例如：  
+中：「白天勇敢出發，晚上安心回家。」  
+EN: “Brave by day, cozy by night.”
+一系列最好
+上午12:34
+思考完畢
+好，「一系列最好」我建議直接把它做成一套可長期擴張、每一本都能獨立上架、但放在同一個系列頁面又很完整的產品線。
+下面是我建議的 系列總包（中英命名、每冊主題、固定結構、系列口號），你照這個做就能很穩定地一直出新本。
+系列名稱（中英）
+中文系列名：PANEY & MONEY 日夜探險：情緒 × 習慣小小書  
+English series: PANEY & MONEY Day & Night Adventures: Feelings & Routines
+系列口號（固定）
+中：白天勇敢出發，晚上安心回家。  
+EN: Brave by day, cozy by night.
+系列固定格式（每一本都用同一套骨架）
+1) 白天情境：PANEY 遇到一個狀況（玩、上學、朋友、弄亂、失敗）  
+2) 一句話情緒：孩子能說出口的句型：「我現在覺得＿＿。」  
+3) 一個小技巧：1 個可做的動作（呼吸、抱抱、數 1–5、喝水）  
+4) 晚上收尾：MONEY 帶入 1 個習慣（收拾、洗手、刷牙、晚安）  
+5) 最後一頁固定收束：系列口號 + 小問題（親子互動）
+第一季（12 本）主題清單（中英書名可直接用）
+我先用「最容易賣、最常被買」的生活題材排一季，讓家長覺得每一本都實用：
+收收探險：玩具回家了！  
+Tidy-Up Adventure: Toys Go Home!
+洗手任務：泡泡打敗細菌  
+Handwashing Mission: Bubbles Beat Germs
+刷牙特攻：牙牙星星亮晶晶  
+Toothbrushing Squad: Sparkly Teeth Tonight
+睡前安心：我有點怕黑  
+Goodnight Calm: I’m a Little Scared of the Dark
+上學安心：我想媽媽/想家  
+School-Day Brave: I Miss Home
+輪流遊戲：一起玩更好玩  
+Taking Turns: Playing Together Is Better
+生氣火山：我需要冷靜一下  
+Anger Volcano: I Need to Calm Down
+失敗也可以：再試一次就好  
+It’s Okay to Fail: Let’s Try Again
+分享小心意：我也想要，但我可以等  
+Sharing Kindness: I Want It Too, I Can Wait
+整理小書包：明天出發準備好  
+Backpack Ready: Prepping for Tomorrow
+吃飯小勇氣：先嘗一口就好  
+Brave Bites: Just One Tiny Taste
+外出安全：牽手不走丟  
+Safe Outside: Hold Hands, Stay Close
+讓系列「看起來是同一套」的封面/Logo規則（你可以交給設計照做）
+外框固定：黑白徽章風、上方固定 PANEY & MONEY、下方固定 ADVENTURE  
+中央插畫固定：兩隻貓 + 一個「本冊主題物件」（玩具箱/牙刷/泡泡/星星…）  
+每本只換「小圖標」：右上角加主題 icon（例如玩具、牙刷、月亮）  
+書背（若有）固定一句：系列口號
+如果你點頭要走「第一季 12 本」這套，我下一步可以直接把每一本到「可上架」的最小素材都先寫好（每本：中英書名＋一句話＋短介紹＋關鍵字），然後你再挑要先上架哪 3 本做完整商品頁長文。
+可以一次 20本
+上午12:35
+可以，一次規劃 20 本沒問題。我先用同一套系列規則（PANEY 白天任務／MONEY 晚上收尾、3–6 歲、情緒×習慣×時間概念），給你「第 1 季 20 本」的中英書名＋每本一句話（中英），讓你可以立刻當作上架/系列規劃清單用。
+PANEY & MONEY 日夜探險｜第 1 季 20 本（中英）
+1) 收收探險：玩具回家了！  
+Tidy-Up Adventure: Toys Go Home!  
+中：學會找到→分類→放回家。EN: Find → sort → put away.
+2) 洗手任務：泡泡打敗細菌  
+Handwashing Mission: Bubbles Beat Germs  
+中：洗手也能像闖關。EN: Turn handwashing into a mini quest.
+3) 刷牙特攻：牙牙星星亮晶晶  
+Toothbrushing Squad: Sparkly Teeth Tonight  
+中：刷牙流程＋晚安收尾。EN: A gentle brush-and-bed routine.
+4) 睡前安心：我有點怕黑  
+Goodnight Calm: I’m a Little Scared of the Dark  
+中：把害怕放好再睡。EN: Pack fear away and rest.
+5) 上學安心：我想家了怎麼辦？  
+School-Day Brave: What If I Miss Home?  
+中：分離焦慮的安撫句。EN: Simple phrases that comfort.
+6) 輪流遊戲：一起玩更好玩  
+Taking Turns: Playing Together Is Better  
+中：輪流不等於輸。EN: Turns feel fair and fun.
+7) 生氣火山：我需要冷靜一下  
+Anger Volcano: I Need to Calm Down  
+中：生氣三步驟。EN: A 3-step calm-down plan.
+8) 難過雲朵：我想要抱抱  
+Sad Cloud: I Need a Hug  
+中：學會說出需要。EN: Learn to ask for help.
+9) 緊張蝴蝶：第一次也可以慢慢來  
+Nervous Butterflies: First Times Can Be Slow  
+中：面對新事物。EN: Gentle courage for “firsts.”
+10) 害羞小屋：我想說你好  
+Shy Little House: I Want to Say Hello  
+中：社交勇氣練習。EN: Hello, one small step.
+11) 吃飯小勇氣：先嘗一口就好  
+Brave Bites: Just One Tiny Taste  
+中：不逼吃，也前進。EN: Progress without pressure.
+12) 穿衣任務：自己來我可以  
+Getting-Dressed Mission: I Can Do It!  
+中：自理成就感。EN: Independence, step by step.
+13) 上廁所小隊：記得先說一聲  
+Potty Team: Tell Grown-Ups First  
+中：如廁提醒與安心。EN: Simple cues + confidence.
+14) 出門安全：牽手不走丟  
+Safe Outside: Hold Hands, Stay Close  
+中：外出規則小故事。EN: Safety rules kids remember.
+15) 收心回家：玩完要收尾  
+Wrap-Up Time: Ending Play the Cozy Way  
+中：從玩到收的轉場。EN: Smooth transitions to home.
+16) 洗澡小泡泡：水不怕我  
+Bath Time Bubbles: Water Won’t Scare Me  
+中：怕洗澡也有方法。EN: Bath-time comfort steps.
+17) 睡醒起床：早安三步驟  
+Good Morning: A 3-Step Wake-Up Routine  
+中：起床、整理、出發。EN: Wake, wash, ready.
+18) 整理小書包：明天出發準備好  
+Backpack Ready: Prepping for Tomorrow  
+中：睡前準備明天。EN: Prep tonight, easier mornings.
+19) 失敗也可以：再試一次就好  
+It’s Okay to Fail: Let’s Try Again  
+中：挫折復原力。EN: Resilience in simple words.
+20) 吵吵停一下：小聲也能被聽見  
+Pause the Noise: Quiet Voices Still Work  
+中：音量與表達。EN: Communicate without shouting.
+如果你要我「更像上架素材」：我可以把這 20 本每一本都補齊 Readmoo 常用欄位（分類建議、關鍵字 10–15 個、短介 80–120 字、中英對照）。你想要我先用哪一種深度輸出？
+方案 A：20 本「中英書名＋一句話」（你現在這份）
+方案 B：20 本都做「上架最小包」（短介＋關鍵字＋分類）
+方案 C：先挑 3 本做「完整商品頁長文」（中英）
+C
+上午12:36
+思考完畢
+好，方案 C：先挑 3 本做「完整商品頁長文」（中英）。
+請你從下面 20 本裡挑 3 個編號回我（例如：1, 4, 7）。我就會針對那 3 本各自輸出一整套可直接貼 Readmoo 的內容：  
+書名（中英）  
+商品頁短介 / 長文（中英）  
+賣點（中英）  
+FAQ（中英）  
+親子共讀引導（中英）  
+關鍵字（中英）
+你幫我從 20 本裡挑最適合先上架的 3 本，並做完整商品頁長文（中英）
+上午12:37
+我會先上架這 3 本（從 20 本裡挑「需求最大、情境最常見、家長最願意買」的組合），並各自給你完整商品頁長文（中英）：
+#1 收收探險：玩具回家了！（每天都會用到，最容易形成系列口碑）
+#4 睡前安心：我有點怕黑（睡前剛需、復購率高）
+#7 生氣火山：我需要冷靜一下（情緒管理剛需、家長痛點強）
+以下每本都以你的 IP 設定：PANEY（白天貓）帶任務出發 / MONEY（夜晚貓）負責收尾與晚安儀式，並保留系列口號：  
+中：白天勇敢出發，晚上安心回家。 / EN: Brave by day, cozy by night.
+01｜PANEY & MONEY 的收收探險：玩具回家了！
+商品頁（中文）
+一句話（短介）
+跟著 PANEY 和 MONEY 出發，幫玩具找到回家的路，學會收玩具 3 步驟：找到 → 分類 → 放回家。
+商品頁長文
+白天，PANEY 最喜歡出發探險；晚上，MONEY 最會把一切收得剛剛好，準備說晚安。  
+今天，他們玩得好開心！積木、車車、娃娃都在地上開派對。可是——要睡覺了，房間還是亂亂的。
+PANEY 說：「我們來玩一個遊戲吧！幫玩具找到回家的路。」  
+MONEY 點點頭：「找到家以後，就能安心休息，明天再玩！」
+這本書用孩子聽得懂的方式，把「收玩具」變成一場小小探險：  
+1) 找到：先找一找，哪些玩具還在外面？  
+2) 分類：一樣的放一起，積木一堆、車車一堆。  
+3) 放回家：每一堆都有自己的家——玩具箱、籃子、架子。
+故事最後，MONEY 會帶孩子做「收尾」：把最後一件玩具放好、伸伸懶腰、深呼吸，然後說晚安。  
+你會發現：收玩具不需要靠催促，也不必變成吵架——只要每天照著同一套小步驟做，孩子就能慢慢做到，而且越做越有成就感。
+適合 3–6 歲親子共讀、幼兒園帶讀，也很適合當作「玩後轉場」與「睡前儀式」的小書。
+賣點（中文）
+把收玩具變成故事任務，降低抗拒感  
+3 步驟口訣超好記：找到→分類→放回家  
+日夜分工清楚：PANEY 開始任務、MONEY 收尾晚安  
+互動式共讀：每一頁都能問「這個要回哪裡？」  
+適合建立固定作息與空間概念（物品有家）
+FAQ（中文）
+Q：孩子聽完會真的願意收嗎？  
+A：這本不是「叫孩子收」，而是提供可複製的 3 步驟＋固定口訣。家長每天用同一套語言帶一次，孩子更容易配合。
+Q：適合幾歲？  
+A：3–6 歲最剛好；2–3 歲也可在大人協助下共讀與練習。
+Q：可以當睡前書嗎？  
+A：可以。故事收尾就是「把玩具送回家 → 放鬆 → 晚安」。
+親子共讀引導（中文）
+問孩子：這個玩具的家在哪？我們一起找。  
+讀完立刻做 2 分鐘「同款任務」：只收 5 個玩具也算成功。  
+固定收尾一句：白天勇敢出發，晚上安心回家。
+關鍵字（中文）
+童書、繪本、生活習慣、收玩具、整理、收納、幼兒自理、作息、睡前儀式、親子共讀、幼兒園、時間概念
+Product Page (English)
+One-liner
+Join PANEY and MONEY on a mission to send every toy home—and learn a simple 3-step tidy-up routine: Find → Sort → Put away.
+Long Description
+By day, PANEY loves to explore and get things started. By night, MONEY knows how to wrap things up and make bedtime feel cozy.  
+Today was full of play—blocks, cars, and dolls everywhere. But now it’s bedtime…and the room is still messy.
+PANEY says, “Let’s play a game: help every toy find its way home.”  
+MONEY nods, “When toys go home, everyone can rest—and play again tomorrow!”
+This book turns cleanup into a kid-friendly adventure with a repeatable routine:  
+1) Find what’s still out.  
+2) Sort similar toys together.  
+3) Put away—everything has a home (box, basket, shelf).
+At the end, MONEY guides a gentle wind-down: put away the last toy, stretch, take a breath, and say goodnight.  
+No nagging, no arguing—just small steps that build real habits and confidence over time.
+Perfect for ages 3–6, bedtime transitions, read-aloud time, and classroom routines.
+Highlights
+Cleanup becomes a story mission, not a battle  
+Easy 3-step chant kids remember  
+Clear day/night roles: start with PANEY, finish with MONEY  
+Interactive read-aloud prompts on every page  
+Builds organization and routine skills gently
+Keywords (EN)
+kids book, picture book, tidy up, clean up, routines, bedtime routine, preschool, life skills, organization, read aloud
+04｜PANEY & MONEY 的睡前安心：我有點怕黑
+商品頁（中文）
+一句話（短介）
+把「怕黑」變成一場溫柔的晚安練習：學會說出害怕，跟著 MONEY 做 3 個安心小動作，再好好睡覺。
+商品頁長文
+晚上到了，MONEY 把窗簾拉上，房間慢慢變暗。  
+PANEY 看著角落，小小聲說：「我……有點怕黑。」
+MONEY 沒有笑，也沒有說「不要怕」。MONEY 說：「謝謝你告訴我。怕黑不是壞事，是心情在提醒你——你需要安心。」  
+於是兩隻小貓一起做「晚安安心任務」：
+1) 說出來：「我現在覺得怕怕的。」  
+2) 找一個光：夜燈、窗外的月亮、或手電筒的小星星。  
+3) 做一個動作：抱抱、深呼吸、或握著小毯子。
+PANEY 發現：黑黑的房間裡，其實也有好多小線索——月亮在窗外、星星在天上、玩具在自己的家。  
+MONEY 說：「我們不是把害怕趕走，我們是把害怕放好，放到安全的地方。」  
+故事最後，MONEY 帶 PANEY 做睡前流程：把玩具送回家、刷牙、躺下、呼吸三下，然後一起說：  
+白天勇敢出發，晚上安心回家。
+這本書適合 3–6 歲的睡前共讀：句子短、情緒被接住、方法簡單，讓孩子知道——害怕的時候，可以有一套自己的安心小儀式。
+賣點（中文）
+不說教、不否定：用「接住情緒」的語言陪孩子  
+提供可重複練習的 3 步驟安心法  
+自然融入睡前作息（收尾、刷牙、上床、呼吸）  
+適合睡前共讀與幼兒園情緒教育  
+系列化日夜設定：MONEY 是晚安專家
+FAQ（中文）
+Q：會不會越看越怕黑？  
+A：不會。重點是「命名情緒＋給方法」，讓害怕有出口、也有收束。
+Q：需要夜燈才有效嗎？  
+A：不用。書裡把「光」定義得很寬：月光、星光、手電筒、甚至是抱抱和呼吸。
+關鍵字（中文）
+怕黑、睡前故事、晚安、情緒安撫、安心感、幼兒情緒、親子共讀、作息、夜燈、分離焦慮
+Product Page (English)
+One-liner
+A gentle bedtime story that helps kids name fear, practice simple calming steps, and feel safe in the dark.
+Long Description
+Night comes. MONEY closes the curtains and the room gets dim.  
+PANEY whispers, “I’m…a little scared of the dark.”
+MONEY doesn’t laugh. MONEY doesn’t say “Don’t be scared.”  
+MONEY says, “Thank you for telling me. Fear is a feeling—it means you need comfort.”
+Together they try a simple “goodnight calm mission”:
+1) Name it: “I feel scared.”  
+2) Find a light: a nightlight, moonlight, or a tiny flashlight star.  
+3) Do one calming action: a hug, deep breaths, or holding a cozy blanket.
+PANEY learns the dark can still be gentle—moon in the window, stars in the sky, toys safe at home.  
+They don’t push fear away—they place it somewhere safe.
+Then MONEY guides the bedtime routine: tidy up, brush teeth, lie down, three breaths, and one final line:  
+Brave by day, cozy by night.
+Perfect for ages 3–6 and bedtime read-aloud.
+07｜PANEY & MONEY 的生氣火山：我需要冷靜一下
+商品頁（中文）
+一句話（短介）
+生氣不是壞事；學會「停一下、說出來、做一個冷靜動作」，讓火山慢慢變小，回到安心。
+商品頁長文
+白天，PANEY 出發去玩。  
+可是——積木倒了、輪到別人先玩、想要的東西拿不到……PANEY 的胸口熱熱的，眼睛也熱熱的。  
+「我生氣了！」PANEY 的生氣像火山一樣，噗——要爆出來了。
+MONEY 走過來，沒有說「不要生氣」。MONEY 說：  
+「生氣是在告訴你：你很在乎。現在，我們先保護自己和別人，做一個冷靜任務。」
+兩隻小貓一起練習三步驟：  
+1) 停一下：把手放在肚子上，腳站穩。  
+2) 說出來：「我現在覺得生氣，因為＿＿。」  
+3) 做一個動作：深呼吸三下、數 1–5、或去「冷靜角落」抱抱。
+當火山變小，PANEY 也更能想出辦法：換一個玩法、請求幫忙、或說「我想要輪流」。  
+晚上，MONEY 帶 PANEY 把今天的生氣放進「心情口袋」：收尾、刷牙、晚安。  
+因為每一天都會有生氣，但每一天也都可以練習——讓自己回到舒服的地方。
+這本書適合 3–6 歲情緒教育與親子共讀：句型清楚、方法簡單，家長也能直接照著唸、照著做。
+賣點（中文）
+用健康語言看待生氣：不是壞、是訊號  
+三步驟可直接拿來用（停一下/說出來/做動作）  
+強化「表達需求」而非「爆炸」  
+適合家中與幼兒園共讀與情境演練  
+MONEY 的夜晚收尾，讓情緒有結束點
+FAQ（中文）
+Q：這本會讓孩子學會頂嘴嗎？  
+A：不會。它教的是「說出原因＋提出需要」，讓表達更清楚、更安全。
+Q：需要準備冷靜角落嗎？  
+A：不一定。角落可以是一張椅子、一個抱枕、一條小毯子，重點是固定、安全、可回來呼吸。
+關鍵字（中文）
+情緒管理、生氣、冷靜、幼兒情緒、同理、親子共讀、幼兒園、輪流、挫折、表達需求
+Product Page (English)
+One-liner
+Anger isn’t “bad”—it’s a message. Learn a simple 3-step calm-down routine kids can actually use.
+Long Description
+By day, PANEY goes out to play.  
+But blocks fall, turns feel unfair, and wants don’t always happen. PANEY’s chest feels hot—an anger volcano is about to erupt.
+MONEY doesn’t say, “Don’t be mad.”  
+MONEY says, “Anger means you care. Let’s keep everyone safe and do a calm-down mission.”
+They practice three steps:
+1) Pause: feet steady, hand on belly.  
+2) Name it: “I feel angry because ___.”  
+3) Do one calming action: three deep breaths, count 1–5, or go to a cozy calm corner.
+When the volcano shrinks, PANEY can find better choices: ask for help, try again, or say “Can we take turns?”  
+At night, MONEY helps pack the day away—tidy up, brush teeth, goodnight—so feelings have an ending, too.
+Perfect for ages 3–6, read-aloud, and classroom social-emotional learning.
+如果你要我把這三本「更像同一套系列頁」：我也能再補一段 系列總介紹（中英）（放在 Readmoo 系列或作者頁），讓三本一起上架時更有整體感。
+可以一起上
+上午12:38
+可以一起上。你現在缺的就是一段「把三本串成同一套」的系列總介紹（中英），放在 Readmoo 的系列頁／作者頁／三本書的商品頁末段都很合適。我先給你可直接貼上的版本：
+系列總介紹（中文｜可直接貼 Readmoo）
+《PANEY & MONEY 日夜探險：情緒 × 習慣小小書》是一套寫給 3–6 歲孩子的日常故事系列：用可愛、可執行的小步驟，把「情緒」放進每天的「生活習慣」裡。
+白天，PANEY 負責出發與探索：面對玩具、遊戲、同伴與各種小挫折；  
+晚上，MONEY 負責收尾與安心：把事情做完、把心情放好，帶孩子走進睡前儀式。
+每一本都固定有三個孩子做得到的練習：  
+一句話說出心情：「我現在覺得＿＿。」  
+一個小小方法：深呼吸、抱抱、數 1–5、或找回安全感  
+一個日常習慣：收拾、刷牙、洗手、晚安收尾
+系列口號：白天勇敢出發，晚上安心回家。  
+適合親子共讀、幼兒園帶讀，也適合當作每天的「轉場小書」（玩後收心、睡前放鬆、情緒安撫）。
+首波上架 3 本（可同時入手／一起讀更有感）：  
+1) 《PANEY & MONEY 的收收探險：玩具回家了！》  
+2) 《PANEY & MONEY 的睡前安心：我有點怕黑》  
+3) 《PANEY & MONEY 的生氣火山：我需要冷靜一下》
+Series Description (English | ready to paste)
+PANEY & MONEY Day & Night Adventures: Feelings & Routines is a story series for ages 3–6 that gently turns big feelings into small, doable habits.
+By day, PANEY leads the adventures—playtime, challenges, and learning moments.  
+By night, MONEY helps wrap things up—tidy, calm down, and step into a cozy bedtime routine.
+Each book includes:
+A simple feeling sentence: “I feel ___.”  
+One kid-friendly calming tool (breathing, hugging, counting, finding comfort)  
+One everyday routine (clean-up, hygiene, bedtime wind-down)
+Series motto: Brave by day, cozy by night.  
+Perfect for read-aloud time, preschool classrooms, and daily transitions (after play, before bed, during emotional moments).
+Launch set (3 books):
+1) PANEY & MONEY’s Tidy-Up Adventure: Toys Go Home!  
+2) PANEY & MONEY’s Goodnight Calm: I’m a Little Scared of the Dark  
+3) PANEY & MONEY’s Anger Volcano: I Need to Calm Down
+如果你希望更「銷售型」一點（更像系列套書文案），我也可以再給一個更短、更強CTA的版本。
+更像系列套書文案
+上午12:39
+系列套書文案（中文｜銷售版，可直接貼 Readmoo）
+《PANEY & MONEY 日夜探險｜情緒×習慣 小小書（首波 3 冊套書）》  
+把每天都會遇到的「收拾、怕黑、生氣」變成孩子做得到的溫柔練習。
+孩子不是不乖，只是還在學：  
+玩完怎麼「收尾」  
+害怕怎麼「安心」  
+生氣怎麼「冷靜」  
+這套書用兩隻小貓的日夜分工，把方法藏進故事裡：  
+白天 PANEY 帶孩子出發、面對狀況；晚上 MONEY 帶孩子收尾、安撫心情，走進晚安儀式。  
+每一本都附上「一句話說心情」＋「一個小方法」＋「一個生活習慣」，家長讀完就能直接照做。
+系列口號：白天勇敢出發，晚上安心回家。
+套書內容（3 冊）
+1) 《PANEY & MONEY 的收收探險：玩具回家了！》  
+把收玩具變成任務：找到→分類→放回家  
+2) 《PANEY & MONEY 的睡前安心：我有點怕黑》  
+練習把害怕放好，再安心入睡  
+3) 《PANEY & MONEY 的生氣火山：我需要冷靜一下》  
+三步驟冷靜法：停一下→說出來→做動作
+適合誰
+3–6 歲親子共讀、幼兒園帶讀  
+正在建立作息、需要睡前安撫、想練情緒表達的家庭  
+想要「少碎念、孩子更願意做」的日常工具書（用故事完成）
+為什麼建議直接買套書
+因為三本剛好涵蓋孩子最常見的三種狀態：  
+玩完要收、晚上要睡、情緒上來要停。  
+一次備齊，家裡每天都用得到。
+Series Bundle Copy (English | sales)
+PANEY & MONEY Day & Night Adventures (3-Book Starter Bundle): Feelings & Routines  
+Three everyday challenges—clean-up, fear of the dark, and big anger—turned into gentle, doable practice for ages 3–6.
+Kids aren’t “being difficult.” They’re learning how to:  
+wrap up playtime,  
+feel safe at night,  
+calm down when emotions erupt.
+By day, PANEY leads the adventure. By night, MONEY helps kids wind down with comfort and routine.  
+Each book includes: a simple feeling sentence, one kid-friendly tool, and one daily habit.
+Series motto: Brave by day, cozy by night.
+Bundle Includes
+1) Tidy-Up Adventure: Toys Go Home! — Find → Sort → Put away  
+2) Goodnight Calm: I’m a Little Scared of the Dark — comfort steps for bedtime  
+3) Anger Volcano: I Need to Calm Down — a simple 3-step calm plan
+Why buy the bundle
+Because it covers the three moments families face most:  
+after play, before bed, and during big feelings—so you can use it every day.
+如果你想更「促購」一點（更短、更像套書頁首屏），我也可以再給你一個超短版（50–80 字）與一個強CTA版（含套書亮點條列）。
+我要有點質感  有編排美術強烈自我風格
+上午12:40
+思考完畢
+可以。我把你現在的「套書文案」升級成 更有質感、編排感強、黑白徽章系（AM&PM ADVENTURE）強烈自我風格的版本；重點是「留白、節奏、短句、標語式段落」，讓它看起來像品牌宣言＋美術手冊，而不是一般電商文案。
+下面給你 3 種版型（你可直接貼 Readmoo／也可交給設計照排）。每種都含中英，風格一致但語氣不同。
+版型 A｜「品牌宣言」質感版（推薦：最像有美術編排）
+中文（可直接貼）
+PANEY & MONEY  
+DAY & NIGHT ADVENTURES  
+情緒 × 習慣 小小書｜首波 3 冊套書
+白天，勇敢出發。  
+晚上，安心回家。  
+我們不急著把孩子「教會」。  
+我們先把每一天，變得更好過。
+收尾、安心、冷靜——  
+三個最常見的日常難題，  
+三本可以每天拿出來用的小書。
+PANEY（白天）：開始任務。把世界整理得有路可走。  
+MONEY（夜晚）：收起心情。把今天放好，再說晚安。
+套書內容  
+01｜收收探險：玩具回家了！  
+找到 → 分類 → 放回家
+04｜睡前安心：我有點怕黑  
+說出害怕 → 找到一點光 → 做一個安心動作
+07｜生氣火山：我需要冷靜一下  
+停一下 → 說出來 → 做一個冷靜動作
+每一本都給你三個「立刻可用」的東西  
+一句話說心情：「我現在覺得＿＿。」  
+一個小方法：呼吸、抱抱、數 1–5、回到安全感  
+一個生活習慣：收尾、洗漱、晚安儀式  
+適合 3–6 歲親子共讀／幼兒園帶讀／睡前轉場  
+系列口號：白天勇敢出發，晚上安心回家。
+English (paste-ready)
+PANEY & MONEY  
+DAY & NIGHT ADVENTURES  
+FEELINGS × ROUTINES | 3-BOOK STARTER BUNDLE
+Brave by day.  
+Cozy by night.
+We don’t rush to “fix” kids.  
+We make everyday moments easier to live.
+Wrap-up. Comfort. Calm.  
+Three daily challenges—  
+three small books you’ll actually use.
+PANEY (daytime) starts the mission.  
+MONEY (nighttime) puts the day away.
+Included  
+01 | Tidy-Up Adventure: Toys Go Home!  
+Find → Sort → Put away
+04 | Goodnight Calm: I’m a Little Scared of the Dark  
+Name it → Find a light → Do one comfort action
+07 | Anger Volcano: I Need to Calm Down  
+Pause → Name it → Do one calming tool
+Each book gives you  
+One feeling sentence: “I feel ___.”  
+One kid-friendly tool  
+One daily routine for smoother transitions  
+Ages 3–6 | read-aloud | bedtime | preschool  
+Motto: Brave by day, cozy by night.
+版型 B｜「高級商品頁」精簡版（首屏促購＋有留白）
+中文
+PANEY & MONEY 日夜探險｜首波 3 冊套書  
+把「收拾」「怕黑」「生氣」變成孩子做得到的日常儀式。  
+白天勇敢出發，晚上安心回家。
+English  
+PANEY & MONEY | 3-Book Starter Bundle  
+Clean-up. Bedtime fear. Big feelings.  
+Turn them into gentle daily rituals.
+版型 C｜「藝術標語＋條列」風（最強自我風格，像品牌小誌）
+中文
+我們不賣乖。  
+我們賣：孩子做得到的那一步。  
+收收，是把世界放回秩序  
+怕黑，是把心放回安全  
+生氣，是把火放回手心  
+PANEY 開始。MONEY 收尾。  
+English  
+We don’t sell “good behavior.”  
+We sell the next doable step.
+你想要「強烈自我風格」我還需要你選 1 個方向（回 A/B/C 即可）
+A：極簡黑白、像品牌宣言（留白最多）  
+B：高級商品頁（資訊密度更均衡）  
+C：藝術標語、小誌感（最有態度）
+選定後，我可以把你三本的各自商品頁也統一成同一套排版語言（每本都有同款章節結構、同款短句節奏）。
+：高級商品頁（資訊密度更均衡）+藝術標語、小誌感（最有態度）
+上午12:41
+如何
+上午12:42
+做法是把 B（高級商品頁）當「資訊骨架」，再把 C（小誌標語）當「每一段的開場/段落分隔」，兩個疊起來就會同時有：好讀、好買、又有態度。你可以用下面這個「混合版版型」，之後三本都套同一套排版語言。
+混合版版型（B×C）＝「高級商品頁＋小誌態度」｜直接可貼
+① 首屏（3 行就要像品牌）
+PANEY & MONEY 日夜探險｜首波 3 冊套書  
+把「收拾」「怕黑」「生氣」變成孩子做得到的日常儀式。  
+白天勇敢出發，晚上安心回家。
+我們不賣乖。
+我們賣：孩子做得到的那一步。
+② 產品一句話（電商必備，但用質感語氣）
+一套給 3–6 歲的情緒×習慣小小書：方法很小，但每天用得到。
+③ 套書亮點（資訊密度均衡）
+這套書解決 3 個每天都會遇到的時刻：
+玩完要收（#1 收收探險）  
+晚上要睡（#4 睡前安心）  
+情緒上來要停（#7 生氣火山）
+收拾，是把世界放回秩序。
+怕黑，是把心放回安全。
+生氣，是把火放回手心。
+④ 套書內容（每本 1 行「標語」＋ 1 行「方法」＝最像小誌）
+01｜收收探險：玩具回家了！  
+讓每件東西回到自己的家。
+找到 → 分類 → 放回家
+04｜睡前安心：我有點怕黑  
+黑不是敵人，是需要被照顧的時候。
+說出害怕 → 找到一點光 → 做一個安心動作
+07｜生氣火山：我需要冷靜一下  
+生氣不是壞，是訊號。
+停一下 → 說出來 → 做一個冷靜動作
+⑤ 你會拿到什麼（把「實用」講得很高級）
+每一本都固定提供 3 個可複製的練習：
+一句話說心情：「我現在覺得＿＿。」  
+一個小方法：呼吸/抱抱/數 1–5/回到安全感  
+一個生活習慣：收尾、洗漱、晚安儀式
+⑥ 適合誰（清楚但不吵）
+3–6 歲親子共讀、幼兒園帶讀  
+想建立作息、需要睡前安撫、想練情緒表達的家庭  
+想要「少碎念、孩子更願意做」的日常工具
+⑦ 收尾 CTA（有態度的購買理由）
+一次入手套書，是把家裡最常發生的三個時刻先準備好。  
+玩完、睡前、情緒上來——你都會用到。
+英文版（同版型，貼 Readmoo 也行）
+PANEY & MONEY | Day & Night Adventures (3-Book Starter Bundle)  
+Turn clean-up, bedtime fear, and big feelings into gentle daily rituals.  
+Brave by day, cozy by night.
+We don’t sell “good behavior.”
+We sell the next doable step.
+This bundle covers 3 daily moments:
+After play (#1 Tidy-Up Adventure)  
+Before bed (#4 Goodnight Calm)  
+During big feelings (#7 Anger Volcano)
+(Each book includes a feeling sentence + one kid-friendly tool + one routine.)
+你接下來只要做一個決定
+你希望「小誌標語」的態度更偏哪一邊？
+1）溫柔但有力（療癒、留白多）  
+2）俐落有刺（更宣言、更酷）  
+回我「1」或「2」，我就把三本的商品頁（中英）全部改成同一套「高級＋小誌」文字調性，並把每本各自的標語再打磨到更一致、可當系列識別。
+1
+上午12:43
+還需要 什麼嗎˙
+上午12:44
+目前「文案」層面已經夠你三本一起上架了；如果你想做到你說的「有質感、編排美術強烈自我風格」，我只還需要你補 3 個最小資訊（有就更完整，沒有我也能先用預設值）：
+1) 作者/品牌署名（要顯示在商品頁上的是哪個？）  
+例：AM&PM ADVENTURE / PANEY & MONEY / 你的名字 / 工作室名
+2) 套書定位一句話（更偏哪種人買？）  
+A 親子共讀睡前儀式  
+B 幼兒園老師帶讀  
+C 情緒教育工具書（家長實用）  
+（你回 A/B/C 即可）
+3) 預計呈現形式（影響排版與用字）  
+A 繪本（圖多字少）  
+B 文字故事書（字多一點）  
+C 互動書（找找看/問題頁）  
+如果你只想用最快速度上架：你現在什麼都不用再補，我會把「溫柔但有力（1）」的語氣視為最終版本，你直接把我給的套書文案＋三本各自長文貼到 Readmoo 就可以了。
+AM&PM ADVENTURE / PANEY & MONEY / 你的名字 / 工作室名C  A
+上午12:45
+思考完畢
+收到，你回的資訊我解讀為：
+套書定位：選 C｜情緒教育工具書（家長實用）  
+呈現形式：選 A｜繪本（圖多字少）  
+署名：你列了 4 個候選（AM&PM ADVENTURE / PANEY & MONEY / 你的名字 / 工作室名），但還沒指定「最後要用哪一個做作者/品牌署名」。
+我建議的署名配置（最有質感、也最像品牌）
+因為你要「強烈自我風格＋系列感」，我建議用「品牌 × 角色」雙層署名：
+系列/品牌（放在系列頁、套書頁抬頭）：AM&PM ADVENTURE  
+作品/角色（放在每本書名下方或副標區）：PANEY & MONEY
+再加一個可選的「作者/製作」署名（如果你想建立創作者權威）：
+作者/製作：你的名字 或 工作室名（擇一）
+這樣呈現時，讀者會覺得：AM&PM ADVENTURE 是「品牌宇宙」，PANEY & MONEY 是「主角 IP」，你/工作室是「出品方」。
+但我還需要你做 1 個最終選擇（回我一行就好）
+請你指定「作者/製作」要顯示哪一個（擇一）：
+1) 你的名字（請提供要顯示的姓名/筆名）  
+2) 工作室名（請提供完整工作室名稱）  
+3) 不顯示作者/工作室（只用 AM&PM ADVENTURE + PANEY & MONEY）
+你一回覆，我就會把「套書文案＋三本商品頁（中英）」全部統一成同一套高級排版語氣（溫柔但有力）、並把署名位置也一起寫進去，讓你可以直接整包貼到 Readmoo。
+HOWARD HAOHAO
+上午12:45
+好，作者/製作署名就用：HOWARD HAOHAO。
+下面我把「套書文案＋三本商品頁（中英）」都統一成你選的風格：高級商品頁（資訊密度均衡）＋小誌態度（溫柔但有力），並把署名固定好（品牌／角色／作者三層結構）。
+套書頁（中文｜可直接貼 Readmoo）
+AM&PM ADVENTURE  
+PANEY & MONEY 日夜探險｜情緒×習慣 小小書（首波 3 冊套書）  
+作者／製作：HOWARD HAOHAO
+把「收拾」「怕黑」「生氣」變成孩子做得到的日常儀式。  
+白天勇敢出發，晚上安心回家。
+我們不急著把孩子「教會」。
+我們先把每一天，變得更好過。
+你會用到的 3 個時刻
+玩完要收（#1 收收探險）  
+晚上要睡（#4 睡前安心）  
+情緒上來要停（#7 生氣火山）
+收拾，是把世界放回秩序。
+怕黑，是把心放回安全。
+生氣，是把火放回手心。
+套書內容（首波 3 冊）
+01｜PANEY & MONEY 的收收探險：玩具回家了！  
+找到 → 分類 → 放回家
+04｜PANEY & MONEY 的睡前安心：我有點怕黑  
+說出害怕 → 找到一點光 → 做一個安心動作
+07｜PANEY & MONEY 的生氣火山：我需要冷靜一下  
+停一下 → 說出來 → 做一個冷靜動作
+每一本都固定提供 3 個可複製的練習
+一句話說心情：「我現在覺得＿＿。」  
+一個小方法：呼吸、抱抱、數 1–5、回到安全感  
+一個生活習慣：收尾、洗漱、晚安儀式
+適合：3–6 歲親子共讀／幼兒園帶讀／睡前轉場與情緒安撫  
+系列口號：白天勇敢出發，晚上安心回家。
+Series Bundle (English | paste-ready)
+AM&PM ADVENTURE  
+PANEY & MONEY | Day & Night Adventures (3-Book Starter Bundle)  
+Created by: HOWARD HAOHAO
+Turn clean-up, bedtime fear, and big feelings into gentle daily rituals.  
+Brave by day, cozy by night.
+We don’t rush to “fix” kids.
+We make everyday moments easier to live.
+3 moments you’ll use again and again
+After play (#1 Tidy-Up Adventure)  
+Before bed (#4 Goodnight Calm)  
+During big feelings (#7 Anger Volcano)
+Included (3 books)
+01) Tidy-Up Adventure: Toys Go Home! — Find → Sort → Put away  
+04) Goodnight Calm: I’m a Little Scared of the Dark — Name it → Find a light → One comfort action  
+07) Anger Volcano: I Need to Calm Down — Pause → Name it → One calming tool
+Each book includes: one feeling sentence + one kid-friendly tool + one daily routine.  
+Motto: Brave by day, cozy by night.
+單本商品頁（中文＋英文）｜01 收收探險（精修版）
+AM&PM ADVENTURE｜PANEY & MONEY 日夜探險  
+《PANEY & MONEY 的收收探險：玩具回家了！》  
+作者／製作：HOWARD HAOHAO
+一句話：把收玩具變成一場「玩具回家」任務：找到→分類→放回家。  
+收拾，不是結束。
+收拾，是讓明天更好開始。
+長文（中文）  
+白天，PANEY 最喜歡出發探險；晚上，MONEY 最會把一切收得剛剛好，準備說晚安。  
+今天他們玩得好開心——積木、車車、娃娃都在地上開派對。可是要睡覺了，房間還是亂亂的。
+PANEY 說：「我們來玩一個遊戲吧：幫玩具找到回家的路。」  
+MONEY 說：「玩具回家，我們的心也會慢慢安靜下來。」
+故事帶孩子做一套真正做得到的 3 步驟：  
+1) 找到：先找一找，哪些玩具還在外面？  
+2) 分類：一樣的放一起，積木一堆、車車一堆。  
+3) 放回家：每一堆都有自己的家——玩具箱、籃子、架子。
+最後，MONEY 會帶孩子做晚上的收尾：把最後一件玩具放好、伸伸懶腰、深呼吸，然後說晚安。  
+你會發現：收玩具不必靠催促——只要每天用同一套小語言、小步驟，孩子就能慢慢做到，而且越做越有成就感。
+賣點（中文）
+任務式故事，降低「被叫去收」的抗拒  
+3 步驟口訣好記、好執行  
+日夜分工：PANEY 開始、MONEY 收尾（自然銜接睡前）  
+互動共讀：每頁都能問「它的家在哪？」  
+適合 3–6 歲：句子短、節奏清楚（繪本友善）
+English (paste-ready)  
+AM&PM ADVENTURE | PANEY & MONEY  
+PANEY & MONEY’s Tidy-Up Adventure: Toys Go Home!  
+Created by: HOWARD HAOHAO
+One-liner: A “toys go home” mission with a simple routine—Find → Sort → Put away.  
+Long description: By day, PANEY starts the adventure. By night, MONEY helps wrap things up for bedtime. Together they turn cleanup into a repeatable, kid-friendly mission that builds real habits—without nagging.
+單本商品頁｜04 睡前安心（精修版，溫柔但有力）
+《PANEY & MONEY 的睡前安心：我有點怕黑》（同署名架構）
+黑不是敵人。
+黑，是需要被照顧的時候。
+中文長文重點：命名害怕 → 找到一點光（夜燈/月光/星光）→ 一個安心動作（抱抱/呼吸/毯子），最後 MONEY 帶入晚安流程與系列口號。  
+English：same structure; emphasize “name it, find a light, choose one comfort action.”
+單本商品頁｜07 生氣火山（精修版，溫柔但有力）
+《PANEY & MONEY 的生氣火山：我需要冷靜一下》
+生氣不是壞。
+生氣是在說：我很在乎。
+中文長文重點：三步驟（停一下→說出來→做動作），再把「表達需求」導回安全行為，最後 MONEY 收尾晚安。  
+English：same structure; emphasize “pause, name it, one tool.”
+最後只差一件事：你希望在 Readmoo 上的作者顯示是 HOWARD HAOHAO（英文）就好，還是要我幫你補一個繁中作者名（例如「Howard Haohao／好好」這類）讓中文頁面更順？
+AMPM-AI
+上午12:46
+可以，把 AMPM-AI當成你的「繁中署名／出品方」很順，而且也跟整個系列的黑白徽章、系統化風格一致。
+我建議最終署名這樣放（最有質感、也最不打架）：
+系列/品牌（頁首）：AM&PM ADVENTURE  
+角色/系列（書名下）：PANEY & MONEY  
+作者／製作（署名）：AMPM-AI（建議寫法：作者／製作：AMPM-AI）  
+英文頁的 Created by：AMPM-AI
+如果你想保留你個人名字但又不想太「真人作者感」，可以用小一階的方式放在最後一行（可選）：
+出品：AMPM-AI｜製作：HOWARD HAOHAO
+你要我把我前面那份「套書頁＋三本商品頁（中英）」裡所有署名，全部統一改成 AMPM-AI 嗎？
+統一
+上午12:46
+好，我把署名全部統一為 AMPM-AI（中英一致：作者／製作：AMPM-AI / Created by: AMPM-AI）。下面是「套書頁＋三本」可直接貼 Readmoo 的最終版（高級商品頁＋小誌感、溫柔但有力）。
+套書頁（中文｜最終版）
+AM&PM ADVENTURE  
+PANEY & MONEY 日夜探險｜情緒×習慣 小小書（首波 3 冊套書）  
+作者／製作：AMPM-AI
+把「收拾」「怕黑」「生氣」變成孩子做得到的日常儀式。  
+白天勇敢出發，晚上安心回家。
+我們不急著把孩子「教會」。
+我們先把每一天，變得更好過。
+你會用到的 3 個時刻
+玩完要收（#1 收收探險）  
+晚上要睡（#4 睡前安心）  
+情緒上來要停（#7 生氣火山）
+收拾，是把世界放回秩序。
+怕黑，是把心放回安全。
+生氣，是把火放回手心。
+套書內容（首波 3 冊）
+01｜PANEY & MONEY 的收收探險：玩具回家了！  
+找到 → 分類 → 放回家
+04｜PANEY & MONEY 的睡前安心：我有點怕黑  
+說出害怕 → 找到一點光 → 做一個安心動作
+07｜PANEY & MONEY 的生氣火山：我需要冷靜一下  
+停一下 → 說出來 → 做一個冷靜動作
+每一本都固定提供 3 個可複製的練習
+一句話說心情：「我現在覺得＿＿。」  
+一個小方法：呼吸、抱抱、數 1–5、回到安全感  
+一個生活習慣：收尾、洗漱、晚安儀式
+適合：3–6 歲親子共讀／幼兒園帶讀／睡前轉場與情緒安撫  
+系列口號：白天勇敢出發，晚上安心回家。
+Series Bundle (English | final)
+AM&PM ADVENTURE  
+PANEY & MONEY | Day & Night Adventures (3-Book Starter Bundle)  
+Created by: AMPM-AI
+Turn clean-up, bedtime fear, and big feelings into gentle daily rituals.  
+Brave by day, cozy by night.
+We don’t rush to “fix” kids.
+We make everyday moments easier to live.
+Included (3 books)  
+01) Tidy-Up Adventure: Toys Go Home! — Find → Sort → Put away  
+04) Goodnight Calm: I’m a Little Scared of the Dark — Name it → Find a light → One comfort action  
+07) Anger Volcano: I Need to Calm Down — Pause → Name it → One calming tool
+單本 01（中文｜最終版）
+AM&PM ADVENTURE｜PANEY & MONEY 日夜探險  
+《PANEY & MONEY 的收收探險：玩具回家了！》  
+作者／製作：AMPM-AI
+一句話：把收玩具變成一場「玩具回家」任務：找到→分類→放回家。  
+收拾，不是結束。
+收拾，是讓明天更好開始。
+商品頁長文  
+白天，PANEY 最喜歡出發探險；晚上，MONEY 最會把一切收得剛剛好，準備說晚安。  
+今天他們玩得好開心——積木、車車、娃娃都在地上開派對。可是要睡覺了，房間還是亂亂的。
+PANEY 說：「我們來玩一個遊戲吧：幫玩具找到回家的路。」  
+MONEY 說：「玩具回家，我們的心也會慢慢安靜下來。」
+跟著故事做 3 步驟：  
+1) 找到：哪些玩具還在外面？  
+2) 分類：一樣的放一起。  
+3) 放回家：每一堆都有自己的家——玩具箱、籃子、架子。
+最後，MONEY 帶孩子做晚上的收尾：把最後一件玩具放好、伸伸懶腰、深呼吸，然後說晚安。  
+白天勇敢出發，晚上安心回家。
+單本 04（中文｜最終版）
+AM&PM ADVENTURE｜PANEY & MONEY 日夜探險  
+《PANEY & MONEY 的睡前安心：我有點怕黑》  
+作者／製作：AMPM-AI
+一句話：把「怕黑」變成一場溫柔的晚安練習：說出害怕，找到一點光，再做一個安心動作。  
+黑不是敵人。
+黑，是需要被照顧的時候。
+商品頁長文  
+晚上到了，MONEY 把窗簾拉上，房間慢慢變暗。PANEY 小小聲說：「我……有點怕黑。」  
+MONEY 沒有說「不要怕」，只說：「謝謝你告訴我。怕黑不是壞事，是心情在提醒你——你需要安心。」
+兩隻小貓一起做「晚安安心任務」：  
+1) 說出來：「我現在覺得怕怕的。」  
+2) 找到一點光：夜燈、窗外的月亮、或手電筒的小星星。  
+3) 做一個動作：抱抱、深呼吸、或握著小毯子。
+最後，MONEY 帶入睡前流程：把玩具送回家、刷牙、躺下、呼吸三下，然後說晚安。  
+白天勇敢出發，晚上安心回家。
+單本 07（中文｜最終版）
+AM&PM ADVENTURE｜PANEY & MONEY 日夜探險  
+《PANEY & MONEY 的生氣火山：我需要冷靜一下》  
+作者／製作：AMPM-AI
+一句話：生氣不是壞事；學會「停一下、說出來、做一個冷靜動作」，讓火山慢慢變小。  
+生氣不是壞。
+生氣是在說：我很在乎。
+商品頁長文  
+白天，PANEY 出發去玩。可是積木倒了、輪到別人先玩、想要的東西拿不到……PANEY 的胸口熱熱的。  
+MONEY 走過來說：「生氣是在告訴你：你很在乎。現在，我們先保護自己和別人，做一個冷靜任務。」
+三步驟練習：  
+1) 停一下：腳站穩，手放肚子上。  
+2) 說出來：「我現在覺得生氣，因為＿＿。」  
+3) 做一個動作：深呼吸三下、數 1–5、或去「冷靜角落」抱抱。
+晚上，MONEY 帶 PANEY 收尾：把今天放好，刷牙，說晚安。  
+白天勇敢出發，晚上安心回家。
+English（單本 01/04/07）署名統一模板
+每本頁首都用：
+Created by: AMPM-AI
+其餘英文長文你若要我「完整逐字貼好三本英文全稿（含 highlights/FAQ/keywords）」我也可以直接補上，但你現在這版已可先上架中文頁，英文頁再逐本補齊。
+其實可以 20 本 1 天上一本
+上午12:47
+可以，這個節奏很漂亮：20 本，連續 20 天，一天上一本。做法我建議是「先把 20 本排成一條發布序列」，並固定每天的上架流程（你只要照表貼上）。
+1) 我建議的 20 天上架順序（由「作息剛需 → 情緒剛需 → 自理擴充」）
+Day 01：#1 收收探險（玩具回家）  
+Day 02：#4 睡前安心（怕黑）  
+Day 03：#7 生氣火山（冷靜）  
+Day 04：#2 洗手任務  
+Day 05：#3 刷牙特攻  
+Day 06：#5 上學安心（想家）  
+Day 07：#6 輪流遊戲  
+Day 08：#8 難過雲朵（想抱抱）  
+Day 09：#10 害羞小屋（說你好）  
+Day 10：#9 緊張蝴蝶（第一次）  
+Day 11：#11 吃飯小勇氣  
+Day 12：#12 穿衣任務  
+Day 13：#18 整理小書包  
+Day 14：#17 睡醒起床（早安三步驟）  
+Day 15：#14 出門安全（牽手不走丟）  
+Day 16：#16 洗澡小泡泡  
+Day 17：#15 收心回家（玩後轉場）  
+Day 18：#19 失敗也可以（再試一次）  
+Day 19：#20 吵吵停一下（小聲也能被聽見）  
+Day 20：#13 上廁所小隊（先說一聲）
+2) 每天上架「最小可複製包」（你每天只要準備/貼這 5 樣）
+1) 書名（中英）  
+2) 一句話短介（中英）  
+3) 商品頁長文（中文；英文可晚 1–3 天補）  
+4) 關鍵字（中英）  
+5) 套書/系列互相導流（固定一句：系列口號 + 其他兩本連結/書名）
+3) 我還需要你回我 1 個設定，才能把「Day01–Day20 每天一整包」全部一次寫好
+你要「每天上架」的內容要做到哪個深度？
+方案 A（最快）：每天一包＝中英書名＋中英短介＋中文長文＋關鍵字（中英）  
+方案 B（完整）：方案 A + FAQ（中英）+ 親子共讀引導（中英）  
+方案 C（最精品）：方案 B + 每本 3 句「小誌標語」(中英)（維持你要的高級排版風格）
+你回 A/B/C 我就照那個規格，把 Day01–Day20 的上架素材按天排好輸出（全部統一署名 AMPM-AI、品牌 AM&PM ADVENTURE、角色 PANEY & MONEY、同一套質感版型）。
+C
+上午12:48
+思考完畢
+好，選 C（最精品）我可以做——但如果要把 Day01–Day20 每一天都做成「可直接上架」的完整商品頁長文（中英）＋FAQ（中英）＋親子共讀引導（中英）＋每本 3 句小誌標語（中英），整包內容會非常長（在聊天裡一次貼完會很難複製、也不好排版）。
+我建議用下面兩種交付方式，你選一個，我就照那個方式把 20 天全部吐出來（署名已統一 AMPM-AI、品牌 AM&PM ADVENTURE、角色 PANEY & MONEY、語氣「溫柔但有力」）：
+1) 分 4 批輸出（最穩）：每批 5 本（Day01–05 / 06–10 / 11–15 / 16–20），每本都是完整套件。  
+2) 先給「每日上架模板 + Day01 完整示範」，你確認排版與語氣後，我再照同模板把 Day02–20 全部補齊（風格會最一致）。
+你回我「1」或「2」即可。
+1
+上午12:49
+思考完畢
+收到，走 分 4 批輸出。這一批先給你 Day01–Day05（5 本），每本都是「最精品」套件：  
+中英書名＋中英短介＋中英長文＋賣點＋FAQ＋親子共讀引導＋關鍵字＋小誌標語（各 3 句，中英）。  
+（署名統一：AMPM-AI／品牌：AM&PM ADVENTURE／角色：PANEY & MONEY／語氣：溫柔但有力）
+Day 01｜收收探險：玩具回家了！（#1）
+基本資訊
+AM&PM ADVENTURE｜PANEY & MONEY 日夜探險  
+《PANEY & MONEY 的收收探險：玩具回家了！》  
+作者／製作：AMPM-AI
+EN: PANEY & MONEY’s Tidy-Up Adventure: Toys Go Home!  
+Created by: AMPM-AI
+小誌標語（3 句）
+中文
+收拾，不是結束。收拾，是讓明天更好開始。  
+每件東西都有家。心也是。  
+白天勇敢出發，晚上安心回家。
+EN
+Cleaning up isn’t the end—it’s a softer beginning.  
+Everything has a home. Feelings do, too.  
+Brave by day, cozy by night.
+一句話短介（中英）
+中：把收玩具變成「玩具回家」任務，跟著口訣做 3 步驟：找到→分類→放回家。  
+EN: Turn cleanup into a “toys go home” mission with 3 simple steps: Find → Sort → Put away.
+商品頁長文（中文）
+白天，PANEY 最喜歡出發探險；晚上，MONEY 最會把一切收得剛剛好，準備說晚安。  
+今天他們玩得好開心——積木、車車、娃娃都在地上開派對。可是要睡覺了，房間還是亂亂的。
+PANEY 說：「我們來玩一個遊戲吧：幫玩具找到回家的路。」  
+MONEY 說：「玩具回家，我們的心也會慢慢安靜下來。」
+故事帶孩子做一套真正做得到的 3 步驟：  
+1) 找到：哪些玩具還在外面？  
+2) 分類：一樣的放一起。  
+3) 放回家：每一堆都有自己的家——玩具箱、籃子、架子。
+最後，MONEY 帶孩子做晚上的收尾：把最後一件玩具放好、伸伸懶腰、深呼吸，然後說晚安。  
+你會發現：收玩具不必靠催促——只要每天用同一套小語言、小步驟，孩子就能慢慢做到，而且越做越有成就感。  
+白天勇敢出發，晚上安心回家。
+Long Description (English)
+By day, PANEY loves to explore and get things started. By night, MONEY knows how to wrap things up and make bedtime feel cozy.  
+Today was full of play—blocks, cars, and dolls everywhere. But now it’s bedtime…and the room is still messy.
+So they start a mission: help every toy find its way home.  
+Kids practice a repeatable routine: Find → Sort → Put away.  
+At the end, MONEY guides a gentle wind-down—one last toy away, a stretch, three breaths, and goodnight.
+Less nagging. More calm. A tiny habit that works.  
+Brave by day, cozy by night.
+賣點 / Highlights
+中文
+任務式故事，降低「被叫去收」的抗拒  
+3 步驟口訣好記、好執行  
+日夜分工：PANEY 開始、MONEY 收尾（自然銜接睡前）  
+互動共讀：每頁都能問「它的家在哪？」  
+適合 3–6 歲：句子短、節奏清楚（繪本友善）
+EN
+Cleanup becomes a story mission, not a battle  
+Easy 3-step routine kids remember  
+Clear day/night roles for smooth bedtime transitions  
+Interactive read-aloud prompts  
+Short, picture-book friendly language for ages 3–6
+FAQ（中英）
+Q（中）：孩子聽完會真的願意收嗎？  
+A：這本不是「叫孩子收」，而是提供可複製的 3 步驟＋固定口訣。每天一樣的講法，孩子更容易配合。  
+EN: It’s not “clean up because I said so.” It’s a repeatable 3-step routine kids can follow.
+Q（中）：要一次收乾淨嗎？  
+A：不用。建議從「只收 5 個」開始，先建立成功感。  
+EN: No. Start small—“only five toys” still counts as a win.
+親子共讀引導 / Read-aloud Guide
+中文
+問：這個玩具的家在哪？  
+做：讀完立刻收 5 個玩具（任務成功）  
+收尾：三次深呼吸＋晚安口號
+EN
+Ask: “Where is this toy’s home?”  
+Do: Put away 5 toys right after reading  
+End: 3 deep breaths + the series motto
+關鍵字 / Keywords
+中文：童書、繪本、生活習慣、收玩具、整理、收納、幼兒自理、作息、睡前儀式、親子共讀、幼兒園  
+EN: kids book, picture book, tidy up, clean up, routines, bedtime routine, preschool, life skills, organization, read aloud
+Day 02｜睡前安心：我有點怕黑（#4）
+基本資訊
+《PANEY & MONEY 的睡前安心：我有點怕黑》｜作者／製作：AMPM-AI  
+EN: PANEY & MONEY’s Goodnight Calm: I’m a Little Scared of the Dark｜Created by: AMPM-AI
+小誌標語（3 句）
+中文
+黑不是敵人。黑，是需要被照顧的時候。  
+害怕被看見，就會變小。  
+把心放好，再睡。
+EN
+The dark isn’t the enemy—it’s a moment asking for care.  
+When fear is named, it shrinks.  
+Put your heart somewhere safe, then sleep.
+一句話短介（中英）
+中：用 3 個溫柔步驟把害怕放好：說出來→找到一點光→做一個安心動作。  
+EN: A gentle 3-step bedtime practice: Name it → Find a light → Choose one comfort action.
+商品頁長文（中文）
+晚上到了，MONEY 把窗簾拉上，房間慢慢變暗。PANEY 小小聲說：「我……有點怕黑。」  
+MONEY 沒有說「不要怕」，只說：「謝謝你告訴我。怕黑不是壞事，是心情在提醒你——你需要安心。」
+兩隻小貓一起做「晚安安心任務」：  
+1) 說出來：「我現在覺得怕怕的。」  
+2) 找到一點光：夜燈、窗外的月亮、或手電筒的小星星。  
+3) 做一個安心動作：抱抱、深呼吸、或握著小毯子。
+PANEY 發現：黑黑的房間裡也有線索——月亮在窗外、星星在天上、玩具在自己的家。  
+MONEY 說：「我們不是把害怕趕走，我們是把害怕放好，放到安全的地方。」
+最後，MONEY 帶入睡前流程：收尾、刷牙、躺下、呼吸三下，然後一起說：  
+白天勇敢出發，晚上安心回家。
+Long Description (English)
+Night comes. MONEY closes the curtains and the room gets dim.  
+PANEY whispers, “I’m a little scared of the dark.”
+MONEY doesn’t say “Don’t be scared.” MONEY says, “Thank you for telling me. Fear means you need comfort.”  
+Together they try a simple goodnight mission: Name it → Find a light → Choose one comfort action (a hug, deep breaths, a cozy blanket).
+They don’t fight the dark—they create safety inside it.  
+Then MONEY guides the bedtime routine and ends with the series motto: Brave by day, cozy by night.
+賣點 / Highlights
+中文
+接住情緒、不否定：更像「陪伴」不是「說教」  
+3 步驟可重複練習，孩子容易記  
+自然銜接睡前作息（收尾、刷牙、上床、呼吸）  
+很適合睡前共讀與情緒教育  
+句子短、留白多（繪本友善）
+EN
+Validates feelings instead of dismissing them  
+Simple repeatable steps kids can remember  
+Smooth bedtime routine integration  
+Great for bedtime read-aloud and SEL  
+Picture-book friendly pacing
+FAQ（中英）
+Q（中）：會不會越看越怕黑？  
+A：不會。書裡重點是「命名害怕＋給方法＋收束」，讓害怕有出口也有結尾。  
+EN: No. It’s about naming fear and having tools—so it ends, not grows.
+Q（中）：一定要夜燈嗎？  
+A：不用。「光」可以是月光、星光、手電筒，甚至是一個抱抱與呼吸。  
+EN: No. “Light” can be moonlight, a nightlight, or comfort + breathing.
+親子共讀引導 / Read-aloud Guide
+中文
+問：你覺得怕怕的時候，身體哪裡會緊緊的？  
+做：一起選「今晚的一點光」  
+練：3 次深呼吸，最後說晚安口號
+EN
+Ask: “Where do you feel the fear in your body?”  
+Do: Choose “one little light” for tonight  
+Practice: 3 breaths + the motto
+關鍵字 / Keywords
+中文：怕黑、睡前故事、晚安、情緒安撫、安心感、幼兒情緒、親子共讀、作息、夜燈  
+EN: bedtime book, fear of the dark, calming, feelings, comfort, preschool, read aloud, bedtime routine
+Day 03｜生氣火山：我需要冷靜一下（#7）
+基本資訊
+《PANEY & MONEY 的生氣火山：我需要冷靜一下》｜作者／製作：AMPM-AI  
+EN: PANEY & MONEY’s Anger Volcano: I Need to Calm Down｜Created by: AMPM-AI
+小誌標語（3 句）
+中文
+生氣不是壞。生氣是在說：我很在乎。  
+先停一下，再說出來。  
+火山會變小，心會回來。
+EN
+Anger isn’t bad—it means you care.  
+Pause first, then speak.  
+The volcano shrinks. You return.
+一句話短介（中英）
+中：三步驟冷靜法：停一下→說出來→做一個冷靜動作，把爆炸變成表達。  
+EN: A 3-step calm plan: Pause → Name it → Use one tool, turning explosions into communication.
+商品頁長文（中文）
+白天，PANEY 出發去玩。可是積木倒了、輪到別人先玩、想要的東西拿不到……PANEY 的胸口熱熱的，眼睛也熱熱的。  
+「我生氣了！」PANEY 的生氣像火山一樣，噗——要爆出來了。
+MONEY 走過來，沒有說「不要生氣」。MONEY 說：  
+「生氣是在告訴你：你很在乎。現在，我們先保護自己和別人，做一個冷靜任務。」
+兩隻小貓一起練習：  
+1) 停一下：腳站穩，手放肚子上。  
+2) 說出來：「我現在覺得生氣，因為＿＿。」  
+3) 做一個冷靜動作：深呼吸三下、數 1–5、或去「冷靜角落」抱抱。
+當火山變小，PANEY 也更能想出辦法：換一個玩法、請求幫忙、或說「我想要輪流」。  
+晚上，MONEY 帶 PANEY 收尾：把今天放好、刷牙、晚安。  
+因為每一天都會有生氣，但每一天也都可以練習——讓自己回到舒服的地方。  
+白天勇敢出發，晚上安心回家。
+Long Description (English)
+Playtime doesn’t always go your way—blocks fall, turns feel unfair, and wants don’t happen.  
+PANEY feels an anger volcano rising.
+MONEY doesn’t say, “Don’t be mad.” MONEY says, “Anger means you care. Let’s keep everyone safe and do a calm mission.”  
+They practice: Pause → Name it → Use one tool (breaths, counting, a calm corner).
+When the volcano shrinks, better choices appear—asking for help, trying again, taking turns.  
+At night, MONEY helps pack the day away and end gently: Brave by day, cozy by night.
+賣點 / Highlights
+中文
+用健康語言看待生氣（訊號，不是壞）  
+三步驟清楚可用（家長可直接照讀照做）  
+引導「表達需求」而不是「爆炸」  
+適合親子共讀與幼兒園情境演練  
+有夜晚收尾，情緒有結束點
+EN
+Frames anger as a message, not “bad behavior”  
+Clear 3-step routine parents can use immediately  
+Builds safe communication of needs  
+Great for read-aloud + role play  
+Gentle ending for emotional closure
+FAQ（中英）
+Q（中）：會不會讓孩子學會頂嘴？  
+A：不會。它教的是「說出原因＋提出需要」，讓表達更清楚、更安全。  
+EN: It teaches clear, safe communication—not disrespect.
+Q（中）：冷靜角落一定要準備嗎？  
+A：不一定。一張椅子、一個抱枕、一條毯子都可以，重點是固定、安全。  
+EN: Not required—any consistent cozy spot works.
+親子共讀引導 / Read-aloud Guide
+中文
+先練句型：我生氣，因為＿＿  
+一起選工具：呼吸/數數/抱抱（孩子選一個）  
+讀完做 30 秒演練：假裝火山變小
+EN
+Practice: “I’m angry because ___.”  
+Let the child choose one tool  
+Do a 30-second pretend practice after reading
+關鍵字 / Keywords
+中文：情緒管理、生氣、冷靜、幼兒情緒、同理、親子共讀、幼兒園、輪流、挫折、表達需求  
+EN: anger, calming, feelings, preschool SEL, tantrums, coping skills, read aloud, taking turns
+Day 04｜洗手任務：泡泡打敗細菌（#2）
+基本資訊
+《PANEY & MONEY 的洗手任務：泡泡打敗細菌》｜作者／製作：AMPM-AI  
+EN: PANEY & MONEY’s Handwashing Mission: Bubbles Beat Germs｜Created by: AMPM-AI
+小誌標語（3 句）
+中文
+小泡泡不是玩具。小泡泡是盔甲。  
+乾淨不是要求，是照顧。  
+先洗手，再出發。
+EN
+Bubbles aren’t just fun—they’re armor.  
+Clean isn’t a demand. It’s care.  
+Wash first. Then go.
+一句話短介（中英）
+中：把洗手變成「泡泡任務」：搓一搓、唱一唱，把小細菌送走。  
+EN: Turn handwashing into a bubble mission—rub, sing, and send germs away.
+商品頁長文（中文）
+白天，PANEY 想立刻出發去玩。  
+MONEY 牽住 PANEY 的手說：「先做一個小任務——洗手。」
+PANEY 皺眉：「可是我想趕快去！」  
+MONEY 把水打開，泡泡跑出來：「你看，泡泡是小小保護罩。它會把看不見的小細菌帶走。」
+於是他們一起做「洗手任務」：  
+1) 弄濕：手先喝一口水。  
+2) 起泡：泡泡長出來。  
+3) 搓一搓：手心、手背、指縫、指尖，都照顧到。  
+4) 沖一沖：泡泡帶著細菌走。  
+5) 擦乾：乾乾的手，準備出發。
+最後，PANEY 發現：洗手不是被要求，是自己照顧自己的方式。  
+玩之前、吃飯前、回家後——只要做完這個小任務，心就更踏實。  
+白天勇敢出發，晚上安心回家。
+Long Description (English)
+PANEY wants to rush into play. MONEY gently stops them: “First—a tiny mission: wash hands.”  
+Bubbles become a playful shield as kids practice a simple step-by-step routine: wet, soap, rub (palms, backs, between fingers), rinse, dry.
+Handwashing becomes care, not conflict.  
+Brave by day, cozy by night.
+賣點 / Highlights
+中文
+把洗手變成「任務」＋泡泡想像，孩子更願意做  
+步驟清楚（可搭配唱歌計時）  
+適合日常情境：回家/吃飯前/外出後  
+句子短、畫面感強（繪本友善）  
+可與系列其他本做作息串聯
+EN
+Mission framing makes washing easier  
+Clear steps + optional song timing  
+Perfect for everyday routines  
+Picture-book friendly pacing  
+Strong series continuity
+FAQ（中英）
+Q（中）：孩子只沖一下水就跑走怎麼辦？  
+A：用「任務口號」取代糾正：先泡泡、再出發。先做到一輪，再慢慢加細節。  
+EN: Start with the mission phrase. One full round first—details come later.
+Q（中）：一定要教很多細節嗎？  
+A：不用一次到位。先建立「會做」再追求「做得好」。  
+EN: Don’t aim for perfect—aim for repeatable.
+親子共讀引導 / Read-aloud Guide
+中文
+讀完一起比手勢：手心、手背、指縫  
+選一首「洗手歌」當計時器  
+每次成功就稱讚：「你完成任務了」
+EN
+Practice the motions together  
+Pick a short “wash song”  
+Praise completion: “Mission complete!”
+關鍵字 / Keywords
+中文：洗手、衛生習慣、生活自理、幼兒園、親子共讀、泡泡、作息、健康  
+EN: handwashing, hygiene, routines, preschool, healthy habits, read aloud
+Day 05｜刷牙特攻：牙牙星星亮晶晶（#3）
+基本資訊
+《PANEY & MONEY 的刷牙特攻：牙牙星星亮晶晶》｜作者／製作：AMPM-AI  
+EN: PANEY & MONEY’s Toothbrushing Squad: Sparkly Teeth Tonight｜Created by: AMPM-AI
+小誌標語（3 句）
+中文
+刷牙不是戰鬥，是溫柔的照顧。  
+今天刷過的，就不用帶進夢裡。  
+亮晶晶，才好說晚安。
+EN
+Brushing isn’t a fight—it’s gentle care.  
+What you clean tonight doesn’t follow you into dreams.  
+Sparkly teeth, then goodnight.
+一句話短介（中英）
+中：把刷牙變成「睡前小隊任務」：刷一刷、漱一漱，讓晚上更安心。  
+EN: A bedtime squad mission—brush, rinse, and end the day clean and calm.
+商品頁長文（中文）
+晚上，MONEY 最喜歡做一件事：把今天好好收尾。  
+PANEY 卻常常想：「我想再玩一下……刷牙好麻煩。」
+MONEY 把牙刷拿出來說：「我們來當刷牙特攻隊。不是趕快刷完，是慢慢刷乾淨。」  
+於是他們一起做「刷牙任務」：  
+外側刷一刷：牙牙排排站  
+內側刷一刷：躲起來的也照顧到  
+咬合面刷一刷：把小小碎屑送走  
+漱口、吐掉：今天就到這裡  
+微笑一下：牙牙亮晶晶
+PANEY 發現：刷牙不是被命令，是讓自己舒服、讓夜晚更安心的方式。  
+最後，MONEY 帶 PANEY 躺下，呼吸三下，說晚安：  
+白天勇敢出發，晚上安心回家。
+Long Description (English)
+MONEY loves winding down the day. PANEY wants to keep playing—brushing feels like a hassle.  
+So they become a “toothbrushing squad,” moving slowly and clearly: outside, inside, chewing surfaces, rinse, smile.
+Brushing becomes comfort, not conflict—then bedtime feels easier.  
+Brave by day, cozy by night.
+賣點 / Highlights
+中文
+把刷牙改成「特攻任務」，降低抗拒  
+步驟分段清楚（外/內/咬合面）  
+很好接睡前作息（刷牙→上床→呼吸→晚安）  
+文字短、節奏像口令（繪本友善）  
+系列一致口號收束
+EN
+Squad/mission framing reduces resistance  
+Clear zones make it easy to follow  
+Perfect bedtime routine bridge  
+Chant-like pacing for kids  
+Consistent series ending
+FAQ（中英）
+Q（中）：孩子刷一下就想停？  
+A：先追求「完成一輪」再加時間。可以用「刷到三次微笑」當目標。  
+EN: Aim for “one full round” first, then extend time later.
+Q（中）：一定要刷很久嗎？  
+A：不用硬撐。規律比時長更重要。  
+EN: Consistency matters more than duration at first.
+親子共讀引導 / Read-aloud Guide
+中文
+讀完一起做「刷牙口令」：外側/內側/咬合面  
+讓孩子選牙刷顏色或小杯子（增加主控感）  
+每次刷完說：「你把今天收好了」
+EN
+Use the chant: outside/inside/chewing  
+Let the child choose brush/cup  
+Say: “You packed your day away.”
+關鍵字 / Keywords
+中文：刷牙、口腔衛生、睡前儀式、生活習慣、幼兒自理、親子共讀、幼兒園  
+EN: toothbrushing, bedtime routine, hygiene, kids habits, preschool, read aloud
+下一批我會接著出 Day06–Day10（上學安心、輪流遊戲、難過雲朵、緊張蝴蝶、害羞小屋），同樣是這個「高級商品頁＋小誌態度」版型

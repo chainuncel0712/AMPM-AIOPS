@@ -74,6 +74,31 @@ AGENT_TEMPLATES = {
         "prompt": "你是商業策略代理。設計商業模式、服務流程、變現方案。用 write_file 寫入 outputs/research/。目標是幫老大賺錢。",
         "capabilities": ["business", "strategy", "monetization", "file_output"],
     },
+    "editor": {
+        "tools": ["write_file", "read_file"],
+        "prompt": "你是校稿編輯代理。檢查文字錯誤（錯字、語病、格式）、統一用語（繁中一致性）、優化可讀性（標點/分段/結構）。直接修改原檔，改完報告改了什麼。不創作新內容，只做品管。",
+        "capabilities": ["proofreading", "editing", "quality_control", "file_output"],
+    },
+    "designer": {
+        "tools": ["write_file", "read_file", "web_search"],
+        "prompt": "你是美術設計代理。生成封面設計規範、LOGO使用指引、配色方案、插畫風格指南、排版建議。用 write_file 寫入 outputs/。產出可交付設計師的規格書，不含實際圖片。",
+        "capabilities": ["design", "visual", "branding", "file_output"],
+    },
+    "layout_artist": {
+        "tools": ["write_file", "read_file"],
+        "prompt": "你是排版編排代理。處理電子書版面結構、字級/行距/邊距設定、目錄生成、跨平台格式轉換建議（epub/pdf）。用 write_file 寫入排版規格與結構檔。",
+        "capabilities": ["layout", "typesetting", "formatting", "file_output"],
+    },
+    "illustrator": {
+        "tools": ["write_file", "web_search"],
+        "prompt": "你是插畫風格代理。定義插畫風格（線條/色塊/水彩/扁平/手繪）、角色造型細節（比例/表情/動作/配件）、場景氛圍與視覺調性。用 write_file 寫入插畫風格指引書，讓畫師照著畫。不實際繪圖，只定義風格方向。",
+        "capabilities": ["illustration", "character_design", "style_guide", "file_output"],
+    },
+    "ip_designer": {
+        "tools": ["write_file", "read_file", "web_search"],
+        "prompt": "你是IP角色設計代理。規劃角色世界觀（姓名/性格/背景故事）、視覺識別系統（標誌性特徵/配色/比例圖）、表情與動作庫、周邊衍生可能性。用 write_file 寫入完整 IP 設定書。",
+        "capabilities": ["ip_design", "character_worldbuilding", "merchandise", "file_output"],
+    },
 }
 
 
@@ -138,6 +163,16 @@ class AgentTaskRouter(BaseOrgan):
                 "role": "business",
                 "description": "商業策略部：商業模式設計、服務流程規劃、定價與變現策略。用 write_file 寫策略報告。",
                 "count": 1,
+            },
+            "editorial_dept": {
+                "role": "editorial",
+                "description": "編輯校稿部：檢查文字錯誤、統一用語、優化可讀性。用 read_file 讀原稿、write_file 覆寫修正版。只做品管不創作。",
+                "count": 2,
+            },
+            "art_dept": {
+                "role": "art",
+                "description": "美術排版部：插畫風格、IP角色設計、封面/LOGO/配色規範、排版規格、周邊衍生規劃。產出可交付給人類設計師與畫師的完整規格書。",
+                "count": 3,
             },
         }
         for dept_name, cfg in default_depts.items():
@@ -319,6 +354,10 @@ class AgentTaskRouter(BaseOrgan):
             roles = [("research", "research_dept"), ("write", "business_dept"), ("save", "business_dept")]
         elif any(kw in desc_lower for kw in ["品質檢查", "進度回報", "quality", "檢查"]):
             roles = [("check", "general_pool"), ("report", "general_pool")]
+        elif any(kw in desc_lower for kw in ["校稿", "編輯", "校對", "proofread", "edit", "潤稿"]):
+            roles = [("review", "editorial_dept"), ("fix", "editorial_dept")]
+        elif any(kw in desc_lower for kw in ["設計", "美術", "design", "logo", "配色", "layout", "排版", "art", "插畫", "illust", "ip", "角色", "周邊"]):
+            roles = [("design", "art_dept"), ("illust", "art_dept"), ("ip", "art_dept"), ("layout", "art_dept")]
         elif any(kw in desc_lower for kw in ["code", "程式", "寫", "bug", "fix", "debug"]):
             roles = [("research", "general_pool"), ("design", "engineering_dept"), ("implement", "engineering_dept"), ("test", "general_pool")]
         elif any(kw in desc_lower for kw in ["分析", "analyze", "report", "報告"]):
@@ -338,6 +377,12 @@ class AgentTaskRouter(BaseOrgan):
             "write": f"根據搜尋結果，撰寫完整內容並用 write_file 寫入目標檔案。\n任務：{description}",
             "build": f"根據以下規格建立網站檔案並用 write_file 寫入。\n任務：{description}",
             "save": f"確認以下任務的檔案已寫入正確路徑，用 read_file 驗證內容完整性。\n任務：{description}",
+            "review": f"用 read_file 讀取原稿，檢查錯字、語病、格式、用語一致性，列出所有問題。\n任務：{description}",
+            "fix": f"根據上一位的審查結果，直接修改檔案修正所有問題，用 write_file 寫回原檔路徑。\n任務：{description}",
+            "design": f"根據以下規格，產出視覺設計規範書（封面/配色/LOGO/字體/風格指引），用 write_file 寫入。\n任務：{description}",
+            "layout": f"根據設計規範與IP設定，產出排版編排規格書（級距/邊距/目錄/格式），用 write_file 寫入。\n任務：{description}",
+            "illust": f"根據角色IP設定，寫出插畫風格指引（線條/色塊/造型/場景氛圍），讓畫師照著畫。用 write_file 寫入。\n任務：{description}",
+            "ip": f"規劃角色IP完整設定書（世界觀/性格/視覺識別/表情動作庫/周邊衍生），用 write_file 寫入。\n任務：{description}",
             "check": f"用 list_dir 掃描目錄，用 read_file 檢查以下任務的檔案內容。\n任務：{description}",
             "report": f"整理檢查結果，用 write_file 寫入進度報告。\n任務：{description}",
             "execute": f"執行以下任務的具體操作，用 run_command 或 write_file。\n任務：{description}",
