@@ -33,6 +33,7 @@ class ProactiveExecutor:
         self._pending_missions: Dict[str, str] = {}  # task_id -> mission_id
         self._last_report_time = 0  # 上次回報時間
         self._report_interval = 300  # 每 5 分鐘回報一次
+        self._max_concurrent_missions = 3  # 同時最多 3 個任務
 
         # 全域單例註冊（供 supervisor 心跳用）
         _ACTIVE_EXECUTORS["proactive_executor"] = self
@@ -144,8 +145,12 @@ class ProactiveExecutor:
         # 檢查是否有逾時的 mission（5 分鐘沒完成就放棄）
         self._cancel_stale_missions(timeout_seconds=300)
 
-        # 一次只跑一個任務，避免塞爆
-        if self._pending_missions:
+        # 限制同時進行中的任務數量
+        active_mission_count = sum(
+            1 for k in self._pending_missions
+            if not k.endswith("_started") and isinstance(self._pending_missions.get(k), str)
+        )
+        if active_mission_count >= self._max_concurrent_missions:
             return
 
         # 取得所有 pending 任務
@@ -167,6 +172,7 @@ class ProactiveExecutor:
         desc = self._build_agent_prompt(task)
 
         print(f"[ProactiveExecutor] 🚀 自動執行: {task['id']} - {task['title']} (優先級={task['priority']})")
+        print(f"[ProactiveExecutor]    目前 {active_mission_count}/{self._max_concurrent_missions} 個任務進行中")
 
         # 簡單系統任務（建立目錄等）直接執行，不經過子代理
         if any(kw in task.get("title", "") for kw in ["目錄結構", "目錄"]):
@@ -178,18 +184,20 @@ class ProactiveExecutor:
         if agents:
             stats = agents.get_global_stats() if hasattr(agents, "get_global_stats") else {}
             busy_agents = stats.get("agents_busy", 0)
-            if busy_agents <= 10:
+            if busy_agents < 15:  # 放寬限制，允許更多子代理並行
                 try:
                     mission_id = agents.launch_mission(desc)
                     if mission_id:
                         self._pending_missions[task["id"]] = mission_id
                         self._pending_missions[f"{task['id']}_started"] = time.time()
-                        self._current_task_id = task["id"]
-                        self._current_mission_id = mission_id
+                        if self._current_task_id is None:
+                            self._current_task_id = task["id"]
+                            self._current_mission_id = mission_id
                         self._notify_user(
                             f"🚀 黑曜派工\n"
                             f"📋 {task['title']}\n"
-                            f"👥 子代理已出動"
+                            f"👥 子代理已出動\n"
+                            f"📊 同時執行: {active_mission_count + 1}/{self._max_concurrent_missions}"
                         )
                         print(f"[ProactiveExecutor] → mission {mission_id}")
                         return
@@ -227,6 +235,11 @@ class ProactiveExecutor:
             task["status"] = "pending"
             task["updated_at"] = datetime.now().isoformat()
             planner._save_to_disk()
+
+            # 強制重置 agent_company 中對應的僵屍代理
+            agents = self.agents
+            if agents and hasattr(agents, 'force_reset_stale_agents'):
+                agents.force_reset_stale_agents()
 
     def _build_agent_prompt(self, task: dict) -> str:
         """為子代理建立明確的任務指示，包含輸出路徑要求"""

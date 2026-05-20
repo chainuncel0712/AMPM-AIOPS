@@ -302,8 +302,12 @@ class Obsidian:
 
         # ===== agent executor（支援工具呼叫） =====
         def _agent_executor(agent, task):
+            import time as _time
             import json as _json
             import re as _re
+
+            # 整體逾時：5 分鐘後強制終止
+            DEADLINE = _time.time() + 300
 
             role = agent.get("role", "")
             prompt_text = agent.get("prompt", "")
@@ -362,9 +366,13 @@ class Obsidian:
                 {"role": "user", "content": f"任務：{desc}"},
             ]
 
-            # 多輪工具呼叫（最多 5 輪）
+            # 多輪工具呼叫（最多 5 輪，但有 5 分鐘整體逾時）
             final_result = None
             for round_num in range(5):
+                if _time.time() > DEADLINE:
+                    print(f"[AgentCompany] {agent_name} ⏰ 逾時，強制終止")
+                    return f"[{agent_name}] ⏰ 執行逾時（5分鐘），已強制終止"
+
                 try:
                     result = self.llm.call(messages, temperature=0.3)
                 except Exception as e:

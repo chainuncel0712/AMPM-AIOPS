@@ -528,6 +528,7 @@ class AgentTaskRouter(BaseOrgan):
                 agent = self._agents[agent_id]
                 agent["status"] = "idle"
                 agent["current_task"] = None
+                agent["task_started_at"] = 0
                 agent["task_count"] += 1
                 if success:
                     agent["success_count"] += 1
@@ -790,15 +791,32 @@ class AgentTaskRouter(BaseOrgan):
             return 0
 
         executed = 0
+        now = time.time()
         with self._execution_lock:
             for aid, agent in list(self._agents.items()):
                 if agent["status"] != "busy" or not agent.get("current_task"):
                     continue
 
+                # 逾時檢查：子代理執行超過 5 分鐘強制復原
+                started = agent.get("task_started_at", 0)
+                if started > 0 and now - started > 300:
+                    agent_name = agent.get('name', aid)
+                    print(f"[AgentCompany] ⏰ {agent_name} 逾時（5分鐘），強制復原為 idle")
+                    task_id = agent["current_task"]
+                    self.complete_task(task_id, False, f"[{agent_name}] 逾時強制終止")
+                    executed += 1
+                    continue
+
                 task_id = agent["current_task"]
                 task = next((t for t in self._task_queue if t["id"] == task_id), None)
                 if not task:
+                    agent["status"] = "idle"
+                    agent["current_task"] = None
                     continue
+
+                # 記錄開始時間（第一次執行時）
+                if agent.get("task_started_at", 0) == 0:
+                    agent["task_started_at"] = now
 
                 try:
                     agent_name = agent.get('name', aid)
@@ -818,6 +836,37 @@ class AgentTaskRouter(BaseOrgan):
                     executed += 1
 
         return executed
+
+    def force_reset_stale_agents(self):
+        """強制將逾時（>5分鐘 busy）的子代理恢復為 idle"""
+        now = time.time()
+        reset_count = 0
+        with self._execution_lock:
+            for aid, agent in list(self._agents.items()):
+                if agent["status"] != "busy":
+                    continue
+                started = agent.get("task_started_at", 0)
+                if started > 0 and now - started > 300:
+                    agent_name = agent.get('name', aid)
+                    print(f"[AgentCompany] 🔄 強制重置僵屍代理: {agent_name}")
+                    task_id = agent.get("current_task")
+                    if task_id:
+                        task = next((t for t in self._task_queue if t["id"] == task_id), None)
+                        if task:
+                            task["status"] = "failed"
+                            task["completed_at"] = now
+                            task["result"] = f"[{agent_name}] 逾時強制終止"
+                            self._task_results[task_id] = task
+                    agent["status"] = "idle"
+                    agent["current_task"] = None
+                    agent["task_started_at"] = 0
+                    agent["failure_count"] += 1
+                    reset_count += 1
+        if reset_count:
+            print(f"[AgentCompany] 已重置 {reset_count} 個僵屍代理")
+            self._save_state()
+
+    # ═══════════════════════════════════════════════════════
 
     # ═══════════════════════════════════════════════════════
     # Promise Execution (答應了就執行)
