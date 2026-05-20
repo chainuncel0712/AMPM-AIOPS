@@ -6,9 +6,9 @@
       "description": "建立 outputs/ 下的完整目錄：ebooks/, children_book/, website/, research/。用 write_file 工具在每個目錄下建一個 .gitkeep。",
       "priority": 1,
       "deadline": null,
-      "status": "pending",
+      "status": "in_progress",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T00:00:00",
+      "updated_at": "2026-05-20T09:01:16.825556",
       "completed_at": null,
       "overdue_warned": false
     },
@@ -131,19 +131,7 @@
       "updated_at": "2026-05-20T00:00:00",
       "completed_at": null,
       "overdue_warned": false
-    },
-    "T0012-2047": {
-      "id": "T0012-2047",
-      "title": "部署電子書內容生成能力",
-      "description": "建立或安裝能實際生成電子書章節文字的工具，使其能寫入 outputs/ebooks/ 目錄，補上目前缺失的核心產出能力",
-      "priority": 1,
-      "deadline": null,
-      "status": "pending",
-      "created_at": "2026-05-20T08:58:48.729586",
-      "updated_at": "2026-05-20T08:58:48.729586",
-      "completed_at": null,
-      "overdue_warned": false
     }
   },
-  "counter": 12
+  "counter": 11
 }
