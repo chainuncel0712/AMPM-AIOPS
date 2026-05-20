@@ -30,9 +30,9 @@
       "description": "用 web_search 搜尋 Amazon KDP、Apple Books、Google Play Books、Kobo Writing Life 四個平台的：註冊流程、費用、抽成比例、檔案格式要求、上架時間。整理成報告，用 write_file 存入 outputs/research/platform_research.md，至少 800 字。",
       "priority": 1,
       "deadline": null,
-      "status": "pending",
+      "status": "in_progress",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T13:34:39.045718",
+      "updated_at": "2026-05-20T13:39:13.756835",
       "completed_at": null,
       "overdue_warned": false
     },
@@ -56,7 +56,7 @@
       "deadline": null,
       "status": "in_progress",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T13:32:37.182654",
+      "updated_at": "2026-05-20T13:37:11.837707",
       "completed_at": null,
       "overdue_warned": false
     },
@@ -68,7 +68,7 @@
       "deadline": null,
       "status": "in_progress",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T13:33:38.133195",
+      "updated_at": "2026-05-20T13:38:12.782023",
       "completed_at": null,
       "overdue_warned": false
     },
