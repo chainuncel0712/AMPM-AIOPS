@@ -68,7 +68,7 @@
       "deadline": null,
       "status": "in_progress",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T15:37:26.302213",
+      "updated_at": "2026-05-20T15:41:29.900723",
       "completed_at": null,
       "overdue_warned": false
     },
@@ -104,7 +104,7 @@
       "deadline": null,
       "status": "in_progress",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T15:37:57.261960",
+      "updated_at": "2026-05-20T15:42:00.852957",
       "completed_at": null,
       "overdue_warned": false
     },
@@ -114,9 +114,9 @@
       "description": "設計一條龍 AI 代理服務的：1. 客戶自助選購流程（網頁表單 → AI 評估需求 → 報價 → 付款 → 自動安裝）2. 客服對話腳本（常見問題、技術支援、退款政策）3. 用 write_file 存入 outputs/research/service_flow.md，至少 800 字。",
       "priority": 3,
       "deadline": null,
-      "status": "pending",
+      "status": "in_progress",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T15:39:58.159329",
+      "updated_at": "2026-05-20T15:43:31.821074",
       "completed_at": null,
       "overdue_warned": false
     },
@@ -126,9 +126,9 @@
       "description": "1. 用 list_dir 掃描 outputs/ 目錄下所有檔案 2. 用 read_file 檢查每個 .md 檔案內容是否超過 500 字且格式完整 3. 不合格的標記並自動補齊 4. 彙整進度透過 Telegram 發送給老大。格式：📊 黑曜進度 \\n 已完成 X 個檔案 \\n 總字數 Y 字 \\n 下一任務 Z。",
       "priority": 3,
       "deadline": null,
-      "status": "pending",
+      "status": "in_progress",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T11:02:23.324265",
+      "updated_at": "2026-05-20T15:43:58.724606",
       "completed_at": null,
       "overdue_warned": false
     }

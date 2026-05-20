@@ -294,6 +294,11 @@ class AgentTaskRouter(BaseOrgan):
 
     def launch_mission(self, description: str, context: Dict = None) -> str:
         """Launch a full mission: analyze → decompose → dispatch → track"""
+        # 🗳️ 投票關鍵字 → 走多數決模式
+        desc_lower = description.lower()
+        if any(kw in desc_lower for kw in ["投票", "多數決", "vote", "三選一", "票選"]):
+            return self.launch_voting_mission(description, context=context)
+
         mission_id = f"mission_{uuid.uuid4().hex[:6]}"
         context = context or {}
 
@@ -1091,6 +1096,101 @@ class AgentTaskRouter(BaseOrgan):
             "name": self.name,
             "alive": self.is_alive(),
             **self.get_global_stats(),
+        }
+
+    # ═══════════════════════════════════════════════════════
+    # 🗳️ 投票多數決模式 — 孤島並行 + 投票選優
+    # ═══════════════════════════════════════════════════════
+
+    def launch_voting_mission(self, description: str, voter_count: int = 3,
+                               context: Dict = None) -> str:
+        """投票式任務：N 個代理獨立做同一件事 → 投票選最佳結果
+
+        - 所有代理各自獨立，不互相等待、不傳遞依賴
+        - 完成後由一個裁判代理讀取所有結果，投票選最佳
+        - 孤島模式：一個卡住不影響其他
+        """
+        mission_id = f"vote_{uuid.uuid4().hex[:6]}"
+        context = context or {}
+        voter_count = max(3, min(voter_count, 5))  # 3-5 票
+
+        # Step 1: 創建 N 個獨立子任務（同一任務描述，不同部門來源增加多樣性）
+        dept_pool = ["general_pool", "content_dept", "research_dept"]
+        sub_tasks = []
+        for i in range(voter_count):
+            sub_tasks.append({
+                "id": f"voter_{i}",
+                "description": f"（第{i+1}票）{description}",
+                "skills": ["write", "research"],
+                "priority": 0,
+                "department": dept_pool[i % len(dept_pool)],
+                "isolated": True,  # 標記為孤島任務
+            })
+
+        # Step 2: 投票裁判任務
+        judge_task = {
+            "id": "judge",
+            "description": f"你是一個裁判。讀取以下 {voter_count} 個代理對「{description}」的產出，選出最佳的一份。若各有優點則融合成最終版。只輸出最終結果，不要解釋投票過程。",
+            "skills": ["write", "analyze"],
+            "priority": 1,
+            "department": "general_pool",
+            "isolated": False,
+            "await_votes": voter_count,  # 等所有票到齊
+        }
+
+        # Step 3: 建立 mission 紀錄
+        mission = {
+            "id": mission_id,
+            "description": description,
+            "mode": "voting",
+            "voter_count": voter_count,
+            "sub_tasks": sub_tasks + [judge_task],
+            "status": "in_progress",
+            "created_at": time.time(),
+            "completed_at": None,
+            "results": {},
+            "context": context,
+        }
+        self._missions[mission_id] = mission
+
+        # Step 4: 派發所有投票代理 + 裁判
+        for st in sub_tasks:
+            task_id = self.submit_task(
+                st["description"], required_skills=st.get("skills", []),
+                priority=st.get("priority", 0),
+                data={"mission_id": mission_id, "sub_task_id": st["id"], "isolated": True},
+            )
+            st["task_id"] = task_id
+        judge_tid = self.submit_task(
+            judge_task["description"], required_skills=judge_task["skills"],
+            priority=judge_task["priority"],
+            data={"mission_id": mission_id, "sub_task_id": "judge"},
+        )
+        judge_task["task_id"] = judge_tid
+
+        self.route_all_pending()
+        self._save_state()
+        return mission_id
+
+    def get_voting_results(self, mission_id: str) -> Dict:
+        """取得投票任務的所有產出與最終結果"""
+        mission = self._missions.get(mission_id)
+        if not mission:
+            return {"error": "找不到任務"}
+        votes = []
+        for st in mission.get("sub_tasks", []):
+            if st["id"].startswith("voter_"):
+                result = self.get_task_result(st.get("task_id", ""))
+                if result:
+                    votes.append({"voter": st["id"], "result": result})
+        judge = self.get_task_result(
+            next((st["task_id"] for st in mission.get("sub_tasks", [])
+                  if st["id"] == "judge"), ""))
+        return {
+            "mission_id": mission_id,
+            "status": mission["status"],
+            "votes": votes,
+            "final_decision": judge,
         }
 
 

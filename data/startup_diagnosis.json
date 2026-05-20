@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-05-20T14:54:12.881809",
+  "timestamp": "2026-05-20T15:44:18.990067",
   "total_organs": 81,
   "organs": [
     {
@@ -408,7 +408,7 @@
       "alive": true
     }
   ],
-  "tools_count": 1179,
+  "tools_count": 1181,
   "tools": [
     "planner.add_task",
     "planner.complete_task",
@@ -604,9 +604,11 @@
     "agent_company.get_mission",
     "agent_company.get_skill",
     "agent_company.get_task_result",
+    "agent_company.get_voting_results",
     "agent_company.is_alive",
     "agent_company.is_asleep",
     "agent_company.launch_mission",
+    "agent_company.launch_voting_mission",
     "agent_company.list_agents",
     "agent_company.list_departments",
     "agent_company.list_skills",
