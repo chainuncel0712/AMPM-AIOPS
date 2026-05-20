@@ -193,7 +193,7 @@ class ProactiveExecutor:
         # 限制同時進行中的任務數量
         active_mission_count = sum(
             1 for k in self._pending_missions
-            if not k.endswith("_started") and isinstance(self._pending_missions.get(k), str)
+            if not str(k).endswith("_started") and isinstance(self._pending_missions.get(k), str)
         )
         if active_mission_count >= self._max_concurrent_missions:
             return
@@ -233,8 +233,9 @@ class ProactiveExecutor:
                 try:
                     mission_id = agents.launch_mission(desc)
                     if mission_id:
-                        self._pending_missions[task["id"]] = mission_id
-                        self._pending_missions[f"{task['id']}_started"] = time.time()
+                        tid = str(task["id"])
+                        self._pending_missions[tid] = mission_id
+                        self._pending_missions[f"{tid}_started"] = time.time()
                         if self._current_task_id is None:
                             self._current_task_id = task["id"]
                             self._current_mission_id = mission_id
@@ -258,7 +259,7 @@ class ProactiveExecutor:
 
         stale_tasks = []
         for task_id, mission_id in list(self._pending_missions.items()):
-            if task_id.endswith("_started"):
+            if str(task_id).endswith("_started"):
                 continue
             started_key = f"{task_id}_started"
             started = self._pending_missions.get(started_key, 0)
@@ -463,7 +464,7 @@ class ProactiveExecutor:
         completed_ids = []
         for task_id, mission_id in list(self._pending_missions.items()):
             # 跳過時間戳記
-            if task_id.endswith("_started"):
+            if str(task_id).endswith("_started"):
                 continue
             if not isinstance(mission_id, str):
                 continue

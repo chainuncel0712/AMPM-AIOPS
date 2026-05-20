@@ -41,7 +41,7 @@ class TaskTracker:
     
     def complete(self, task_id: int) -> str:
         for task in self.tasks:
-            if task["id"] == task_id and task["status"] == "pending":
+            if str(task["id"]) == str(task_id) and task["status"] == "pending":
                 task["status"] = "completed"
                 task["completed_at"] = datetime.now().isoformat()
                 self._save()
@@ -69,7 +69,7 @@ class TaskTracker:
 
     def get(self, task_id, default=None):
         for task in self.tasks:
-            if task["id"] == task_id:
+            if str(task["id"]) == str(task_id):
                 return task
         return default
 
@@ -78,7 +78,7 @@ class TaskTracker:
 
     def update_task_status(self, task_id, status: str):
         for task in self.tasks:
-            if task["id"] == task_id:
+            if str(task["id"]) == str(task_id):
                 task["status"] = status
                 task.setdefault("history", []).append({
                     "status": status,
