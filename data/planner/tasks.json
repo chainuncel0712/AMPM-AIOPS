@@ -80,7 +80,7 @@
       "deadline": null,
       "status": "in_progress",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T10:50:45.242072",
+      "updated_at": "2026-05-20T10:58:48.549252",
       "completed_at": null,
       "overdue_warned": false
     },
@@ -102,9 +102,9 @@
       "description": "用 web_search 研究電子書和童書的市場定價策略、Amazon KDP 抽成結構、促銷方案。制定：1. 定價策略（電子書、童書各一本的建議售價）2. 初期行銷方案（免費宣傳管道、社群推廣方式）3. 寫成報告存入 outputs/research/business_strategy.md，至少 600 字。",
       "priority": 3,
       "deadline": null,
-      "status": "pending",
+      "status": "in_progress",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T00:00:00",
+      "updated_at": "2026-05-20T10:59:20.488722",
       "completed_at": null,
       "overdue_warned": false
     },
@@ -114,9 +114,9 @@
       "description": "設計一條龍 AI 代理服務的：1. 客戶自助選購流程（網頁表單 → AI 評估需求 → 報價 → 付款 → 自動安裝）2. 客服對話腳本（常見問題、技術支援、退款政策）3. 用 write_file 存入 outputs/research/service_flow.md，至少 800 字。",
       "priority": 3,
       "deadline": null,
-      "status": "pending",
+      "status": "in_progress",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T00:00:00",
+      "updated_at": "2026-05-20T10:59:51.407616",
       "completed_at": null,
       "overdue_warned": false
     },
