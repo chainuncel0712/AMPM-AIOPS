@@ -95,6 +95,7 @@ class AgentTaskRouter(BaseOrgan):
 
         self._auto_spawn_departments()
         self.fill_all_departments()
+        self._load_state()
 
     # ═══════════════════════════════════════════════════════
     # Department Formation (從對話中動態建立)
@@ -790,8 +791,12 @@ class AgentTaskRouter(BaseOrgan):
         if not hasattr(self, '_executor_fn') or not self._executor_fn:
             return 0
 
+        from concurrent.futures import ThreadPoolExecutor, as_completed, TimeoutError
+
         executed = 0
         now = time.time()
+        tasks_to_run = []
+
         with self._execution_lock:
             for aid, agent in list(self._agents.items()):
                 if agent["status"] != "busy" or not agent.get("current_task"):
@@ -818,22 +823,36 @@ class AgentTaskRouter(BaseOrgan):
                 if agent.get("task_started_at", 0) == 0:
                     agent["task_started_at"] = now
 
+                tasks_to_run.append((aid, agent, task))
+
+        if not tasks_to_run:
+            return 0
+
+        with ThreadPoolExecutor(max_workers=min(5, len(tasks_to_run))) as executor:
+            futures = {}
+            for aid, agent, task in tasks_to_run:
+                future = executor.submit(self._executor_fn, agent, task)
+                futures[future] = (aid, agent, task)
+
+            for future in as_completed(futures):
+                aid, agent, task = futures[future]
+                task_id = task["id"]
+                agent_name = agent.get('name', aid)
                 try:
-                    agent_name = agent.get('name', aid)
-                    print(f"[AgentCompany] {agent_name} executing: {task['description'][:80]}")
-                    try:
-                        from core.agent_supervisor import supervisor
-                        supervisor.heartbeat(f"sub_{aid}")
-                    except Exception:
-                        pass
-                    result = self._executor_fn(agent, task)
-                    self.complete_task(task_id, True, result)
-                    print(f"[AgentCompany] {agent_name} done: {str(result)[:100]}")
-                    executed += 1
+                    result = future.result(timeout=300)
+                except TimeoutError:
+                    result = f"[{agent_name}] 執行逾時"
                 except Exception as e:
-                    print(f"[AgentCompany] {agent_name} failed: {e}")
-                    self.complete_task(task_id, False, str(e))
-                    executed += 1
+                    result = f"[{agent_name}] 執行例外: {e}"
+
+                # 檢查是否為錯誤結果
+                is_error = isinstance(result, str) and (
+                    result.startswith("⚠️") or result.startswith("❌")
+                    or "不可用" in result or "錯誤" in result
+                )
+                print(f"[AgentCompany] {agent_name} {'FAILED' if is_error else 'done'}: {str(result)[:100]}")
+                self.complete_task(task_id, not is_error, result)
+                executed += 1
 
         return executed
 
@@ -857,6 +876,17 @@ class AgentTaskRouter(BaseOrgan):
                             task["completed_at"] = now
                             task["result"] = f"[{agent_name}] 逾時強制終止"
                             self._task_results[task_id] = task
+                            # 同時更新 mission results
+                            mission_id = task.get("data", {}).get("mission_id")
+                            if mission_id and mission_id in self._missions:
+                                m = self._missions[mission_id]
+                                sub_id = task.get("data", {}).get("sub_task_id", task_id)
+                                m["results"][sub_id] = {
+                                    "success": False,
+                                    "result": f"[{agent_name}] 逾時強制終止",
+                                    "agent": aid,
+                                }
+                                self._check_mission_complete(mission_id)
                     agent["status"] = "idle"
                     agent["current_task"] = None
                     agent["task_started_at"] = 0
