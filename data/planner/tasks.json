@@ -66,9 +66,9 @@
       "description": "用 web_search 搜尋學齡前（3-6歲）童書熱門主題，分析 Amazon、博客來 TOP20 童書的主題、風格、定價、頁數。寫選題建議，用 write_file 存入 outputs/children_book/research.md，至少 500 字。",
       "priority": 2,
       "deadline": null,
-      "status": "in_progress",
+      "status": "pending",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T15:03:23.902569",
+      "updated_at": "2026-05-20T15:10:00.876968",
       "completed_at": null,
       "overdue_warned": false
     },
@@ -104,7 +104,7 @@
       "deadline": null,
       "status": "in_progress",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T15:04:24.835881",
+      "updated_at": "2026-05-20T15:06:58.304940",
       "completed_at": null,
       "overdue_warned": false
     },
@@ -114,9 +114,9 @@
       "description": "設計一條龍 AI 代理服務的：1. 客戶自助選購流程（網頁表單 → AI 評估需求 → 報價 → 付款 → 自動安裝）2. 客服對話腳本（常見問題、技術支援、退款政策）3. 用 write_file 存入 outputs/research/service_flow.md，至少 800 字。",
       "priority": 3,
       "deadline": null,
-      "status": "pending",
+      "status": "in_progress",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T15:04:56.460157",
+      "updated_at": "2026-05-20T15:08:59.231705",
       "completed_at": null,
       "overdue_warned": false
     },
