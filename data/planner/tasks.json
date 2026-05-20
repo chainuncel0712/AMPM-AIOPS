@@ -78,10 +78,10 @@
       "description": "根據市場研究結果，創作第一本童書：1. 故事大綱與角色設定（book1_outline.md）2. 完整故事內容至少 1000 字（book1_story.md）3. 插圖描述與分頁規劃（book1_illustrations.md）。全部存入 outputs/children_book/。",
       "priority": 2,
       "deadline": null,
-      "status": "in_progress",
+      "status": "completed",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T10:58:48.549252",
-      "completed_at": null,
+      "updated_at": "2026-05-20T11:01:52.351378",
+      "completed_at": "2026-05-20T11:01:52.351378",
       "overdue_warned": false
     },
     "B008": {
@@ -102,9 +102,9 @@
       "description": "用 web_search 研究電子書和童書的市場定價策略、Amazon KDP 抽成結構、促銷方案。制定：1. 定價策略（電子書、童書各一本的建議售價）2. 初期行銷方案（免費宣傳管道、社群推廣方式）3. 寫成報告存入 outputs/research/business_strategy.md，至少 600 字。",
       "priority": 3,
       "deadline": null,
-      "status": "in_progress",
+      "status": "pending",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T10:59:20.488722",
+      "updated_at": "2026-05-20T11:04:25.179866",
       "completed_at": null,
       "overdue_warned": false
     },
@@ -126,9 +126,9 @@
       "description": "1. 用 list_dir 掃描 outputs/ 目錄下所有檔案 2. 用 read_file 檢查每個 .md 檔案內容是否超過 500 字且格式完整 3. 不合格的標記並自動補齊 4. 彙整進度透過 Telegram 發送給老大。格式：📊 黑曜進度 \\n 已完成 X 個檔案 \\n 總字數 Y 字 \\n 下一任務 Z。",
       "priority": 3,
       "deadline": null,
-      "status": "pending",
+      "status": "in_progress",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T00:00:00",
+      "updated_at": "2026-05-20T11:02:23.324265",
       "completed_at": null,
       "overdue_warned": false
     }
