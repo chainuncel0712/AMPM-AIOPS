@@ -17,7 +17,7 @@ import subprocess
 from datetime import datetime  # 導入 datetime 用於時間戳記
 
 class Cortex(BaseOrgan):
-    def __init__(self, llm_client, memory, compass, decisions, tasks, executor, registry, persona, contradiction, life_cycle=None, context_assembler=None, critic=None, learning_engine=None, evolution_engine=None, runtime_update=None):
+    def __init__(self, llm_client, memory, compass, decisions, tasks, executor, registry, persona, contradiction, life_cycle=None, context_assembler=None, critic=None, learning_engine=None, evolution_engine=None, runtime_update=None, thalamus=None):
         super().__init__("cortex")
         self.llm = llm_client
         self.memory = memory
@@ -34,6 +34,7 @@ class Cortex(BaseOrgan):
         self.learning_engine = learning_engine
         self.evolution_engine = evolution_engine
         self.runtime_update = runtime_update
+        self.thalamus = thalamus
         self.firewall = Firewall()
         self.breaker = Breaker()
         self.eye = Eye()
@@ -272,8 +273,11 @@ class Cortex(BaseOrgan):
                 {"role": "user", "content": user_msg}
             ]
 
-        # 呼叫 LLM 取得回覆
-        reply = self.llm.call(messages)
+        # 呼叫 LLM 取得回覆（有路由層就用智慧路由，沒有就降級舊 fallback）
+        if self.thalamus and hasattr(self.llm, 'call_smart'):
+            reply = self.llm.call_smart(user_msg, messages)
+        else:
+            reply = self.llm.call(messages)
 
         # ===== [已禁用] Critic + Learning 閉環 — 每訊息消耗 5-10x token 做自我反省 =====
         ENABLE_SELF_REFLECTION = False

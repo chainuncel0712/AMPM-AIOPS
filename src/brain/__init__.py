@@ -47,6 +47,7 @@ from blood.scheduler import Scheduler
 from blood.monitor import VitalMonitor
 
 # 中樞
+from brain.thalamus import Thalamus
 from brain.hypothalamus import Hypothalamus
 from brain.cortex import Cortex
 
@@ -140,8 +141,12 @@ class Obsidian:
             agents=self.agents, call_ai_func=self._call_ai
         ))
 
+        # 丘腦路由器（必須在 LLMClient 之前初始化）
+        self.thalamus = Thalamus()
+
         # 舊 LLM 和執行器
-        self.llm = LLMClient(self.breath)
+        self.llm = LLMClient(self.breath, thalamus=self.thalamus)
+        self.thalamus.llm = self.llm  # 回注，供路由統計用
         self.old_executor = OldExecutor(self.tools)
         # self.handler = MessageHandler(...)  # Phase 1: 死碼
 
@@ -214,6 +219,7 @@ class Obsidian:
             learning_engine=self.learning_engine,
             evolution_engine=self.evolution_engine,
             runtime_update=self.runtime_update,
+            thalamus=self.thalamus,
         ))
         self.wardrobe = self.registry.add(Wardrobe())
         self.face = self.registry.add(Face())

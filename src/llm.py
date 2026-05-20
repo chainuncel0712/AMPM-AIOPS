@@ -218,6 +218,70 @@ class LLMClient:
                 print(f"⚠️ {p['name']}: {str(e)[:30]}")
         return "⚠️ 錯誤：所有模型不可用"
 
+    def call_smart(self, user_msg: str, messages, temperature=0.7) -> str:
+        """智慧路由呼叫：分類訊息 → 挑最佳模型 → 一條直通（最多 1 次 fallback）"""
+        if not self.breath or self.breath.can_call_api():
+            if self.breath:
+                self.breath.record_api_call()
+        else:
+            return "休息中..."
+
+        if not self.rate_limiter.consume():
+            wait = self.rate_limiter.wait_time()
+            if wait > 0:
+                time.sleep(wait)
+
+        safe = [m if isinstance(m, dict) else {"role": "user", "content": str(m)} for m in messages]
+        if not safe:
+            safe = [{"role": "user", "content": str(messages)}]
+
+        # 速率保護
+        if self.thalamus:
+            if not self.thalamus.acquire(timeout=5.0):
+                print("⚠️ [Router] 無法取得 LLM 呼叫權（被自治任務佔用），等待中...")
+                self.thalamus.acquire(timeout=15.0)
+
+        try:
+            if self.thalamus:
+                route = self.thalamus.route(user_msg, self.providers)
+                primary = route["provider"]
+                category = route["category"]
+                print(f"🧠 [Router] 「{user_msg[:30]}」→ {category} → {primary['name'] if primary else '?'}")
+
+                if primary:
+                    # 只試主模型 + 一個備援，不盲目 fallback
+                    fallback = next((p for p in self.providers if p != primary), None)
+                    for p in [primary, fallback]:
+                        if p is None:
+                            continue
+                        try:
+                            r = requests.post(
+                                p["ep"],
+                                headers={"Authorization": f"Bearer {p['key']}", "Content-Type": "application/json"},
+                                json={"model": p["model"], "messages": safe, "temperature": temperature, "max_tokens": 4000},
+                                timeout=25
+                            )
+                            if r.status_code == 200:
+                                try:
+                                    return r.json().get("choices", [{}])[0].get("message", {}).get("content", "")
+                                except (KeyError, IndexError, TypeError, json.JSONDecodeError):
+                                    continue
+                            if r.status_code == 429:
+                                print(f"⚠️ {p['name']} 速率限制，換備援")
+                                time.sleep(1)
+                                continue
+                            print(f"⚠️ {p['name']} {r.status_code}，換備援")
+                        except Exception as e:
+                            print(f"⚠️ {p['name']}: {str(e)[:30]}，換備援")
+                            continue
+        finally:
+            if self.thalamus:
+                self.thalamus.release()
+
+        # 路由失敗 → 降級到舊的盲目 fallback
+        print("⚠️ [Router] 智慧路由失敗，降級到完整 fallback")
+        return self.call(messages, temperature)
+
     def call_local(self, messages, temperature=0.3):
         """只在 Ollama 本地模型上呼叫（免費，給子代理用）"""
         ollama = next((p for p in self.providers if p["name"] == "Ollama"), None)
