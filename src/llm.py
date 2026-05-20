@@ -216,6 +216,37 @@ class LLMClient:
                 print(f"⚠️ {p['name']}: {str(e)[:30]}")
         return "⚠️ 錯誤：所有模型不可用"
 
+    def call_local(self, messages, temperature=0.3):
+        """只在 Ollama 本地模型上呼叫（免費，給子代理用）"""
+        ollama = next((p for p in self.providers if p["name"] == "Ollama"), None)
+        if not ollama:
+            return "⚠️ Ollama 不可用（嘗試子代理任務）"
+
+        if self.breath and not self.breath.can_call_api():
+            return "休息中..."
+        if self.breath:
+            self.breath.record_api_call()
+
+        safe = [m if isinstance(m, dict) else {"role": "user", "content": str(m)} for m in messages]
+        if not safe:
+            safe = [{"role": "user", "content": str(messages)}]
+
+        try:
+            r = requests.post(
+                ollama["ep"],
+                headers={"Authorization": f"Bearer {ollama['key']}", "Content-Type": "application/json"},
+                json={"model": ollama["model"], "messages": safe, "temperature": temperature, "max_tokens": 4000},
+                timeout=60
+            )
+            if r.status_code == 200:
+                try:
+                    return r.json().get("choices", [{}])[0].get("message", {}).get("content", "")
+                except (KeyError, IndexError, TypeError, json.JSONDecodeError):
+                    return "⚠️ Ollama 回應格式異常"
+            return f"⚠️ Ollama {r.status_code}"
+        except Exception as e:
+            return f"⚠️ Ollama 錯誤: {str(e)[:30]}"
+
     def call_vision(self, prompt: str, image_url: str = None, image_path: str = None) -> str:
         """視覺理解 — 傳圖片給模型分析
 

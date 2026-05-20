@@ -374,7 +374,7 @@ class Obsidian:
                     return f"[{agent_name}] ⏰ 執行逾時（5分鐘），已強制終止"
 
                 try:
-                    result = self.llm.call(messages, temperature=0.3)
+                    result = self.llm.call_local(messages, temperature=0.3)
                 except Exception as e:
                     print(f"[AgentCompany] {agent_name} LLM 呼叫失敗 (round {round_num}): {e}")
                     if round_num == 0:

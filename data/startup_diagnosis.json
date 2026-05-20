@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-05-20T09:14:31.295192",
+  "timestamp": "2026-05-20T10:41:37.820712",
   "total_organs": 81,
   "organs": [
     {
@@ -408,7 +408,7 @@
       "alive": true
     }
   ],
-  "tools_count": 1178,
+  "tools_count": 1179,
   "tools": [
     "planner.add_task",
     "planner.complete_task",
@@ -595,6 +595,7 @@
     "agent_company.execute_assigned_tasks",
     "agent_company.fill_all_departments",
     "agent_company.fill_department",
+    "agent_company.force_reset_stale_agents",
     "agent_company.get_agent",
     "agent_company.get_agent_stats",
     "agent_company.get_agent_status",
