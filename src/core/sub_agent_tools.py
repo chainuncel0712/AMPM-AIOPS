@@ -155,6 +155,9 @@ TOOL_DEFINITIONS = """
 5. web_search — 搜尋網頁
    格式：{"tool": "web_search", "args": {"query": "搜尋關鍵字"}}
 
+6. generate_image — 產生圖像（插畫、封面、設計稿）
+   格式：{"tool": "generate_image", "args": {"prompt": "詳細的圖片描述（英文效果更好）", "filepath": "images/my_design.png"}}
+
 ⚠️ 鐵則（違反視為任務失敗）：
 - 必須先搜尋再寫內容（web_search → write_file）
 - 寫檔案時 content 必須是完整內容，不能寫「此處省略」
@@ -162,6 +165,27 @@ TOOL_DEFINITIONS = """
 - 路徑範例：ebooks/ch03_xxx.md、children_book/research.md、website/index.html
 - 路徑不要加 outputs/ 前綴
 """
+
+
+def generate_image(prompt: str, filepath: str = "images/generated.png") -> str:
+    """透過 HuggingFace 產生圖像"""
+    hf_key = os.getenv("HUGGINGFACE_TOKEN")
+    if not hf_key:
+        return "❌ 需要 HUGGINGFACE_TOKEN"
+    path = _resolve_path(filepath)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    model = "stabilityai/stable-diffusion-3.5-large"
+    try:
+        req = urllib.request.Request(
+            f"https://api-inference.huggingface.co/models/{model}",
+            data=json.dumps({"inputs": prompt}).encode(),
+            headers={"Authorization": f"Bearer {hf_key}", "Content-Type": "application/json"},
+        )
+        with urllib.request.urlopen(req, timeout=120) as resp:
+            path.write_bytes(resp.read())
+        return f"✅ 圖片已產生: {filepath} ({path.stat().st_size // 1024}KB)"
+    except Exception as e:
+        return f"❌ 圖像生成失敗: {str(e)[:60]}"
 
 
 def execute_tool(tool_name: str, args: dict) -> str:
@@ -172,6 +196,7 @@ def execute_tool(tool_name: str, args: dict) -> str:
         "list_dir": list_dir,
         "run_command": run_command,
         "web_search": web_search,
+        "generate_image": generate_image,
     }
     fn = tools_map.get(tool_name)
     if not fn:

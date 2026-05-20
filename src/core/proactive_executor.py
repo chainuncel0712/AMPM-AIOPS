@@ -33,7 +33,9 @@ class ProactiveExecutor:
         self._pending_missions: Dict[str, str] = {}  # task_id -> mission_id
         self._last_report_time = 0  # 上次回報時間
         self._report_interval = 300  # 每 5 分鐘回報一次
-        self._max_concurrent_missions = 3  # 同時最多 3 個任務
+        self._max_concurrent_missions = 5  # 同時最多 5 個任務
+        self._last_suggestion_time = 0
+        self._suggestion_interval = 1800  # 每 30 分鐘主動提案
 
         # 全域單例註冊（供 supervisor 心跳用）
         _ACTIVE_EXECUTORS["proactive_executor"] = self
@@ -121,6 +123,9 @@ class ProactiveExecutor:
                 # 4. 定時回報進度給老大（每 5 分鐘）
                 self._periodic_report()
 
+                # 5. 主動提案：有什麼可以做的
+                self._proactive_suggest()
+
                 # 心跳
                 try:
                     from core.agent_supervisor import supervisor
@@ -132,7 +137,39 @@ class ProactiveExecutor:
                 print(f"[ProactiveExecutor] 迴圈錯誤: {e}")
                 traceback.print_exc()
 
-            time.sleep(30)
+            time.sleep(15)
+
+    # ── 5. 主動提案 ───────────────────────────────────────────
+
+    def _proactive_suggest(self):
+        """每 30 分鐘主動提案，看有什麼可以做的"""
+        now = time.time()
+        if now - self._last_suggestion_time < self._suggestion_interval:
+            return
+        self._last_suggestion_time = now
+
+        planner = self.planner
+        if not planner:
+            return
+
+        # 如果任務充足就不提案
+        pending = [t for t in planner.tasks.values() if t.get("status") == "pending"]
+        in_progress = [t for t in planner.tasks.values() if t.get("status") == "in_progress"]
+        if pending or in_progress:
+            return
+
+        # 檢查 outputs/ 產出狀態
+        outputs_dir = Path(__file__).parent.parent.parent / "outputs"
+        ebooks = list((outputs_dir / "ebooks").glob("ch*.md")) if (outputs_dir / "ebooks").exists() else []
+        children = list((outputs_dir / "children_book").glob("*.md")) if (outputs_dir / "children_book").exists() else []
+
+        suggestions = []
+        if len(ebooks) < 3:
+            suggestions.append(f"📝 電子書目前只有 {len(ebooks)} 章，要繼續寫嗎？")
+        if not children:
+            suggestions.append("📚 童書還沒開始，要不要先做市場研究？")
+        if suggestions:
+            self._notify_user("💡 *黑曜提案*\n" + "\n".join(suggestions))
 
     # ── 1. 執行 pending 任務 ─────────────────────────────────
 

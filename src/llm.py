@@ -360,3 +360,45 @@ class LLMClient:
             except Exception as e:
                 print(f"⚠️ vision {p['name']}: {str(e)[:30]}")
         return "⚠️ 所有視覺模型不可用"
+
+    def call_image_gen(self, prompt: str, output_path: str = None) -> str:
+        """圖像生成 — 透過 HuggingFace Inference API 產生圖片
+
+        Args:
+            prompt: 文字提示詞
+            output_path: 儲存路徑（可選，預設 outputs/images/）
+
+        Returns:
+            結果描述或錯誤訊息
+        """
+        hf_key = os.getenv("HUGGINGFACE_TOKEN")
+        if not hf_key:
+            return "⚠️ 需要 HUGGINGFACE_TOKEN"
+
+        if not output_path:
+            ts = int(time.time())
+            output_path = f"outputs/images/gen_{ts}.png"
+
+        full_path = Path(output_path)
+        if not full_path.is_absolute():
+            full_path = Path(__file__).parent.parent / output_path
+        full_path.parent.mkdir(parents=True, exist_ok=True)
+
+        # 用 Stable Diffusion 3.5 (免費 HF Inference API)
+        model = "stabilityai/stable-diffusion-3.5-large"
+        try:
+            r = requests.post(
+                f"https://api-inference.huggingface.co/models/{model}",
+                headers={"Authorization": f"Bearer {hf_key}"},
+                json={"inputs": prompt},
+                timeout=120
+            )
+            if r.status_code == 200:
+                full_path.write_bytes(r.content)
+                size_kb = len(r.content) // 1024
+                return f"✅ 圖片已產生: {full_path.relative_to(Path(__file__).parent.parent)} ({size_kb}KB)"
+            if r.status_code == 503:
+                return f"⚠️ HF 模型載入中，請稍後再試 ({r.json().get('error','')[:80]})"
+            return f"⚠️ HF {r.status_code}"
+        except Exception as e:
+            return f"⚠️ 圖像生成失敗: {str(e)[:60]}"

@@ -126,6 +126,17 @@ class Cortex(BaseOrgan):
                 return "🔍 正在分析圖片...\n\n" + self.llm.call_vision(prompt=prompt, image_url=image_url)
             return "請提供圖片網址（例如：看圖 https://example.com/photo.jpg）"
 
+        # 圖像生成
+        if "畫" in user_msg or "繪" in user_msg or "generate" in user_msg.lower() or "image" in user_msg.lower():
+            if "畫" in user_msg or "繪" in user_msg:
+                prompt = user_msg.replace("畫", "").replace("繪", "").replace("一張", "").replace("圖片", "").replace("生成", "").strip()
+                if prompt:
+                    import time as _time
+                    ts = int(_time.time())
+                    result = self.llm.call_image_gen(prompt, f"outputs/images/gen_{ts}.png")
+                    return f"🎨 {result}"
+            # 純 mention 不含描述 → 讓 LLM 處理
+
         # 模型擴充
         if "找模型" in user_msg or "探索模型" in user_msg or "新模型" in user_msg:
             models = self.llm.discover_models(limit=8)
