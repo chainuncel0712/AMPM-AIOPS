@@ -327,21 +327,22 @@ class ProactiveExecutor:
         try:
             model = getattr(llm, "model", "deepseek-v4-pro")
 
-            # 步驟 1：如果是寫作任務，先研究選題可行性
+            # 步驟 1：快速收集本章所需資訊（不討論選題，主題已定）
             if "寫作" in title or "章" in title or "創作" in title:
-                print(f"[ProactiveExecutor] 🔍 先研究選題: {title}")
+                print(f"[ProactiveExecutor] 🔍 收集寫作素材: {title}")
                 research_prompt = f"""
-你是一個商業顧問。在開始寫作之前，請先評估這個任務的選題可行性。
+你是一個內容研究員。主題已定為「AI 入門指南」，不需討論選題。
 
 任務：{title}
 描述：{desc}
 
-請用繁體中文回答：
-1. 這個主題在市場上有需求嗎？為什麼？
-2. 選什麼具體題目最好賣？（給 3 個選項，並推薦最佳的一個）
-3. 這個任務這樣規劃可行嗎？有沒有更好的建議？
+請用繁體中文直接輸出本章需要的知識點和素材大綱：
+1. 本章要涵蓋的核心知識點（至少 5 個）
+2. 初學者最常問的問題（至少 3 個）
+3. 可以舉的實際例子或工具名稱
+4. 直接給出本章大綱（不要問、不要給選項）
 
-輸出你的分析和建議。"""
+只輸出大綱和素材，不要寫完整內容。"""
                 
                 research_resp = llm.chat.completions.create(
                     model=model,
