@@ -66,9 +66,9 @@
       "description": "用 web_search 搜尋學齡前（3-6歲）童書熱門主題，分析 Amazon、博客來 TOP20 童書的主題、風格、定價、頁數。寫選題建議，用 write_file 存入 outputs/children_book/research.md，至少 500 字。",
       "priority": 2,
       "deadline": null,
-      "status": "in_progress",
+      "status": "pending",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T15:18:38.491328",
+      "updated_at": "2026-05-20T15:24:42.986041",
       "completed_at": null,
       "overdue_warned": false
     },
@@ -104,7 +104,7 @@
       "deadline": null,
       "status": "in_progress",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T15:15:05.599914",
+      "updated_at": "2026-05-20T15:20:10.135911",
       "completed_at": null,
       "overdue_warned": false
     },
@@ -116,7 +116,7 @@
       "deadline": null,
       "status": "in_progress",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T15:17:37.545980",
+      "updated_at": "2026-05-20T15:22:42.036890",
       "completed_at": null,
       "overdue_warned": false
     },
