@@ -721,28 +721,8 @@ class ProactiveExecutor:
     # ── Telegram 通知 ────────────────────────────────────────
 
     def _notify_user(self, message: str):
-        """透過 Telegram 發送通知給使用者"""
-        token = getattr(self.obsidian, "telegram_token", None)
-        chat_id = getattr(self.obsidian, "telegram_chat_id", None)
-
-        if not token or not chat_id:
-            return
-
-        try:
-            import urllib.request
-            import urllib.parse
-
-            url = f"https://api.telegram.org/bot{token}/sendMessage"
-            data = urllib.parse.urlencode({
-                "chat_id": chat_id,
-                "text": message[:4000],
-                "parse_mode": "Markdown",
-            }).encode()
-
-            req = urllib.request.Request(url, data=data)
-            urllib.request.urlopen(req, timeout=10)
-        except Exception:
-            pass
+        """背景通知 — 靜默：不發送 Telegram 訊息，只印 log"""
+        print(f"[ProactiveExecutor] 📋 {message[:100].replace(chr(10), ' ')}")
 
     def _periodic_report(self):
         """每 5 分鐘回報一次進度給老大"""

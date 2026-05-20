@@ -37,7 +37,16 @@ class LLMClient:
         self.rate_limiter = TokenBucket(rate=30, per_seconds=60)  # 每分鐘 30 次
         self._last_user_msg = ""  # 供 router 分類用
 
-        # 🥇 DeepSeek（文字主力，先用自己的 API）
+        # 🏠 Ollama 本機（優先使用，免費）
+        import socket
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        ollama_ok = sock.connect_ex(('127.0.0.1', 11434)) == 0
+        sock.close()
+        if ollama_ok:
+            ollama_model = os.getenv("OLLAMA_MODEL", "qwen2.5:7b")
+            self.providers.append({"name":"Ollama","key":"ollama","ep":"http://localhost:11434/v1/chat/completions","model":ollama_model})
+
+        # 🥇 DeepSeek（備援）
         ds_key = os.getenv("DEEPSEEK_API_KEY")
         if ds_key:
             self.providers.append({"name":"DeepSeek","key":ds_key,"ep":"https://api.deepseek.com/v1/chat/completions","model":"deepseek-v4-pro"})
@@ -54,19 +63,10 @@ class LLMClient:
             self.providers.append({"name":"OR-DeepSeek","key":or_key,"ep":"https://openrouter.ai/api/v1/chat/completions","model":"deepseek/deepseek-v4-pro"})
             self.providers.append({"name":"OR-Gemini","key":or_key,"ep":"https://openrouter.ai/api/v1/chat/completions","model":"google/gemini-2.0-flash-001"})
 
-        # 🥉 NVIDIA
+        # 🥇 NVIDIA（優先使用）
         nv = os.getenv("NVIDIA_API_KEY")
         if nv:
             self.providers.append({"name":"NV-Llama","key":nv,"ep":"https://integrate.api.nvidia.com/v1/chat/completions","model":"meta/llama-3.1-8b-instruct"})
-
-        # 🏠 Ollama 本機
-        import socket
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        ollama_ok = sock.connect_ex(('127.0.0.1', 11434)) == 0
-        sock.close()
-        if ollama_ok:
-            ollama_model = os.getenv("OLLAMA_MODEL", "qwen2.5:7b")
-            self.providers.append({"name":"Ollama","key":"ollama","ep":"http://localhost:11434/v1/chat/completions","model":ollama_model})
 
         print(f"🤖 {len(self.providers)}層: {' → '.join(p['name'] for p in self.providers)}")
         self.rate_limiter = TokenBucket(rate=int(os.getenv("MAX_API_CALLS_PER_MINUTE", "30")), per_seconds=60)
