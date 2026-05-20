@@ -31,6 +31,8 @@ class ProactiveExecutor:
         self._current_task_id: Optional[str] = None
         self._current_mission_id: Optional[str] = None
         self._pending_missions: Dict[str, str] = {}  # task_id -> mission_id
+        self._last_report_time = 0  # 上次回報時間
+        self._report_interval = 300  # 每 5 分鐘回報一次
 
         # 全域單例註冊（供 supervisor 心跳用）
         _ACTIVE_EXECUTORS["proactive_executor"] = self
@@ -114,6 +116,9 @@ class ProactiveExecutor:
 
                 # 3. 主動偵測系統問題並建立修復任務
                 self._scan_for_problems()
+
+                # 4. 定時回報進度給老大（每 5 分鐘）
+                self._periodic_report()
 
                 # 心跳
                 try:
@@ -247,9 +252,8 @@ class ProactiveExecutor:
 
     def _try_direct_execute(self, task: dict) -> bool:
         """
-        對於可直接處理的任務（目錄建立、簡單檔案操作）直接執行，
-        內容生成任務用 LLM 直接生成並寫入檔案。
-        回傳 True 表示已處理，False 表示不適用需走 agent_company。
+        商業任務執行：先研究選題可行性 → 再生成內容 → 寫入檔案。
+        回傳 True 表示已處理，False 表示需走 agent_company。
         """
         title = task.get("title", "")
         desc = task.get("description", "")
@@ -270,7 +274,7 @@ class ProactiveExecutor:
             self._current_task_id = None
             return True
 
-        # 辨識是否為內容生成任務（關鍵字）
+        # 辨識是否為內容生成任務
         content_keywords = ["寫作", "章", "生成", "研究", "報告", "建立", "產出",
                            "撰寫", "write", "generate", "create", "存入", "存到"]
         is_content_task = any(kw in title or kw in desc for kw in content_keywords)
@@ -279,17 +283,16 @@ class ProactiveExecutor:
 
         # 找出目標輸出路徑
         output_path = None
-        for keyword in ["存入 ", "存到 ", "outputs/"]:
+        for keyword in ["存入 ", "存到 "]:
             idx = desc.find(keyword)
             if idx >= 0:
-                path_str = desc[idx + len(keyword):].strip().split()[0].rstrip("。.")
+                path_str = desc[idx + len(keyword):].strip().split()[0].rstrip("。.,")
                 if path_str:
                     output_path = Path(__file__).parent.parent.parent / path_str
                     break
 
         if not output_path:
-            # 預設用任務標題猜路徑
-            if "電子工具書" in title or "電子書" in title:
+            if "電子書" in title or "章" in title:
                 output_path = Path(__file__).parent.parent.parent / "outputs" / "ebooks" / "generated_chapter.md"
             elif "童書" in title:
                 output_path = Path(__file__).parent.parent.parent / "outputs" / "children_book" / "generated.md"
@@ -300,36 +303,77 @@ class ProactiveExecutor:
             else:
                 return False
 
-        # 確保目錄存在
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
-        # 用 LLM 生成內容
+        # 取得 LLM
         llm = getattr(self.obsidian, "llm", None)
         if not llm:
-            print("[ProactiveExecutor] ⚠️ LLM 不可用，無法直接生成內容")
+            print("[ProactiveExecutor] ⚠️ LLM 不可用")
             return False
 
         try:
-            prompt = f"""你是一個專業的內容創作者。請根據以下任務生成完整內容，直接輸出檔案內容，不要說多餘的話。
+            model = getattr(llm, "model", "deepseek-v4-pro")
 
-任務標題：{title}
-任務描述：{desc}
+            # 步驟 1：如果是寫作任務，先研究選題可行性
+            if "寫作" in title or "章" in title or "創作" in title:
+                print(f"[ProactiveExecutor] 🔍 先研究選題: {title}")
+                research_prompt = f"""
+你是一個商業顧問。在開始寫作之前，請先評估這個任務的選題可行性。
 
-請直接輸出要寫入檔案的完整內容。如果是 Markdown 檔案，用 Markdown 格式；如果是 HTML，用 HTML 格式。
-內容必須充實，至少 500 字以上。不要輸出任何解釋或說明，只輸出檔案內容本身。"""
+任務：{title}
+描述：{desc}
 
-            print(f"[ProactiveExecutor] 🤖 直接生成: {output_path}")
-            response = llm.chat.completions.create(
-                model=getattr(llm, "model", "deepseek-v4-pro"),
-                messages=[{"role": "user", "content": prompt}],
+請用繁體中文回答：
+1. 這個主題在市場上有需求嗎？為什麼？
+2. 選什麼具體題目最好賣？（給 3 個選項，並推薦最佳的一個）
+3. 這個任務這樣規劃可行嗎？有沒有更好的建議？
+
+輸出你的分析和建議。"""
+                
+                research_resp = llm.chat.completions.create(
+                    model=model,
+                    messages=[{"role": "user", "content": research_prompt}],
+                    temperature=0.7,
+                    max_tokens=1500,
+                )
+                research = research_resp.choices[0].message.content.strip()
+                print(f"[ProactiveExecutor] 📊 選題分析完成 ({len(research)} 字)")
+
+                # 步驟 2：根據研究結果生成實際內容
+                print(f"[ProactiveExecutor] ✍️ 開始寫作: {output_path}")
+                write_prompt = f"""
+你是一個專業內容創作者。根據以下選題研究結果，生成完整內容。
+
+{research}
+
+任務：{title}
+描述：{desc}
+
+⚠️ 鐵則：
+- 直接輸出要寫入檔案的完整內容，不要多餘的說明
+- 內容必須充實，至少 800 字
+- 如果是 Markdown 檔案用 Markdown 格式，HTML 用 HTML 格式
+- 不要輸出任何「以下是內容」、「這是草稿」等開場白
+- 繁體中文"""
+            else:
+                write_prompt = f"""你是一個專業的內容創作者。請根據以下任務生成完整內容，直接輸出檔案內容，不要說多餘的話。
+
+任務：{title}
+描述：{desc}
+
+直接輸出要寫入檔案的完整內容。內容必須充實，至少 500 字。不要輸出任何解釋或說明，只輸出檔案內容本身。繁體中文。"""
+
+            write_resp = llm.chat.completions.create(
+                model=model,
+                messages=[{"role": "user", "content": write_prompt}],
                 temperature=0.7,
                 max_tokens=4000,
             )
-            content = response.choices[0].message.content.strip()
+            content = write_resp.choices[0].message.content.strip()
 
             if content and len(content) > 50:
                 output_path.write_text(content, encoding="utf-8")
-                print(f"[ProactiveExecutor] ✅ 內容已寫入: {output_path} ({len(content)} 字)")
+                print(f"[ProactiveExecutor] ✅ 寫入: {output_path} ({len(content)} 字)")
 
                 planner = self.planner
                 task["status"] = "completed"
@@ -338,7 +382,7 @@ class ProactiveExecutor:
                 planner._save_to_disk()
 
                 self._notify_user(
-                    f"✅ 黑曜完成任務\n"
+                    f"✅ 任務完成\n"
                     f"📋 {title}\n"
                     f"📁 {output_path}\n"
                     f"📊 {len(content)} 字"
@@ -346,10 +390,10 @@ class ProactiveExecutor:
                 self._current_task_id = None
                 return True
             else:
-                print("[ProactiveExecutor] ⚠️ LLM 回傳內容太短或為空")
+                print("[ProactiveExecutor] ⚠️ LLM 回傳內容太短")
 
         except Exception as e:
-            print(f"[ProactiveExecutor] ❌ LLM 生成失敗: {e}")
+            print(f"[ProactiveExecutor] ❌ 執行失敗: {e}")
             traceback.print_exc()
 
         return False
@@ -685,3 +729,63 @@ class ProactiveExecutor:
             urllib.request.urlopen(req, timeout=10)
         except Exception:
             pass
+
+    def _periodic_report(self):
+        """每 5 分鐘回報一次進度給老大"""
+        now = time.time()
+        if now - self._last_report_time < self._report_interval:
+            return
+        self._last_report_time = now
+
+        planner = self.planner
+        if not planner:
+            return
+
+        # 統計任務進度
+        tasks = list(planner.tasks.values())
+        completed = [t for t in tasks if t.get("status") == "completed"]
+        in_progress = [t for t in tasks if t.get("status") == "in_progress"]
+        pending = [t for t in tasks if t.get("status") == "pending"]
+
+        # 統計產出檔案
+        outputs_dir = Path(__file__).parent.parent.parent / "outputs"
+        file_list = []
+        total_chars = 0
+        if outputs_dir.exists():
+            for f in sorted(outputs_dir.rglob("*")):
+                if f.is_file() and f.suffix not in (".gitkeep",):
+                    try:
+                        content = f.read_text(encoding="utf-8")
+                        chars = len(content)
+                        total_chars += chars
+                        rel = f.relative_to(outputs_dir)
+                        file_list.append(f"  📄 {rel} ({chars} 字)")
+                    except:
+                        file_list.append(f"  📄 {f.relative_to(outputs_dir)}")
+
+        # 組裝回報訊息
+        lines = [
+            "📊 *黑曜進度回報*",
+            "",
+            f"✅ 已完成：{len(completed)} 項",
+            f"🔄 執行中：{len(in_progress)} 項",
+            f"⏳ 待處理：{len(pending)} 項",
+            "",
+            f"📁 產出檔案：{len(file_list)} 個",
+            f"📝 總字數：{total_chars:,} 字",
+            "",
+        ]
+
+        if file_list:
+            lines.append("📂 *檔案清單：*")
+            lines.extend(file_list[:15])
+            lines.append("")
+
+        if in_progress:
+            lines.append("🔄 *正在執行：*")
+            for t in in_progress[:3]:
+                lines.append(f"  • {t.get('title', '?')}")
+            lines.append("")
+
+        self._notify_user("\n".join(lines))
+        print(f"[ProactiveExecutor] 📊 已回報進度: {len(completed)}完成 {len(in_progress)}執行中 {len(pending)}待處理")
