@@ -13,3 +13,5 @@ backup/
 structure.txt
 src/data/
 src/brain/learning_loop.py
+.npmrc
+nuget.config
