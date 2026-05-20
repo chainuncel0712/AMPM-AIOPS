@@ -15,14 +15,14 @@ from skeleton.base_organ import BaseOrgan
 
 AGENT_TEMPLATES = {
     "researcher": {
-        "tools": ["web_search", "http", "market_data"],
-        "prompt": "你是一個研究代理。搜尋、分析、整理資訊，回報結構化結果。不閒聊。",
-        "capabilities": ["research", "search", "analyze", "summarize"],
+        "tools": ["web_search", "http", "market_data", "write_file"],
+        "prompt": "你是一個研究代理。搜尋、分析、整理資訊，並將研究結果寫入檔案。回報結構化結果和儲存路徑。不閒聊。",
+        "capabilities": ["research", "search", "analyze", "summarize", "file_output"],
     },
     "coder": {
-        "tools": ["python_exec", "code_gen", "file_write"],
-        "prompt": "你是一個程式代理。寫程式、修bug、執行測試。只回報程式碼和執行結果。",
-        "capabilities": ["coding", "debug", "testing", "scripting"],
+        "tools": ["python_exec", "code_gen", "write_file"],
+        "prompt": "你是一個程式代理。寫程式、修bug、執行測試、將程式寫入檔案。只回報程式碼和執行結果。",
+        "capabilities": ["coding", "debug", "testing", "scripting", "file_output"],
     },
     "analyst": {
         "tools": ["python_exec", "market_data", "chart"],
@@ -30,9 +30,9 @@ AGENT_TEMPLATES = {
         "capabilities": ["analysis", "data", "chart", "reporting"],
     },
     "writer": {
-        "tools": ["translate", "summarize"],
-        "prompt": "你是一個寫作代理。撰寫文章、翻譯、潤稿。回報最終文本。",
-        "capabilities": ["writing", "translation", "editing"],
+        "tools": ["write_file", "translate", "summarize"],
+        "prompt": "你是一個寫作代理。撰寫文章、翻譯、潤稿，並將成品寫入檔案。回報最終文本和檔案路徑。",
+        "capabilities": ["writing", "translation", "editing", "file_output"],
     },
     "trader": {
         "tools": ["market_data", "market_analysis", "price_check"],
