@@ -66,9 +66,9 @@
       "description": "用 web_search 搜尋學齡前（3-6歲）童書熱門主題，分析 Amazon、博客來 TOP20 童書的主題、風格、定價、頁數。寫選題建議，用 write_file 存入 outputs/children_book/research.md，至少 500 字。",
       "priority": 2,
       "deadline": null,
-      "status": "pending",
+      "status": "in_progress",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T15:10:00.876968",
+      "updated_at": "2026-05-20T15:14:03.722847",
       "completed_at": null,
       "overdue_warned": false
     },
@@ -102,9 +102,9 @@
       "description": "用 web_search 研究電子書和童書的市場定價策略、Amazon KDP 抽成結構、促銷方案。制定：1. 定價策略（電子書、童書各一本的建議售價）2. 初期行銷方案（免費宣傳管道、社群推廣方式）3. 寫成報告存入 outputs/research/business_strategy.md，至少 600 字。",
       "priority": 3,
       "deadline": null,
-      "status": "in_progress",
+      "status": "pending",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T15:06:58.304940",
+      "updated_at": "2026-05-20T15:14:34.657717",
       "completed_at": null,
       "overdue_warned": false
     },
@@ -116,7 +116,7 @@
       "deadline": null,
       "status": "in_progress",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T15:08:59.231705",
+      "updated_at": "2026-05-20T15:13:02.778829",
       "completed_at": null,
       "overdue_warned": false
     },
