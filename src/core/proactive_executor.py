@@ -548,7 +548,7 @@ class ProactiveExecutor:
         if len(ebook_files) < 1:
             planner.add_task(
                 title="電子書：第一章寫作",
-                description="選熱門工具書主題（AI入門指南），撰寫第一章。含標題、引言、800+字內容、實戰步驟、總結。用 write_file 寫入 outputs/ebooks/ch01_intro.md。",
+                description="以 AI 入門指南為主題，撰寫第一章。先用 web_search 搜尋最新 AI 工具、新手入門知識、常見問題。含標題、引言、800+字內容、實戰步驟、總結。用 write_file 寫入 outputs/ebooks/ch01_intro.md。",
                 priority=1,
             )
             print("[ProactiveExecutor] 📝 自動建立：電子書第一章")
@@ -581,7 +581,7 @@ class ProactiveExecutor:
             next_ch = len(ebook_files) + 1
             planner.add_task(
                 title=f"電子書第{next_ch}章寫作",
-                description=f"延續前面章節，寫第{next_ch}章。至少 800 字，含實戰步驟和總結。用 write_file 寫入 outputs/ebooks/ch{next_ch:02d}.md。",
+                description=f"延續前章 AI 入門指南，寫第{next_ch}章。{ {2:'AI 工具介紹與比較',3:'Prompt 技巧實戰',4:'AI 實戰案例',5:'進階應用與變現'}.get(next_ch, '更多內容')}。至少 800 字，含實戰步驟和總結。先用 web_search 搜尋相關資訊。用 write_file 寫入 outputs/ebooks/ch{next_ch:02d}.md。",
                 priority=2,
             )
             print(f"[ProactiveExecutor] 📝 自動建立：電子書第{next_ch}章")

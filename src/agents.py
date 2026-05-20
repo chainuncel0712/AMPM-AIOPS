@@ -331,12 +331,29 @@ class AgentTaskRouter(BaseOrgan):
         return self._build_subtasks_from_pairs(description, roles)
 
     def _build_subtasks_from_pairs(self, description: str, role_pairs: List[tuple]) -> List[Dict]:
-        """從 (role, dept) 配對建立子任務"""
+        """從 (role, dept) 配對建立子任務——每人有明確分工，不重複思考"""
+        role_instructions = {
+            "research": "先用 web_search 搜尋資料，將原始資訊存成暫存檔",
+            "search": "先用 web_search 搜尋資料，回傳搜尋結果摘要",
+            "write": "根據搜尋結果，撰寫完整內容並用 write_file 寫入目標檔案",
+            "build": "根據規格建立網站檔案並用 write_file 寫入",
+            "save": "確認檔案已寫入正確路徑，用 read_file 驗證內容完整性",
+            "check": "用 list_dir 掃描目錄，用 read_file 檢查檔案內容",
+            "report": "整理檢查結果，用 write_file 寫入進度報告",
+            "execute": "執行具體操作，用 run_command 或 write_file",
+            "analyze": "分析已收集的資料，用 write_file 寫入分析結果",
+            "verify": "驗證執行結果，用 read_file 確認",
+            "design": "設計架構，用 write_file 寫入設計文件",
+            "implement": "根據設計文件實作，用 write_file 寫入程式碼",
+            "test": "測試實作結果，用 run_command 執行測試",
+            "summarize": "彙整所有子任務產出，用 write_file 寫入總結報告",
+        }
         result = []
         for i, (role, dept) in enumerate(role_pairs):
+            instruction = role_instructions.get(role, f"[{role}] {description[:80]}")
             result.append({
                 "id": role,
-                "description": f"[{role}] {description[:80]}",
+                "description": instruction,
                 "skills": [role],
                 "priority": i,
                 "department": dept,
