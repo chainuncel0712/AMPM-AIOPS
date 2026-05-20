@@ -35,16 +35,16 @@ class LLMClient:
         self.providers = []
         self.rate_limiter = TokenBucket(rate=30, per_seconds=60)  # 每分鐘 30 次
 
-        # 🥇 ATXP LLM Gateway（AI 經濟協議）
+        # 🥇 DeepSeek（文字主力，先用自己的 API）
+        ds_key = os.getenv("DEEPSEEK_API_KEY")
+        if ds_key:
+            self.providers.append({"name":"DeepSeek","key":ds_key,"ep":"https://api.deepseek.com/v1/chat/completions","model":"deepseek-v4-pro"})
+
+        # 🥈 ATXP LLM Gateway（付費線路，視覺/備援用）
         atxp_conn = os.getenv("ATXP_CONNECTION_STRING")
         if atxp_conn:
             atxp_model = os.getenv("ATXP_MODEL", "gpt-4.1")
             self.providers.append({"name":"ATXP","key":atxp_conn,"ep":"https://llm.atxp.ai/v1/chat/completions","model":atxp_model})
-
-        # 🥈 DeepSeek
-        ds_key = os.getenv("DEEPSEEK_API_KEY")
-        if ds_key:
-            self.providers.append({"name":"DeepSeek","key":ds_key,"ep":"https://api.deepseek.com/v1/chat/completions","model":"deepseek-v4-pro"})
 
         # 🥈 OpenRouter
         or_key = os.getenv("OPENROUTER_API_KEY")

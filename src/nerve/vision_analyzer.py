@@ -31,6 +31,7 @@ class VisionAnalyzer(BaseOrgan):
         super().__init__("vision_analyzer")
         self.api_key = os.getenv("OPENAI_API_KEY", "")
         self.gemini_key = os.getenv("GEMINI_API_KEY", "")
+        self.nvidia_key = os.getenv("NVIDIA_API_KEY", "")
         self.atxp_conn = os.getenv("ATXP_CONNECTION_STRING", "")
         self.atxp_model = os.getenv("ATXP_MODEL", "gpt-4.1")
         self.analysis_history: List[Dict] = []
@@ -52,13 +53,27 @@ class VisionAnalyzer(BaseOrgan):
         return mime.get(ext, "jpeg")
 
     def _call_vision_llm(self, image_b64: str, questions: List[str], mime: str = "jpeg") -> str:
-        """呼叫視覺 LLM"""
+        """呼叫視覺 LLM — 開源優先"""
         content = []
         for q in questions:
             content.append({"type": "text", "text": q})
         content.append({"type": "image_url", "image_url": {"url": f"data:image/{mime};base64,{image_b64}"}})
 
-        # 🥇 ATXP (gpt-4.1 支援視覺，已付費)
+        # 🥇 NVIDIA (開源 Llama 3.2 Vision，免費額度)
+        if self.nvidia_key:
+            try:
+                r = requests.post(
+                    "https://integrate.api.nvidia.com/v1/chat/completions",
+                    headers={"Authorization": f"Bearer {self.nvidia_key}", "Content-Type": "application/json"},
+                    json={"model": "meta/llama-3.2-90b-vision-instruct", "messages": [{"role": "user", "content": content}], "max_tokens": 1500},
+                    timeout=45
+                )
+                if r.status_code == 200:
+                    return r.json()["choices"][0]["message"]["content"]
+            except Exception:
+                pass
+
+        # 🥈 ATXP (gpt-4.1 付費備援)
         if self.atxp_conn:
             try:
                 r = requests.post(
@@ -72,7 +87,7 @@ class VisionAnalyzer(BaseOrgan):
             except Exception:
                 pass
 
-        # 🥈 GPT-4V
+        # 🥉 GPT-4V
         if self.api_key:
             try:
                 r = requests.post(
@@ -86,7 +101,7 @@ class VisionAnalyzer(BaseOrgan):
             except Exception:
                 pass
 
-        # 🥉 備援 Gemini
+        # 🏁 備援 Gemini
         if self.gemini_key:
             try:
                 r = requests.post(

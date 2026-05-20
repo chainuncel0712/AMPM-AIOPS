@@ -32,7 +32,7 @@
       "deadline": null,
       "status": "in_progress",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T14:47:51.643529",
+      "updated_at": "2026-05-20T14:52:56.442713",
       "completed_at": null,
       "overdue_warned": false
     },
@@ -54,9 +54,9 @@
       "description": "建立專業服務網站：1. outputs/website/index.html（品牌介紹、三大服務、聯絡方式）2. outputs/website/style.css（現代簡潔風格）3. 用 Cloudflare Pages API 或 Wrangler 部署到 ampm-aiops.com。",
       "priority": 2,
       "deadline": null,
-      "status": "pending",
+      "status": "in_progress",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T14:49:53.560793",
+      "updated_at": "2026-05-20T14:50:23.562039",
       "completed_at": null,
       "overdue_warned": false
     },
@@ -68,7 +68,7 @@
       "deadline": null,
       "status": "in_progress",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T14:48:22.606266",
+      "updated_at": "2026-05-20T14:54:12.884621",
       "completed_at": null,
       "overdue_warned": false
     },
@@ -90,9 +90,9 @@
       "description": "接續第一章新手工具書，依序寫第二章（AI 工具介紹與比較）、第三章（Prompt 技巧實戰）、第四章（新手常見錯誤與解法）、第五章（從入門到變現）。每章至少 800 字，含主題介紹、實戰步驟、總結。先用 web_search 搜尋相關資訊。用 write_file 分別存入 outputs/ebooks/ch02.md ~ ch05.md。",
       "priority": 2,
       "deadline": null,
-      "status": "pending",
+      "status": "in_progress",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T10:51:16.163346",
+      "updated_at": "2026-05-20T14:54:44.807748",
       "completed_at": null,
       "overdue_warned": false
     },
