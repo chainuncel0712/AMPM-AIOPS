@@ -78,10 +78,10 @@
       "description": "定期檢查 outputs/ 目錄下的產出品質，檢查完成的檔案數量。如果有檔案內容不完整，自動補齊。記錄每次檢查結果到 outputs/quality_log.md。",
       "priority": 3,
       "deadline": null,
-      "status": "in_progress",
+      "status": "completed",
       "created_at": "2026-05-19T14:45:56.854379",
-      "updated_at": "2026-05-19T20:56:00.612809",
-      "completed_at": null,
+      "updated_at": "2026-05-20T00:14:31.651465",
+      "completed_at": "2026-05-20T00:14:31.651465",
       "overdue_warned": false
     }
   },
