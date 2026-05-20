@@ -40,8 +40,8 @@ class LLMClient:
         # 🥇 OpenRouter 免費模型（優先，不燒錢）
         or_key = os.getenv("OPENROUTER_API_KEY")
         if or_key:
-            self.providers.append({"name":"OR-Gemini","key":or_key,"ep":"https://openrouter.ai/api/v1/chat/completions","model":"google/gemini-2.0-flash-001"})
-            self.providers.append({"name":"OR-DeepSeek","key":or_key,"ep":"https://openrouter.ai/api/v1/chat/completions","model":"deepseek/deepseek-v4-pro"})
+            self.providers.append({"name":"OR-Free","key":or_key,"ep":"https://openrouter.ai/api/v1/chat/completions","model":"deepseek/deepseek-v4-flash:free"})
+            self.providers.append({"name":"OR-Llama","key":or_key,"ep":"https://openrouter.ai/api/v1/chat/completions","model":"meta-llama/llama-3.3-70b-instruct:free"})
 
         # 🥈 DeepSeek 直連（備援）
         ds_key = os.getenv("DEEPSEEK_API_KEY")
@@ -57,10 +57,7 @@ class LLMClient:
             ollama_model = os.getenv("OLLAMA_MODEL", "qwen2.5:7b")
             self.providers.append({"name":"Ollama","key":"ollama","ep":"http://localhost:11434/v1/chat/completions","model":ollama_model})
 
-        # 🤗 HuggingFace（最終備援）
-        hf_key = os.getenv("HUGGINGFACE_TOKEN")
-        if hf_key:
-            self.providers.append({"name":"HF-Qwen14B","key":hf_key,"ep":"https://api-inference.huggingface.co/v1/chat/completions","model":"deepseek-ai/DeepSeek-R1-Distill-Qwen-14B"})
+        # 🤗 HuggingFace（已移除 — DNS 無法解析且模型不支援）
 
         print(f"🤖 {len(self.providers)}層: {' → '.join(p['name'] for p in self.providers)}")
         self.rate_limiter = TokenBucket(rate=int(os.getenv("MAX_API_CALLS_PER_MINUTE", "30")), per_seconds=60)
@@ -196,7 +193,7 @@ class LLMClient:
                     p["ep"],
                     headers={"Authorization": f"Bearer {p['key']}", "Content-Type": "application/json"},
                     json={"model": p["model"], "messages": safe, "temperature": temperature, "max_tokens": 4000},
-                    timeout=30
+                    timeout=15
                 )
                 if r.status_code == 200:
                     try:
