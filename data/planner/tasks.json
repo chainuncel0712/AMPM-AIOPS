@@ -32,7 +32,7 @@
       "deadline": null,
       "status": "in_progress",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T14:44:17.868704",
+      "updated_at": "2026-05-20T14:47:51.643529",
       "completed_at": null,
       "overdue_warned": false
     },
@@ -54,9 +54,9 @@
       "description": "建立專業服務網站：1. outputs/website/index.html（品牌介紹、三大服務、聯絡方式）2. outputs/website/style.css（現代簡潔風格）3. 用 Cloudflare Pages API 或 Wrangler 部署到 ampm-aiops.com。",
       "priority": 2,
       "deadline": null,
-      "status": "in_progress",
+      "status": "pending",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T14:42:16.907229",
+      "updated_at": "2026-05-20T14:49:53.560793",
       "completed_at": null,
       "overdue_warned": false
     },
@@ -66,9 +66,9 @@
       "description": "用 web_search 搜尋學齡前（3-6歲）童書熱門主題，分析 Amazon、博客來 TOP20 童書的主題、風格、定價、頁數。寫選題建議，用 write_file 存入 outputs/children_book/research.md，至少 500 字。",
       "priority": 2,
       "deadline": null,
-      "status": "pending",
+      "status": "in_progress",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T14:44:48.792219",
+      "updated_at": "2026-05-20T14:48:22.606266",
       "completed_at": null,
       "overdue_warned": false
     },

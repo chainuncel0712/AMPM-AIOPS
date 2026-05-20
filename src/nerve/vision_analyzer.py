@@ -31,6 +31,8 @@ class VisionAnalyzer(BaseOrgan):
         super().__init__("vision_analyzer")
         self.api_key = os.getenv("OPENAI_API_KEY", "")
         self.gemini_key = os.getenv("GEMINI_API_KEY", "")
+        self.atxp_conn = os.getenv("ATXP_CONNECTION_STRING", "")
+        self.atxp_model = os.getenv("ATXP_MODEL", "gpt-4.1")
         self.analysis_history: List[Dict] = []
         self.total_analyzed = 0
         self._cache: Dict[str, Dict] = {}
@@ -56,7 +58,21 @@ class VisionAnalyzer(BaseOrgan):
             content.append({"type": "text", "text": q})
         content.append({"type": "image_url", "image_url": {"url": f"data:image/{mime};base64,{image_b64}"}})
 
-        # 優先 GPT-4V
+        # 🥇 ATXP (gpt-4.1 支援視覺，已付費)
+        if self.atxp_conn:
+            try:
+                r = requests.post(
+                    "https://llm.atxp.ai/v1/chat/completions",
+                    headers={"Authorization": f"Bearer {self.atxp_conn}", "Content-Type": "application/json"},
+                    json={"model": self.atxp_model, "messages": [{"role": "user", "content": content}], "max_tokens": 1500},
+                    timeout=45
+                )
+                if r.status_code == 200:
+                    return r.json()["choices"][0]["message"]["content"]
+            except Exception:
+                pass
+
+        # 🥈 GPT-4V
         if self.api_key:
             try:
                 r = requests.post(
@@ -70,7 +86,7 @@ class VisionAnalyzer(BaseOrgan):
             except Exception:
                 pass
 
-        # 備援 Gemini
+        # 🥉 備援 Gemini
         if self.gemini_key:
             try:
                 r = requests.post(
@@ -238,6 +254,7 @@ class VisionAnalyzer(BaseOrgan):
             "name": self.name,
             "alive": self.is_alive(),
             "total_analyzed": self.total_analyzed,
+            "has_atxp_vision": bool(self.atxp_conn),
             "has_openai_vision": bool(self.api_key),
             "has_gemini_vision": bool(self.gemini_key),
         }
