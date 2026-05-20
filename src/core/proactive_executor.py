@@ -136,6 +136,9 @@ class ProactiveExecutor:
         if not planner:
             return
 
+        # 檢查是否有逾時的 mission（5 分鐘沒完成就放棄）
+        self._cancel_stale_missions(timeout_seconds=300)
+
         # 一次只跑一個任務，避免塞爆
         if self._pending_missions:
             return
@@ -160,6 +163,11 @@ class ProactiveExecutor:
 
         print(f"[ProactiveExecutor] 🚀 自動執行: {task['id']} - {task['title']} (優先級={task['priority']})")
 
+        # 簡單系統任務（建立目錄等）直接執行，不經過子代理
+        if any(kw in task.get("title", "") for kw in ["目錄結構", "目錄"]):
+            if self._try_direct_execute(task):
+                return
+
         # 優先走 agent_company 子代理路線
         agents = self.agents
         if agents:
@@ -170,6 +178,7 @@ class ProactiveExecutor:
                     mission_id = agents.launch_mission(desc)
                     if mission_id:
                         self._pending_missions[task["id"]] = mission_id
+                        self._pending_missions[f"{task['id']}_started"] = time.time()
                         self._current_task_id = task["id"]
                         self._current_mission_id = mission_id
                         self._notify_user(
@@ -188,6 +197,31 @@ class ProactiveExecutor:
 
         # 都失敗，恢復 pending
         planner.update_task_status(task["id"], "pending")
+
+    def _cancel_stale_missions(self, timeout_seconds: int = 300):
+        """取消超過 timeout 還沒完成的 mission，改用直接執行"""
+        planner = self.planner
+        if not planner:
+            return
+
+        stale_tasks = []
+        for task_id, mission_id in list(self._pending_missions.items()):
+            if task_id.endswith("_started"):
+                continue
+            started_key = f"{task_id}_started"
+            started = self._pending_missions.get(started_key, 0)
+            if isinstance(started, (int, float)) and started > 0:
+                if time.time() - started > timeout_seconds:
+                    stale_tasks.append(task_id)
+
+        for task_id in stale_tasks:
+            print(f"[ProactiveExecutor] ⏰ 任務 {task_id} 逾時，取消子代理，改用直接執行")
+            self._pending_missions.pop(task_id, None)
+            self._pending_missions.pop(f"{task_id}_started", None)
+            task = planner.tasks.get(task_id, {})
+            task["status"] = "pending"
+            task["updated_at"] = datetime.now().isoformat()
+            planner._save_to_disk()
 
     def _build_agent_prompt(self, task: dict) -> str:
         """為子代理建立明確的任務指示，包含輸出路徑要求"""
@@ -213,12 +247,28 @@ class ProactiveExecutor:
 
     def _try_direct_execute(self, task: dict) -> bool:
         """
-        對於內容生成類任務，直接用 LLM 生成內容並寫入檔案。
-        跳過 agent_company 子代理（因為子代理不會寫檔案）。
+        對於可直接處理的任務（目錄建立、簡單檔案操作）直接執行，
+        內容生成任務用 LLM 直接生成並寫入檔案。
         回傳 True 表示已處理，False 表示不適用需走 agent_company。
         """
         title = task.get("title", "")
         desc = task.get("description", "")
+
+        # 目錄結構建立 — 不用 LLM，直接做
+        if any(kw in title for kw in ["目錄結構", "目錄"]):
+            import os
+            outputs_dir = Path(__file__).parent.parent.parent / "outputs"
+            for subdir in ["ebooks", "children_book", "website", "research"]:
+                (outputs_dir / subdir).mkdir(parents=True, exist_ok=True)
+                (outputs_dir / subdir / ".gitkeep").touch()
+            print("[ProactiveExecutor] ✅ 目錄結構已建立")
+            planner = self.planner
+            task["status"] = "completed"
+            task["completed_at"] = datetime.now().isoformat()
+            task["updated_at"] = datetime.now().isoformat()
+            planner._save_to_disk()
+            self._current_task_id = None
+            return True
 
         # 辨識是否為內容生成任務（關鍵字）
         content_keywords = ["寫作", "章", "生成", "研究", "報告", "建立", "產出",
@@ -315,6 +365,12 @@ class ProactiveExecutor:
 
         completed_ids = []
         for task_id, mission_id in list(self._pending_missions.items()):
+            # 跳過時間戳記
+            if task_id.endswith("_started"):
+                continue
+            if not isinstance(mission_id, str):
+                continue
+
             mission = agents.get_mission(mission_id) if hasattr(agents, "get_mission") else None
 
             if not mission:
