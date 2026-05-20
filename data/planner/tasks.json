@@ -32,7 +32,7 @@
       "deadline": null,
       "status": "in_progress",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T14:22:56.973158",
+      "updated_at": "2026-05-20T14:29:33.632650",
       "completed_at": null,
       "overdue_warned": false
     },
@@ -54,9 +54,9 @@
       "description": "建立專業服務網站：1. outputs/website/index.html（品牌介紹、三大服務、聯絡方式）2. outputs/website/style.css（現代簡潔風格）3. 用 Cloudflare Pages API 或 Wrangler 部署到 ampm-aiops.com。",
       "priority": 2,
       "deadline": null,
-      "status": "pending",
+      "status": "in_progress",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T14:24:58.933587",
+      "updated_at": "2026-05-20T14:28:01.774508",
       "completed_at": null,
       "overdue_warned": false
     },
@@ -68,7 +68,7 @@
       "deadline": null,
       "status": "in_progress",
       "created_at": "2026-05-20T00:00:00",
-      "updated_at": "2026-05-20T14:24:27.891406",
+      "updated_at": "2026-05-20T14:28:32.713894",
       "completed_at": null,
       "overdue_warned": false
     },
