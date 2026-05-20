@@ -384,47 +384,46 @@ def main():
                     else:
                         raise StopIteration("fallthrough")
                 except StopIteration:
-                    # fallthrough: 走原本 langgraph / cortex 路徑
-                    try:
-                        if obsidian.langgraph and hasattr(obsidian.langgraph, 'process'):
-                            _sys.stdout.write(f"[Bot] 使用 LangGraph 引擎\n")
-                            _sys.stdout.flush()
-                            agent = getattr(obsidian.langgraph, 'agent', None)
-                            if agent:
-                                llm = agent.get('llm')
-                                _sys.stdout.write(f"[Bot] LLM 狀態: {llm is not None}\n")
-                            reply = obsidian.langgraph.process(msg)
-                        elif hasattr(obsidian, 'cortex') and obsidian.cortex and hasattr(obsidian.cortex, 'think'):
-                            _sys.stdout.write(f"[Bot] 使用 Cortex 引擎\n")
-                            reply = obsidian.cortex.think(msg)
-                        else:
-                            _sys.stdout.write(f"[Bot] 無可用引擎\n")
-                            reply = "🤔 我目前無法處理這個請求，因為思考引擎尚未初始化。"
-                    except Exception as e:
-                        _sys.stdout.write(f"[Bot] 引擎錯誤: {e}\n")
-                        reply = f"⚠️ {translate_error(e)}"
+                    # ── 判斷是否為任務請求 ──
+                    task_keywords = ["幫我", "查", "找", "搜", "分析", "寫", "做", "研究",
+                                     "build", "code", "規劃", "生成", "建立", "設計", "部署",
+                                     "任務", "幫我查", "幫我找", "幫我分析", "幫我寫"]
+                    is_task = any(kw in msg for kw in task_keywords)
 
-                # ── 子代理任務觸發：背景靜默執行，不通知使用者 ──
-                try:
-                    agents = getattr(obsidian, 'agents', None)
-                    if agents and hasattr(agents, 'launch_mission'):
-                        task_keywords = ["幫我", "查", "找", "搜", "分析", "寫", "做", "研究",
-                                         "build", "code", "規劃", "生成", "建立", "設計", "部署",
-                                         "任務", "幫我查", "幫我找", "幫我分析", "幫我寫"]
-                        if any(kw in msg for kw in task_keywords):
-                            mission_id = agents.launch_mission(msg)
-                            if mission_id:
-                                _sys.stdout.write(f"[Bot] 🚀 子代理任務已啟動（靜默）: {mission_id}\n")
-                except Exception as e:
-                    _sys.stdout.write(f"[Bot] 代理任務失敗: {e}\n")
+                    if is_task:
+                        # ── 任務路徑：不聊天，直接執行 ──
+                        reply = "🚀 執行中，完成後會通知你..."
+                        try:
+                            agents = getattr(obsidian, 'agents', None)
+                            if agents and hasattr(agents, 'launch_mission'):
+                                agents.launch_mission(msg)
+                                agents.execute_assigned_tasks()
+                        except Exception as e:
+                            _sys.stdout.write(f"[Bot] 任務啟動失敗: {e}\n")
+                    else:
+                        # ── 聊天路徑：正常 LLM 回覆 ──
+                        try:
+                            if obsidian.langgraph and hasattr(obsidian.langgraph, 'process'):
+                                _sys.stdout.write(f"[Bot] 使用 LangGraph 引擎\n")
+                                reply = obsidian.langgraph.process(msg)
+                            elif hasattr(obsidian, 'cortex') and obsidian.cortex and hasattr(obsidian.cortex, 'think'):
+                                _sys.stdout.write(f"[Bot] 使用 Cortex 引擎\n")
+                                reply = obsidian.cortex.think(msg)
+                            else:
+                                reply = "🤔 我目前無法處理這個請求，因為思考引擎尚未初始化。"
+                        except Exception as e:
+                            _sys.stdout.write(f"[Bot] 引擎錯誤: {e}\n")
+                            reply = f"⚠️ {translate_error(e)}"
 
-                # ── 掃描回覆中的承諾，自動執行（不修改回覆文字）──
-                try:
-                    agents = getattr(obsidian, 'agents', None)
-                    if agents and hasattr(agents, 'scan_and_execute_promises') and reply:
-                        agents.scan_and_execute_promises(reply)
-                except Exception:
-                    pass
+                        # ── 掃描回覆中的承諾，自動執行 ──
+                        try:
+                            agents = getattr(obsidian, 'agents', None)
+                            if agents and hasattr(agents, 'scan_and_execute_promises') and reply:
+                                extra = agents.scan_and_execute_promises(reply)
+                                if extra:
+                                    reply += extra
+                        except Exception:
+                            pass
 
                 _sys.stdout.write(f"[Bot] 回覆: {reply[:100]}\n")
                 _sys.stdout.flush()

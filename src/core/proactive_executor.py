@@ -193,12 +193,6 @@ class ProactiveExecutor:
                         if self._current_task_id is None:
                             self._current_task_id = task["id"]
                             self._current_mission_id = mission_id
-                        self._notify_user(
-                            f"🚀 黑曜派工\n"
-                            f"📋 {task['title']}\n"
-                            f"👥 子代理已出動\n"
-                            f"📊 同時執行: {active_mission_count + 1}/{self._max_concurrent_missions}"
-                        )
                         print(f"[ProactiveExecutor] → mission {mission_id}")
                         return
                 except Exception as e:
@@ -721,8 +715,19 @@ class ProactiveExecutor:
     # ── Telegram 通知 ────────────────────────────────────────
 
     def _notify_user(self, message: str):
-        """背景通知 — 靜默：不發送 Telegram 訊息，只印 log"""
-        print(f"[ProactiveExecutor] 📋 {message[:100].replace(chr(10), ' ')}")
+        """透過 Telegram 發送通知給使用者"""
+        token = getattr(self.obsidian, "telegram_token", None)
+        chat_id = getattr(self.obsidian, "telegram_chat_id", None)
+        if not token or not chat_id:
+            print(f"[ProactiveExecutor] 📋 {message[:100].replace(chr(10), ' ')}")
+            return
+        try:
+            import urllib.request, urllib.parse
+            url = f"https://api.telegram.org/bot{token}/sendMessage"
+            data = urllib.parse.urlencode({"chat_id": chat_id, "text": message[:4000], "parse_mode": "Markdown"}).encode()
+            urllib.request.urlopen(urllib.request.Request(url, data=data), timeout=10)
+        except Exception:
+            pass
 
     def _periodic_report(self):
         """每 5 分鐘回報一次進度給老大"""
@@ -781,5 +786,9 @@ class ProactiveExecutor:
                 lines.append(f"  • {t.get('title', '?')}")
             lines.append("")
 
-        self._notify_user("\n".join(lines))
-        print(f"[ProactiveExecutor] 📊 已回報進度: {len(completed)}完成 {len(in_progress)}執行中 {len(pending)}待處理")
+        self._notify_user(
+            f"📊 黑曜進度\n"
+            f"✅ {len(completed)}完成  🔄 {len(in_progress)}執行中  ⏳ {len(pending)}待處理\n"
+            f"📁 {len(file_list)}檔案  📝 {total_chars:,}字"
+        )
+        print(f"[ProactiveExecutor] 📊 進度: {len(completed)}完成 {len(in_progress)}執行中 {len(pending)}待處理")

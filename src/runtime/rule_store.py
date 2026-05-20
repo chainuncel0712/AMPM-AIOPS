@@ -154,14 +154,14 @@ class RuleStore:
             self._save()
 
     def get_rules_for_context(self) -> str:
-        """产生可注入 Context 的规则摘要"""
-        active = self.get_active()
+        """产生可注入 Context 的规则摘要（只取前 5 条高信心）"""
+        active = sorted(self.get_active(), key=lambda r: -r.confidence)[:5]
         if not active:
             return ""
 
-        lines = ["[Runtime 规则库 — 从过去学习中总结的行动规则]"]
-        for r in active[:10]:
-            lines.append(f"- [{r.pattern}] {r.rule} (信心: {r.confidence:.0%})")
+        lines = ["[规则摘要]"]
+        for r in active:
+            lines.append(f"- {r.rule[:80]}")
 
         return "\n".join(lines)
 
