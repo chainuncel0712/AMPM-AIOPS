@@ -127,8 +127,8 @@
 <p align="center">
   如果你願意給他一點指教，或單純覺得這個故事有點意思——
   <br /><br />
-  <a href="https://www.buymeacoffee.com/chainuncel0712">
-    <img src="https://img.shields.io/badge/☕-請他喝杯咖啡-ff69b4?style=for-the-badge" />
+  <a href="https://paypal.me/chainuncel0712">
+    <img src="https://img.shields.io/badge/-請支持他-0070ba?style=for-the-badge&logo=paypal" />
   </a>
   <br /><br />
   他會很開心的。
