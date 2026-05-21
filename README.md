@@ -2,68 +2,155 @@
 
 [![Sponsor](https://img.shields.io/badge/贊助-❤️-ff69b4)](https://github.com/sponsors/chainuncel0712) [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-> A Modular AI Operating System. Runtime. Multi-agent. Self-healing. Long-term memory. Built for VPS.
+> 一個會自己找事做、自己執行、自己修、自己進化的 AI 系統。
+> 不是聊天機器人，是 Autonomous AI Operating System。
 
 ---
 
 ## 一句話
 
-普通的 AI 對話框，聊完就忘，只會給建議。
+市面上每個 AI agent 都在等你下指令。
 
-黑曜不一樣：它會記住你、能自己拆任務、能派 Agent 去執行、出錯會自己修、還會從經驗中進化。
+黑曜不會等。它自己掃任務、自己派 agent、自己寫檔案、出錯自己修、做完還會想下一步做什麼。
 
 ---
 
-## 技術定位
+## 黑曜跟一般 AI Agent 有什麼不一樣？
 
-AMPM-AIOPS 是一個**模組化的 AI 作業系統（AIOS）**，設計目標是在 VPS 上持續自主運作。
-
-它**不是**一個聊天機器人，也**不是** AGI。
-
-它是：
-
-| 能力層 | 說明 |
-|--------|------|
-| **Runtime** | 生命週期狀態機，管理 IDLE → OBSERVE → THINK → ... → EVOLVE 全循環 |
-| **Orchestration** | 中樞調度，任務路由、Agent 協調、負載平衡 |
-| **Multi-Agent** | 多代理系統，可動態建立/釋放部門與 Agent，自動拆解並分派任務 |
-| **Self-Healing** | 回覆失敗自動修復，系統異常自動復原 |
-| **Memory** | 三層記憶架構（工作/情節/語義），支援向量檢索、自動整理與遺忘 |
-| **Tooling** | 內建工具系統、Tool Creator（自動生成工具）、Plugin SDK |
-| **Evolution** | 進化循環，從經驗中學習並優化參數（含沙盒防護） |
-| **Multi-Model** | 多層 LLM 備援（ATXP → DeepSeek → OpenRouter → NVIDIA → Ollama） |
+| 特性 | 一般 AI Agent | 黑曜 |
+|------|--------------|------|
+| **啟動方式** | 你問一句，它答一句 | 你設定商業目標，它 24h 自主運作 |
+| **任務來源** | 你下指令 | 自己有 ProactiveExecutor 掃任務佇列、自動建立商業管線任務 |
+| **執行方式** | 單一回覆 | 拆子任務 → 派 sub-agent → 呼叫 tools → 產出檔案 → 回報 |
+| **記憶** | 對話歷史（有限） | 三層記憶：工作、情節、語義 + 向量檢索 |
+| **修復能力** | 出錯就報錯 | CrushRecovery + SelfHeal + Supervisor 心跳監控 + 自動重啟 |
+| **進化能力** | 無 | EvolutionCycle：從經驗學習，自動調整行為參數 |
+| **輸出** | 文字回覆 | 實際產出檔案（電子書章節、研究報告、網站 HTML、商業策略） |
+| **模型** | 固定一種 | 多層備援：Free OpenRouter → DeepSeek 直連 → Ollama 本地 |
+| **離開後** | 對話結束就停 | Daemon + Watchdog 確保永不停機 |
 
 ---
 
 ## 系統架構
 
 ```
-src/
-├── brain/         # 大腦皮層：思考、決策、LLM 呼叫
-├── memory/        # 記憶系統：工作記憶、情節記憶、語義記憶
-├── immune/        # 免疫系統：防火牆、矛盾檢測、自我修復
-├── muscle/        # 肌肉系統：工具執行、Agent 管理
-├── nerve/         # 神經系統：網路搜尋、外部感知
-├── blood/         # 數據匯流排：事件總線、排程器
-├── core/          # 核心模組：進化循環、任務規劃、效能監控
-├── skin/          # 介面層：人格、語音、介面
-├── womb/          # 模組工廠：Agent 建立、插件載入
-├── skeleton/      # 骨架：基礎類別、註冊表、DNA
-├── compass/       # 方向感測器：KPI 追蹤、目標管理
-└── meta/          # Meta 層：世界模型、系統意識、進化治理
+黑曜 (AMPM-AIOPS)
+│
+├── 🧠 Brain (大腦皮層)
+│   ├── Cortex        — 中央思考引擎
+│   ├── Thalamus       — LLM 路由器
+│   └── Hypothalamus   — 自主任務調度
+│
+├── 📋 Task System (任務系統)
+│   ├── TaskTracker    — 持久化任務佇列 (tasks.json)
+│   ├── TaskPlanner    — 任務分解與依賴排序
+│   └── ProactiveExecutor — 主動掃描 + 自動執行 + 進度回報
+│
+├── 👥 AgentCompany (代理公司)
+│   ├── Departments    — 部門（research / content / engineering / art …）
+│   ├── Sub-Agents     — 子代理，每人有角色 + 技能 + 工具
+│   └── Mission System — mission → sub-tasks → 分配 → 執行 → 驗證 → 完成
+│
+├── 🛡️ Immune (防護系統)
+│   ├── Firewall       — 輸入過濾
+│   ├── CrushRecovery  — 崩潰恢復
+│   ├── SelfHeal       — 自動修復異常器官
+│   └── Supervisor     — 心跳監控所有執行緒
+│
+├── 💾 Memory (記憶系統)
+│   ├── Working Memory — 目前上下文
+│   ├── Episodic Memory— 過去事件
+│   └── Semantic Memory— 長期知識 + 向量檢索
+│
+├── 🔧 Tools (工具系統)
+│   ├── ToolRegistry   — 108+ 內建工具
+│   ├── ToolCreator    — 自動生成新工具
+│   └── SubAgentTools  — write_file / web_search / run_command / read_file
+│
+├── 🤖 LLM Layer (模型層)
+│   ├── OR-Free        — OpenRouter 免費模型 (備援1)
+│   ├── DeepSeek 直連  — 主模型 (有 credits，穩定)
+│   └── Ollama 本地    — qwen2.5:14b (免費備援)
+│
+├── 🔄 Evolution (進化循環)
+│   ├── EvolutionCycle — 定期評估效能、調參數
+│   └── FeedbackLearn  — 從回饋中學習
+│
+├── 🖥️ Interface (介面)
+│   ├── Telegram Bot   — 接收指令 + 回報進度
+│   └── Dashboard      — Flask 網頁儀表板
+│
+└── ⚙️ Runtime (運行時)
+    ├── LifeCycleManager — IDLE → OBSERVE → THINK → … → EVOLVE
+    ├── ExecutionContext  — 單一執行權威鏈
+    └── Daemon + Watchdog — 永不停機守護
 ```
 
 ---
 
-## 進階商業模組
+## 實際運作流程
 
-核心框架為 MIT 開源，以下商業模組另有授權：
+```
+ProactiveExecutor (每15秒迴圈)
+  │
+  ├─ 0. _ensure_business_tasks()
+  │     如果任務佇列空了，自動建立商業管線任務
+  │     （電子書、童書、網站、研究報告…）
+  │
+  ├─ 1. _execute_pending_tasks()
+  │     按優先級排序 → 取最高 → 送給 AgentCompany
+  │
+  ├─ 2. AgentCompany.launch_mission()
+  │     ├─ _decompose_task() → 拆成 3~4 個子任務
+  │     ├─ submit_task() → 進任務佇列
+  │     ├─ route_all_pending() → 配對到閒置 sub-agent
+  │     └─ 執行緒每3秒 polling，撿 busy agent 執行
+  │
+  ├─ 3. Sub-agent 執行
+  │     ├─ LLM 呼叫 (call() → DeepSeek API, ~3s)
+  │     ├─ 工具呼叫 (web_search / write_file / run_command)
+  │     ├─ 最多5輪，5分鐘超時
+  │     └─ 回傳結果 → complete_task()
+  │
+  ├─ 4. _check_mission_completions()
+  │     檢查 mission 是否全數完成
+  │     驗證輸出檔案是否存在
+  │     標記任務完成 → Telegram 通知
+  │
+  ├─ 5. _periodic_report()
+  │     每5分鐘統計進度
+  │     ✅ 0完成 🔄 5執行中 ⏳ 849待處理
+  │
+  └─ 6. _scan_for_problems()
+       檢查記憶體、器官狀態、逾期任務
+       自動建立修復任務
+```
 
-- **行銷自動化**：Email 行銷、社群管理、SEO、廣告投放
-- **內容出版**：自動寫文章、電子書出版
-- **加密貨幣**：錢包管理、跨鏈橋接、Gas 追蹤、合約審計
-- **NFT 工具**：狙擊手、鯨魚追蹤、地板掃描、空投檢查
-- **企業 SaaS**：多租戶系統、API 金鑰管理、CRM
+---
+
+## 實際產出範例
+
+黑曜不是只會講話。它真的會寫檔案：
+
+```
+outputs/
+├── ebooks/
+│   ├── ch03_prompt.md       10KB — Prompt 技巧實戰 (完整章節)
+│   └── ch04.md               7KB — AI 實戰案例 (含表格)
+├── research/
+│   ├── cloudflare_setup.md         Cloudflare 身分驗證
+│   ├── platform_research.md        上架平台研究
+│   └── business_strategy.md        定價與行銷規劃
+├── children_book/
+│   ├── book1_outline.md     童書大綱
+│   └── product_pages/       20+ 童書產品頁
+├── website/
+│   └── index.html, style.css  品牌網站
+└── ai_agent/
+    └── ...  AI 代理服務設計
+```
+
+每個檔案都是由 sub-agent 透過 `write_file` 工具實際寫入，不是 LLM 幻覺文字。
 
 ---
 
@@ -77,23 +164,44 @@ pip install -r requirements.txt
 ### 2. 設定環境變數
 ```bash
 cp .env.example .env
-# 編輯 .env，至少填入一個 LLM API Key
+# 至少要填入一個 LLM API Key
+# DEEPSEEK_API_KEY 最穩定
+# OPENROUTER_API_KEY 有免費額度
 ```
 
 ### 3. 啟動
 ```bash
-python main.py      # 完整版（含 LangGraph、儀表板）
-python bot.py       # 輕量版（純 Telegram Bot）
+OBSIDIAN_MODE=full nohup python3 main.py > /tmp/heiyao.log 2>&1 &
 ```
+
+黑曜會在背景自主運作。你可以：
+- `/status` 查看系統健康狀態
+- 直接傳訊息讓它執行任務
+- 它會每 15 分鐘主動回報進度
 
 ---
 
-## 誰適合使用
+## 為什麼叫黑曜？
 
-- 需要在 **VPS 上長期自主運作** AI 系統的開發者
-- 想研究 **Multi-Agent 架構** 與 **Runtime 狀態機** 的工程師
-- 需要 **自動化商業流程**（行銷、加密貨幣、內容出版）的創業者
-- 不想被綁在某個雲端服務上，希望**完全掌控自己 AI** 的人
+黑曜石（Obsidian）—— 火山熔岩急速冷卻形成的天然玻璃，邊緣鋒利到可以切割電子顯微鏡樣本。
+
+名字取自 Obsidian.md（筆記軟體）的靈感，加上一個信念：
+
+> AI 不該是等指令的笨蛋，而是能自主思考、行動、進化的工具。
+
+---
+
+## 技術棧
+
+| 類別 | 技術 |
+|------|------|
+| 語言 | Python 3.11 |
+| 通訊 | Telegram Bot API / Flask |
+| LLM | DeepSeek API / OpenRouter / Ollama |
+| 記憶 | ChromaDB (向量) + JSON |
+| 執行緒 | threading + ThreadPoolExecutor |
+| 排程 | 自製 Scheduler + Token Bucket |
+| 持久化 | JSON / 檔案系統 |
 
 ---
 
@@ -102,14 +210,34 @@ python bot.py       # 輕量版（純 Telegram Bot）
 | 部分 | 授權 | 說明 |
 |------|------|------|
 | `src/` 核心框架 | MIT | 器官架構、Runtime、記憶系統、工具系統 |
-| `src/core/` 商業模組 | Proprietary | 市場分析、營收優化、NFT 工具等 |
+| `src/core/` 商業模組 | Proprietary | 市場分析、營收優化等 |
+| `outputs/` | CC BY-NC | 產出檔案僅供參考 |
 
 ---
 
 ## 誰做的
 
-一個沒有工程背景的人，賣掉房子，全職做了八個月。
+他叫 Hao，不是工程師，沒有寫過一行 production code。
 
-沒有團隊，沒有資金，只有一個終端機、一個 AI 對話框、和一個不想放棄的念頭。
+2024 年，他賣掉房子，把自己逼到沒有退路的地步。
+——因為他相信，真正的 AI 不該是等指令的笨蛋。
 
-[❤️ 支持這個專案](https://github.com/sponsors/chainuncel0712)
+接下來的八個多月，他每天醒來面對的只有一個終端機、一個 AI 對話框、和一個連他自己都常常懷疑的念頭。
+
+他被假的開發團隊騙過整整三個月。
+對方拿走錢，交出空殼，然後消失。
+他從頭來過，一個人。
+
+沒有團隊、沒有資金、沒有導師。
+他靠的是：
+- 對 LLM 一遍又一遍地問「為什麼不行」
+- 在同一個錯誤上跌倒十次，第十一次爬起來
+- 凌晨三點終端機的光，和天亮時鳥的叫聲
+
+黑曜不是一個 side project。
+它是一個人把所有東西押下去之後，換回來的東西。
+
+如果你用了黑曜，覺得它有點意思——
+那不是程式碼厲害，是一個不想放棄的人，硬撐出來的。
+
+[❤️ 如果你願意，可以在這裡請他喝一杯咖啡](https://github.com/sponsors/chainuncel0712)
