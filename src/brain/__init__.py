@@ -440,7 +440,11 @@ class Obsidian:
                         parent_id=event_log.last_rollback_point() or "",
                     )
 
-                    tool_output = execute_tool(tool_name, tool_args)
+                    # Execution Isolation
+                    from governance.isolation import isolated_execute
+                    tool_output = isolated_execute(
+                        agent_name, tool_name, tool_args, execute_tool
+                    )
                     print(f"[AgentCompany] {agent_name} 工具結果: {tool_output[:150]}")
 
                     # 更新 event log 輸出
