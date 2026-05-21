@@ -42,6 +42,7 @@ from immune.firewall import Firewall
 from immune.breaker import Breaker
 from immune.contradiction import Contradiction
 from immune.self_heal import SelfHeal
+from governance.repair_orchestrator import RepairOrchestrator
 
 from muscle.executor import MuscularExecutor
 from muscle.tool_registry import ToolRegistry
@@ -98,6 +99,7 @@ class Obsidian:
 
         self.organs_registry = OrganRegistry()
 
+        self.repair_orchestrator = self.organs_registry.add(RepairOrchestrator(self.base_dir))
         self.memory = self.organs_registry.add(MemoryManager(self.base_dir))
         self.tools = self.organs_registry.add(ToolSystem(str(self.base_dir / "data" / "tools" / "registry.json")))
         from tools import set_tool_system
@@ -110,7 +112,7 @@ class Obsidian:
         self.decisions = self.organs_registry.add(DecisionRecorder(self.base_dir))
         self.tasks = self.organs_registry.add(TaskTracker(self.base_dir))
         self.circuit = self.organs_registry.add(CircuitController(self.base_dir))
-        self.monitor = self.organs_registry.add(Monitor(self.base_dir, alert_callback=self._on_alert, call_ai_func=self._call_ai))
+        self.monitor = self.organs_registry.add(Monitor(self.base_dir, alert_callback=self._on_alert, call_ai_func=self._call_ai, repair_orchestrator=self.repair_orchestrator))
         self.evolution = self.organs_registry.add(Evolution(
             base_dir=self.base_dir, memory=self.memory, tools=self.tools,
             agents=self.agents, call_ai_func=self._call_ai
@@ -129,7 +131,7 @@ class Obsidian:
         self.firewall = self.organs_registry.add(Firewall())
         self.breaker = self.organs_registry.add(Breaker())
         self.contradiction = self.organs_registry.add(Contradiction(self.base_dir))
-        self.self_heal = self.organs_registry.add(SelfHeal())
+        self.self_heal = self.organs_registry.add(SelfHeal(orchestrator=self.repair_orchestrator))
 
         self.muscle = self.organs_registry.add(MuscularExecutor(self.tools))
         self.tool_registry = self.organs_registry.add(ToolRegistry(self.tools))
