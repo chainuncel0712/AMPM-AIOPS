@@ -42,14 +42,14 @@ class ProactiveExecutor:
 
     @property
     def planner(self):
-        """取得 PlannerOrgan (TaskSchedulerOrgan)"""
-        planners = ["plannerorgan", "taskschedulerorgan", "task_planner", "tasktracker"]
+        """取得 TaskTracker（任務資料來源）"""
+        planners = ["task_tracker", "tasktracker", "task_planner", "taskschedulerorgan", "plannerorgan"]
         for name in planners:
             found = self.obsidian.organs.get(name)
             if found:
                 return found
         # 也檢查直接屬性
-        for attr in ["task_planner", "planner"]:
+        for attr in ["tasks", "task_planner", "planner"]:
             found = getattr(self.obsidian, attr, None)
             if found:
                 return found
