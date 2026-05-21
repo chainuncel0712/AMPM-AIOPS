@@ -1,10 +1,180 @@
 <div align="center">
-  <h1>🧬 AI-BOS</h1>
+  <h1>🧬 AI-BOS <sup>v1.0.0</sup></h1>
   <p><strong>Artificial Intelligence Body Operating System</strong></p>
-  <p><em>世界第一個 AI 生命體作業系統</em></p>
+  <p><em>世界第一個 AI 生命體作業系統 — The World's First AI Life Body Operating System</em></p>
+  <p>
+    <a href="./LICENSE"><img src="https://img.shields.io/badge/license-AGPL%20v3%20%2B%20Custom-blue" alt="License"></a>
+    <a href="#"><img src="https://img.shields.io/badge/organs-54%2B-brightgreen" alt="Organs"></a>
+    <a href="#"><img src="https://img.shields.io/badge/baseline-29%2F29-green" alt="Baseline"></a>
+  </p>
 </div>
 
 ---
+
+# English
+
+## What is AI-BOS?
+
+**AI-BOS (Artificial Intelligence Body Operating System)** is the first AI operating system designed with a **biological body architecture**.
+
+Unlike traditional AI agent frameworks (LangChain, CrewAI, AutoGen) that rely on function calls and pipeline thinking, AI-BOS treats an AI system as a **complete living organism** with 54+ organs working in unison:
+
+| System | Organs | Function |
+|--------|--------|----------|
+| 🧠 Central Nervous | brain, cortex, thalamus | Decision-making, routing, message relay |
+| 💾 Memory System | memory, hippocampus, civilization_memory | Working/semantic/civilization memory |
+| 🛡️ Immune System | firewall, breaker, guard, sandbox | Security, anomaly detection |
+| 🔬 Sensory System | nose, breath, compass | Environment perception, direction |
+| 💪 Muscular System | muscle, executor, tools | Tool execution, action |
+| 🔄 Circulatory System | blood, circulatory, scheduler | Message passing, scheduling |
+| 🧬 Evolution System | evolution, self_evolve, meta_cognition | Self-evolution, meta-cognition |
+| ⚖️ Governance System | gatekeeper, control_plane, audit | Access control, audit trail |
+| 🔧 Repair System | repair_orchestrator, self_heal | Self-healing, recovery orchestration |
+
+## Architecture
+
+```
+User Input
+    │
+    ▼
+┌──────────────┐
+│  Skin / Nose │  ← Interface Layer
+└──────┬───────┘
+       │
+┌──────▼───────┐
+│  Brain       │  ← Decision Layer
+│  Cortex      │
+└──────┬───────┘
+       │
+┌──────▼───────┐
+│  Immune      │  ← Security Layer
+│  Governance  │
+│  Isolation   │
+└──────┬───────┘
+       │
+┌──────▼───────┐
+│  Memory      │  ← Memory Layer
+│  Evolution   │
+└──────┬───────┘
+       │
+┌──────▼───────┐
+│  Muscle      │  ← Execution Layer
+│  Tools       │
+└──────────────┘
+```
+
+## Behavior Flow
+
+### Startup
+1. DNA load → Organ registry init
+2. Organ scan & register (54+ organs)
+3. Startup diagnosis (writes startup_diagnosis.json)
+4. Background tasks: heartbeat, monitoring, evolution cycle
+
+### Decision
+1. User input → Nose perception → Context enrichment
+2. Breath regulation → Model selection & call
+3. Security check (gatekeeper + immune system)
+4. Memory retrieval → Context assembly
+5. LLM reasoning → Tool selection & execution
+6. Self-reflection (self_reflect) → Reply output
+7. Self-evolution (self_evolve) → Memory write
+
+### Repair
+1. Monitor detects anomaly
+2. Immune system diagnoses issue type
+3. Repair orchestrator executes repair
+4. Event log writes audit trail
+
+## Quick Start
+
+```bash
+# 1. Install dependencies
+pip install -r requirements.txt
+
+# 2. Setup environment
+cp .env.example .env
+# Edit .env with your LLM API Keys
+
+# 3. Start the system
+python3 main.py
+
+# 4. Run tests
+PYTHONPATH=src python3 tests/test_lifecycle_baseline.py
+```
+
+## Requirements
+
+- Python 3.10+
+- LLM API Key (DeepSeek / Gemini / OpenAI / Ollama)
+- Linux / macOS (some features require POSIX)
+
+## How to Extend
+
+### Create a New Organ
+
+```python
+from ai_bos.core import Organ
+
+class MyOrgan(Organ):
+    def __init__(self):
+        super().__init__("my_organ")
+
+    def status(self) -> dict:
+        return {"name": self.name, "alive": self.is_alive()}
+```
+
+Register it in Obsidian:
+```python
+obsidian.organs_registry.add(MyOrgan())
+```
+
+### Add a Tool
+
+```python
+@tool(name="my_tool", description="My custom tool")
+def my_tool(param: str) -> str:
+    return f"Result: {param}"
+```
+
+## Directory Structure
+
+```
+ai-bos/
+├── core/              # Core abstractions (Organ interface, Lifecycle)
+├── organs/            # Organ system directory
+│   ├── brain/         # Central decision
+│   ├── memory/        # Memory management
+│   ├── tools/         # Tool system
+│   ├── skin/          # Interface layer
+│   ├── muscle/        # Action execution
+│   ├── blood/         # Message passing
+│   ├── breath/        # Breath regulation
+│   └── nose/          # Sensory system
+├── lifecycle/         # Lifecycle pipeline
+├── executor/          # Executor
+└── docs/              # Documentation
+```
+
+## License
+
+**AGPL v3 + Additional Terms**
+
+- ✅ Free use, modification, distribution (under AGPL)
+- ❌ Commercial use prohibited (separate license required)
+- ❌ "AI-BOS" and "AMPM" trademarks may not be used in commercial products
+- ✅ Open source projects and academic research are completely free
+
+See [LICENSE](./LICENSE), [COPYRIGHT](./COPYRIGHT), [TRADEMARK](./TRADEMARK) for details.
+
+## Contact
+
+- Issues: [GitHub Issues](https://github.com/chainuncel0712/AMPM-AIOPS/issues)
+- Commercial licensing: chainuncel0712@gmail.com
+
+---
+
+# 中文
 
 ## 什麼是 AI-BOS？
 
@@ -119,13 +289,11 @@ class MyOrgan(Organ):
 ```
 
 在 Obsidian 中註冊：
-
 ```python
 obsidian.organs_registry.add(MyOrgan())
 ```
 
 ### 擴展工具
-
 ```python
 @tool(name="my_tool", description="我的自訂工具")
 def my_tool(param: str) -> str:
@@ -171,4 +339,5 @@ ai-bos/
 
 <div align="center">
   <p><strong>AI-BOS：讓 AI 不只是工具，而是一個生命。</strong></p>
+  <p><em>Making AI not just a tool, but a life.</em></p>
 </div>

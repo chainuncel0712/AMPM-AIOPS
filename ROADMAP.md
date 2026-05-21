@@ -1,36 +1,34 @@
 # AI-BOS Roadmap
 
-## ✅ v0.1 (Current) — Life Body Foundation
-- [x] 54+ Organ architecture
-- [x] Brain (obsidian) with organ registry
-- [x] Immune system (firewall, breaker, guard, sandbox)
-- [x] Governance layer (gatekeeper, security zone, isolation)
-- [x] Event log + audit trail
-- [x] Meta-cognition (self-observer, reflection engine)
-- [x] Memory Manager (working/semantic/episodic)
-- [x] Civilization memory (episodic/failure/evolution)
-- [x] Evolution cycle (absorb-learn-select-remember-enhance-exclude)
-- [x] Repair orchestrator
-- [x] Self-reflect / self-repair / self-evolve
-- [x] LangGraphExecutor modular split
-- [x] Baseline test suite (29/29)
-- [x] Stability test suite (20/20)
-- [x] Isolation test suite (17/17)
+## ✅ v1.0.0 (Current) — Life Body Foundation
+- [x] 54+ Organ architecture with biological metaphors
+- [x] Brain (Obsidian) with LangGraphExecutor modular split
+- [x] Triple-layer memory: working → semantic → civilization (episodic/failure/evolution)
+- [x] Governance layer: gatekeeper → security zones → isolation → audit → stable mode
+- [x] Immune system: firewall, breaker, guard, sandbox, risk scorer
+- [x] Meta-cognition: self-observer, reflection engine, strategy suggester
+- [x] Evolution cycle: absorb → learn → select → remember → enhance → exclude
+- [x] Repair orchestrator: unified repair execution
+- [x] Self-reflect / self-repair / self-evolve behavioral modules
+- [x] Organ Registry v2: multi-organ, versioning, dependencies, health checks
+- [x] Audit layer: event_log, tool_usage, repair, evolution logs
+- [x] Civilization snapshot for backup & audit
+- [x] Baseline 29/29 · Stability 20/20 · Isolation 17/17
 
-## 🚧 v0.2 — Self-Evolution & Multi-Life
+## 🚧 v1.1 — Autonomous Growth
 - [ ] Autonomous tool creation (self_upgrade)
 - [ ] Cross-organ dependency auto-resolution
 - [ ] Evolution-driven code generation
+- [ ] Version manager with SemVer + rollback snapshots
+
+## 🧬 v1.2 — Multi-Life Orchestration
 - [ ] Multi-brain orchestration (swarm mode)
+- [ ] Inter-organ communication via EventBus
+- [ ] Organ replication and migration
 
-## 🧬 v0.3 — Consciousness & Memory
-- [ ] Long-term memory consolidation
-- [ ] Dream/replay mode (offline learning)
-- [ ] Emotional weighting system
-- [ ] Identity persistence across restarts
-
-## 🌐 v1.0 — Production Ready
-- [ ] Plugin system
+## 🌐 v2.0 — Production Platform
 - [ ] Web dashboard
-- [ ] API gateway
+- [ ] Plugin marketplace
+- [ ] REST API gateway
 - [ ] Multi-tenant support
+- [ ] Container-native deployment
