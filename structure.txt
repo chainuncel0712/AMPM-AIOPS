@@ -1,0 +1,161 @@
+.
+├── AMPM_AIOPS_黑曜_規劃狀況與公司架構.md
+├── BLUEPRINT.md
+├── BUSINESS_MODEL.md
+├── COMMERCE.md
+├── LICENSE
+├── OPS
+├── PRICING.md
+├── README.md
+├── README_EN.md
+├── STORY.md
+├── STORY_EN.md
+├── __pycache__
+│   └── main.cpython-311.pyc
+├── ai_brain_overview.txt
+├── ai_hot_paths.txt
+├── ai_structure.txt
+├── ampm-core-install.sh
+├── ampm-core-src
+│   └── core.py
+├── assets
+│   ├── cover-pro.svg
+│   ├── gumroad-pro.txt
+│   └── gumroad.html
+├── bin
+│   ├── manage_bots.sh
+│   └── sync_all.sh
+├── bot.py
+├── channel_bridge.py
+├── connect.py
+├── daemon.sh
+├── dashboard
+│   ├── app.py
+│   └── pricing.html
+├── data
+│   ├── evolution
+│   ├── inheritance
+│   ├── planner
+│   ├── rebirth_state.json
+│   ├── rules
+│   ├── self_awareness.json
+│   ├── startup_diagnosis.json
+│   ├── startup_diagnosis.json.example
+│   ├── state
+│   ├── tasks
+│   └── tools
+├── desktop_setup.bat
+├── desktop_setup.sh
+├── file_browser.py
+├── fix_tools.py
+├── growth_log.json
+├── heiyao.log
+├── heiyao_sync.bat
+├── heiyao_tunnel.bat
+├── install_desktop.bat
+├── link_map.json
+├── main.py
+├── memory
+├── outputs
+│   ├── AMPM_longterm_memory.md
+│   ├── ai_agent
+│   ├── brand_identity
+│   ├── character_ip
+│   ├── children_book
+│   ├── design
+│   ├── designs
+│   ├── ebooks
+│   ├── general_pool_2
+│   ├── outputs
+│   ├── research
+│   ├── self_fix_response.txt
+│   ├── specs
+│   ├── summaries
+│   ├── test_rules.txt
+│   ├── test_run_command
+│   ├── website
+│   └── 同步黑曜作品.bat
+├── packages
+│   └── setup_auth.sh
+├── plugins
+│   └── __init__.py
+├── requirements.txt
+├── run.sh
+├── scripts
+│   └── manage_license.py
+├── serve_outputs.py
+├── src
+│   ├── __init__.py
+│   ├── __pycache__
+│   ├── agents.py
+│   ├── bag
+│   ├── blood
+│   ├── brain
+│   ├── breath.py
+│   ├── bridge
+│   ├── circuit
+│   ├── civilization_controller.py
+│   ├── civilization_memory
+│   ├── commerce
+│   ├── compass
+│   ├── config.py
+│   ├── core
+│   ├── dashboard
+│   ├── data
+│   ├── decisions
+│   ├── dna_system
+│   ├── economy
+│   ├── evolution.py
+│   ├── executor.py
+│   ├── goals
+│   ├── handler.py
+│   ├── immune
+│   ├── lifecycle
+│   ├── llm.py
+│   ├── memory.py
+│   ├── memory_vector.py
+│   ├── meta
+│   ├── meta_cognition
+│   ├── models.py
+│   ├── monitor.py
+│   ├── muscle
+│   ├── nerve
+│   ├── nose.py
+│   ├── organs
+│   ├── pro
+│   ├── rollback.py
+│   ├── runtime
+│   ├── simulation
+│   ├── skeleton
+│   ├── skin
+│   ├── society
+│   ├── studio
+│   ├── tasks
+│   ├── temporal
+│   ├── tool_decorators
+│   ├── tools.py
+│   ├── trust
+│   ├── waste
+│   ├── web
+│   └── womb
+├── start_bot.sh
+├── start_heiyao.bat
+├── structure.txt
+├── subbot.py
+├── test_compound.py
+├── test_organs.py
+├── tools
+│   ├── auto_builder.py
+│   ├── keygen.py
+│   ├── license_generator.py
+│   └── meta_tooling.py
+├── venv
+│   ├── bin
+│   ├── include
+│   ├── lib
+│   ├── lib64 -> lib
+│   └── pyvenv.cfg
+└── versions
+    └── v1_stable
+
+79 directories, 80 files
