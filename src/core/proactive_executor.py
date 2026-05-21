@@ -512,6 +512,17 @@ class ProactiveExecutor:
                                        success_count, total,
                                        output_files=[], duration=0)
 
+                # Event Log
+                from governance.event_log import event_log
+                event_log.record(
+                    source="proactive_executor",
+                    action="mission_completed",
+                    input_data={"task_id": task_id, "title": task.get("title", "")},
+                    output_data={"success": success_count, "total": total},
+                    decision=f"completed {success_count}/{total}",
+                    rollback_point=True,
+                )
+
                 self._notify_user(
                     f"✅ 黑曜完成任務\n"
                     f"📋 {task.get('title', task_id)}\n"

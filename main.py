@@ -65,6 +65,14 @@ def print_header(text):
     print("─" * 50)
 
 def main():
+    # ── Gatekeeper：系統唯一入口檢查 ──
+    from governance.gatekeeper import gatekeeper, GatekeeperViolation
+    try:
+        gatekeeper.check_entry("main")
+    except GatekeeperViolation as e:
+        print(f"🔴 {e}")
+        sys.exit(1)
+
     print_banner()
 
     # ── 設定行程群組（避免孤兒殭屍） ──

@@ -431,8 +431,25 @@ class Obsidian:
                     tool_args = tool_call.get("args", {})
                     print(f"[AgentCompany] {agent_name} 🔧 呼叫工具: {tool_name} {str(tool_args)[:80]}")
 
+                    # Event Log
+                    from governance.event_log import event_log
+                    tool_action_id = event_log.record(
+                        source=f"agent:{agent_name}",
+                        action=f"tool:{tool_name}",
+                        input_data=tool_args,
+                        parent_id=event_log.last_rollback_point() or "",
+                    )
+
                     tool_output = execute_tool(tool_name, tool_args)
                     print(f"[AgentCompany] {agent_name} 工具結果: {tool_output[:150]}")
+
+                    # 更新 event log 輸出
+                    event_log.record(
+                        source=f"agent:{agent_name}",
+                        action=f"tool_result:{tool_name}",
+                        input_data={"action_id": tool_action_id},
+                        output_data=tool_output[:200],
+                    )
 
                     # 寫檔驗證：如果寫了檔案，讀回檢查內容品質
                     if tool_name == "write_file" and tool_output.startswith("✅"):
