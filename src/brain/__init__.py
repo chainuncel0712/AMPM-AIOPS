@@ -434,6 +434,16 @@ class Obsidian:
                     tool_output = execute_tool(tool_name, tool_args)
                     print(f"[AgentCompany] {agent_name} 工具結果: {tool_output[:150]}")
 
+                    # 寫檔驗證：如果寫了檔案，讀回檢查內容品質
+                    if tool_name == "write_file" and tool_output.startswith("✅"):
+                        fp = tool_args.get("filepath", "")
+                        content_raw = tool_args.get("content", "")
+                        if len(content_raw.strip()) < 200:
+                            print(f"[AgentCompany] {agent_name} ⚠️ 寫入內容過短 ({len(content_raw)} chars)，要求重寫")
+                            messages.append({"role": "assistant", "content": result})
+                            messages.append({"role": "user", "content": f"⚠️ 你寫入的內容只有 {len(content_raw)} 字，太短了。請重新撰寫完整內容（至少 500 字），再次用 write_file 寫入。不要問、不要解釋，直接寫。"})
+                            continue
+
                     # 將工具結果附加到對話中
                     messages.append({"role": "assistant", "content": result})
                     messages.append({"role": "user", "content": f"工具執行結果：\n{tool_output}\n\n請根據此結果繼續思考或給出最終答案。"})
