@@ -2,6 +2,7 @@ from pathlib import Path
 from .models import ProductCatalog, Product, ProductType, CartItem
 from .payment import StripeClient
 
+
 class CommerceOrgan:
     def __init__(self, data_dir: str = "data/commerce", stripe_key: str = ""):
         self.catalog = ProductCatalog(data_dir)
@@ -11,18 +12,62 @@ class CommerceOrgan:
     def is_alive(self):
         return True
 
-    def seed_sample_products(self):
-        samples = [
-            Product("organ-memory-pro", "記憶體 Pro 版", ProductType.ORGAN, 2999,
-                    "高效能記憶模組，支援向量檢索 + 長期記憶"),
-            Product("organ-economy", "經濟引擎", ProductType.ORGAN, 4999,
-                    "完整經濟系統：成本計算、ROI 預測、資源調度"),
-            Product("tool-seo-master", "SEO 優化工具組", ProductType.TOOL, 1499,
-                    "自動 SEO 分析、關鍵字建議、排名追蹤"),
-            Product("agent-sales", "銷售代理", ProductType.AGENT, 9999,
-                    "24/7 自動銷售代理，整合 CRM + 報價系統"),
-            Product("license-studio", "工作室授權 (年)", ProductType.LICENSE, 19999,
-                    "多租戶工作室平台授權，含 5 個工作空間"),
+    def tier_products(self) -> list:
+        """回傳版本授權商品清單（供 README / 儀表板使用）"""
+        return [
+            {
+                "id": "license-pro-monthly",
+                "name": "黑曜專業版 💎",
+                "type": "license",
+                "price": "$29/月",
+                "price_cents": 2900,
+                "description": "40 器官 + SEO/廣告 + AI 內容 + 200 工具",
+                "features": [
+                    "40 個核心器官", "自我診斷 / 修復", "Telegram Bot",
+                    "SEO / 廣告零件", "AI 內容生成",
+                    "工具系統 (200+ 個)", "優先技術支援",
+                ],
+            },
+            {
+                "id": "license-pro-yearly",
+                "name": "黑曜專業版 💎 (年)",
+                "type": "license",
+                "price": "$290/年 (省 17%)",
+                "price_cents": 29000,
+                "description": "專業版年繳優惠",
+                "features": [],
+            },
+            {
+                "id": "license-enterprise-monthly",
+                "name": "黑曜企業版 🏢",
+                "type": "license",
+                "price": "$99/月",
+                "price_cents": 9900,
+                "description": "50 器官 + 雲端託管 + 專屬支援 + SLA",
+                "features": [
+                    "50 個核心器官", "雲端託管服務", "專屬技術支援",
+                    "定製新零件", "SLA 保障",
+                    "工具系統 (250+ 個)", "文明級記憶",
+                ],
+            },
+            {
+                "id": "license-enterprise-yearly",
+                "name": "黑曜企業版 🏢 (年)",
+                "type": "license",
+                "price": "$990/年 (省 17%)",
+                "price_cents": 99000,
+                "description": "企業版年繳優惠",
+                "features": [],
+            },
         ]
-        for p in samples:
-            self.catalog.add_product(p)
+
+    def seed_sample_products(self):
+        for pdef in self.tier_products():
+            self.catalog.add_product(Product(
+                id=pdef["id"],
+                name=pdef["name"],
+                type=ProductType.LICENSE,
+                price_cents=pdef["price_cents"],
+                description=pdef["description"],
+                metadata={"features": pdef["features"], "type": "license"},
+            ))
