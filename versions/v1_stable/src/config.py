@@ -10,7 +10,7 @@ class Config:
         self.base_dir = Path.home() / ".ampm_brain"
         
         # 新的 Telegram Token
-        self.telegram_token = "8614933947:AAFGb3BDLNgDvrcGo7A_86jETV9QGjqWYlQ"
+        self.telegram_token = "NEW_TOKEN_HERE"
         self.your_chat_id = 5600355483
         
         # NVIDIA API
