@@ -414,3 +414,67 @@ class MemoryManager:
 
     def suggest_what_to_remember(self, call_ai_func) -> str:
         return ""
+
+    # ── Vector Memory Integration ──────────────────────────
+
+    def vector_remember(self, text: str, metadata: dict = None) -> bool:
+        """Store to vector memory (ChromaDB). Returns True if successful."""
+        try:
+            from memory_vector import VectorMemory
+            vm = VectorMemory()
+            vm.remember(text, metadata or {})
+            return True
+        except Exception as e:
+            return False
+
+    def vector_recall(self, query: str, n: int = 5) -> list:
+        """Search vector memory. Returns empty list if unavailable."""
+        try:
+            from memory_vector import VectorMemory
+            vm = VectorMemory()
+            return vm.recall(query, n) or []
+        except Exception:
+            return []
+
+    # ── Civilization Memory Integration ─────────────────────
+
+    def civilization_remember(self, event_type: str, summary: str,
+                               importance: float = 0.5, tags: list = None,
+                               context: str = "") -> bool:
+        """Store to civilization episodic memory. Returns True if successful."""
+        try:
+            from civilization_memory.episodic import EpisodicMemory
+            em = EpisodicMemory()
+            em.record(event_type, summary, importance, tags or [], context)
+            return True
+        except Exception as e:
+            return False
+
+    def civilization_recall(self, tags: list = None, limit: int = 10) -> list:
+        """Recall from civilization episodic memory by tags."""
+        try:
+            from civilization_memory.episodic import EpisodicMemory
+            em = EpisodicMemory()
+            return em.recall_by_tags(tags or [], limit) or []
+        except Exception:
+            return []
+
+    def civilization_record_failure(self, action: str, error: str,
+                                     severity: str = "medium", context: str = "") -> bool:
+        """Record a failure to civilization failure memory."""
+        try:
+            from civilization_memory.episodic import FailureMemory
+            fm = FailureMemory()
+            fm.record(action, error, severity, context)
+            return True
+        except Exception:
+            return False
+
+    def civilization_is_risky(self, action: str) -> dict:
+        """Check if an action is risky based on past failures."""
+        try:
+            from civilization_memory.episodic import FailureMemory
+            fm = FailureMemory()
+            return fm.is_risky(action) or {"risky": False}
+        except Exception:
+            return {"risky": False}
