@@ -25,11 +25,10 @@ from pro.license import LicenseManager
 lemon_bp = Blueprint("lemon", __name__, url_prefix="/api/commerce")
 
 # Variant ID → tier 對照表（請替換成你 Lemon Squeezy 的實際 variant ID）
+# 你的 Store ID: 5057273712712330
 VARIANT_TIERS = {
-    # "123456": "pro",        # 專業版 (月)
-    # "123457": "pro",        # 專業版 (年)
-    # "123458": "enterprise", # 企業版 (月)
-    # "123459": "enterprise", # 企業版 (年)
+    # "5057273712712330": "pro",        # 範例: 專業版
+    # "5057273712712331": "enterprise", # 範例: 企業版
 }
 
 # Lemon Squeezy webhook 白名單 IP（選擇性）
