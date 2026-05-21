@@ -49,14 +49,20 @@ def check_daemon_alive():
 
     if hb_file.exists():
         try:
-            hb = json.loads(hb_file.read_text())
+            raw = hb_file.read_text()
+            # Try JSON first, then key=value format
+            try:
+                hb = json.loads(raw)
+                healthy = hb.get("all_healthy", False)
+            except json.JSONDecodeError:
+                hb = dict(line.split("=", 1) for line in raw.strip().splitlines() if "=" in line)
+                healthy = hb.get("all_healthy", "").lower() == "true"
             age = time.time() - os.path.getmtime(hb_file)
-            healthy = hb.get("all_healthy", False)
             if age < 120 and healthy:
                 results.append((PASS, f"Heartbeat {age:.0f}s old, all_healthy={healthy}"))
             else:
                 results.append((WARN, f"Heartbeat {age:.0f}s old, all_healthy={healthy}"))
-        except (json.JSONDecodeError, Exception) as e:
+        except Exception as e:
             results.append((WARN, f"Heartbeat file 不可解析（可能剛重啟）: {e}"))
     else:
         results.append((WARN, "Heartbeat file 不存在"))
