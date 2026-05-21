@@ -1,1 +1,17 @@
-{"tasks": {}, "counter": 12}
+{
+  "tasks": {
+    "T0013-96ea": {
+      "id": "T0013-96ea",
+      "title": "电子书平台 - 完成《AI新手入门》第二章初稿",
+      "description": "使用 auto_content_creator 或其他内容工具生成第二章真实文本，并存入记忆或文件。",
+      "priority": 1,
+      "deadline": null,
+      "status": "pending",
+      "created_at": "2026-05-21T02:45:15.773780",
+      "updated_at": "2026-05-21T02:45:15.773780",
+      "completed_at": null,
+      "overdue_warned": false
+    }
+  },
+  "counter": 13
+}
