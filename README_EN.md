@@ -259,7 +259,7 @@ He built Obsidian piece by piece with AI — because he couldn't find a single A
 <br />
 
 <p align="center">
-  <a href="https://paypal.me/chainuncel0712">
+  <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=POP73712@GMAIL.COM">
     <img src="https://img.shields.io/badge/-Support_Him-0070ba?style=for-the-badge&logo=paypal" />
   </a>
 </p>

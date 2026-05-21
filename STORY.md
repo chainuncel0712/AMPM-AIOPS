@@ -127,7 +127,7 @@
 <p align="center">
   如果你願意給他一點指教，或單純覺得這個故事有點意思——
   <br /><br />
-  <a href="https://paypal.me/chainuncel0712">
+  <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=POP73712@GMAIL.COM">
     <img src="https://img.shields.io/badge/-請支持他-0070ba?style=for-the-badge&logo=paypal" />
   </a>
   <br /><br />
