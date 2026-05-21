@@ -1,4 +1,5 @@
 import os, time, threading, requests, json, base64
+from typing import Dict
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -37,6 +38,9 @@ class LLMClient:
         self.rate_limiter = TokenBucket(rate=30, per_seconds=60)  # 每分鐘 30 次
         self._last_user_msg = ""  # 供 router 分類用
         self._working_provider = None  # 上次成功的 provider，下次優先試
+        self._provider_health: Dict[str, bool] = {}  # provider name → healthy
+        self._health_lock = threading.Lock()
+        self._start_health_checks()
 
         # 🥇 OpenRouter 免費模型（優先，不燒錢）
         or_key = os.getenv("OPENROUTER_API_KEY")
@@ -49,14 +53,14 @@ class LLMClient:
         if ds_key:
             self.providers.append({"name":"DeepSeek","key":ds_key,"ep":"https://api.deepseek.com/v1/chat/completions","model":"deepseek-v4-pro"})
 
-        # 🥉 Ollama 本機（免費備援）
-        import socket
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        ollama_ok = sock.connect_ex(('127.0.0.1', 11434)) == 0
-        sock.close()
-        if ollama_ok:
-            ollama_model = os.getenv("OLLAMA_MODEL", "qwen2.5:7b")
-            self.providers.append({"name":"Ollama","key":"ollama","ep":"http://localhost:11434/v1/chat/completions","model":ollama_model})
+        # 🥉 Ollama 本機（免費備援 — 快速檢查，不卡 startup）
+        ollama_model = os.getenv("OLLAMA_MODEL", "qwen2.5:7b")
+        try:
+            r = requests.get("http://localhost:11434/api/tags", timeout=3)
+            if r.status_code == 200:
+                self.providers.append({"name":"Ollama","key":"ollama","ep":"http://localhost:11434/v1/chat/completions","model":ollama_model})
+        except Exception:
+            pass
 
         # 🤗 HuggingFace（已移除 — DNS 無法解析且模型不支援）
 
@@ -155,15 +159,63 @@ class LLMClient:
         return "auto (fallback: " + " → ".join(p["name"] for p in self.providers) + ")"
         self.preferred_model = None  # None = 自動 fallback，設值後優先使用指定模型
 
+    # ===== Provider 健康檢查 =====
+
+    def _start_health_checks(self):
+        """背景執行緒，每 60 秒檢查所有 provider 健康狀態"""
+        def _loop():
+            time.sleep(10)
+            while True:
+                try:
+                    self._check_all_health()
+                except Exception:
+                    pass
+                time.sleep(60)
+        t = threading.Thread(target=_loop, daemon=True, name="provider-health")
+        t.start()
+
+    def _check_all_health(self):
+        """ping 所有 provider endpoint，標記不健康的"""
+        for p in self.providers:
+            try:
+                if p["name"] == "Ollama":
+                    r = requests.get("http://localhost:11434/api/tags", timeout=3)
+                else:
+                    r = requests.get(
+                        p["ep"].replace("/chat/completions", "/models"),
+                        headers={"Authorization": f"Bearer {p['key']}"},
+                        timeout=5
+                    )
+                healthy = r.status_code < 500  # 401/403 = endpoint 活著
+            except Exception:
+                healthy = False
+                # Ollama 不健康時順便清理卡住的 runner 行程
+                if p["name"] == "Ollama":
+                    try:
+                        import subprocess
+                        subprocess.run(
+                            ["pkill", "-f", "ollama runner"],
+                            timeout=3, capture_output=True
+                        )
+                    except Exception:
+                        pass
+            with self._health_lock:
+                self._provider_health[p["name"]] = healthy
+
+    def _is_healthy(self, name: str) -> bool:
+        """檢查 provider 是否健康（預設健康，除非被標記）"""
+        with self._health_lock:
+            return self._provider_health.get(name, True)
+
     def call(self, messages, temperature=0.7):
-        # ===== Phase 8: runtime guard — 檢查是否經 ContextAssembler =====
-        from runtime.context.persona_builder import RUNTIME_IDENTITY
+        # ===== Phase 8: runtime guard — 確保 RUNTIME_IDENTITY 存在 =====
+        from runtime.context.persona_builder import RUNTIME_IDENTITY, RUNTIME_RULES
         has_identity = any(
             isinstance(m, dict) and m.get("role") == "system" and RUNTIME_IDENTITY[:20] in m.get("content", "")
             for m in (messages if isinstance(messages, list) else [])
         )
         if not has_identity and isinstance(messages, list) and len(messages) > 0:
-            print("⚠️ [Guard] LLM call bypasses ContextAssembler — 缺少 RUNTIME_IDENTITY")
+            messages.insert(0, {"role": "system", "content": f"{RUNTIME_IDENTITY}\n\n{RUNTIME_RULES}"})
 
         if self.breath and not self.breath.can_call_api():
             return "休息中..."
@@ -196,6 +248,8 @@ class LLMClient:
                 ordered_providers.insert(0, pref)
 
         for p in ordered_providers:
+            if not self._is_healthy(p["name"]):
+                continue
             try:
                 r = requests.post(
                     p["ep"],
