@@ -1,7 +1,12 @@
 {
-  "timestamp": "2026-05-21T03:33:26.459739",
-  "total_organs": 81,
+  "timestamp": "2026-05-21T08:19:18.183865",
+  "total_organs": 82,
   "organs": [
+    {
+      "name": "RepairOrchestrator",
+      "type": "RepairOrchestrator",
+      "alive": true
+    },
     {
       "name": "MemoryManager",
       "type": "MemoryManager",
@@ -408,7 +413,7 @@
       "alive": true
     }
   ],
-  "tools_count": 1188,
+  "tools_count": 1194,
   "tools": [
     "planner.add_task",
     "planner.complete_task",
@@ -565,6 +570,11 @@
     "smart_contract_auditor.sleep",
     "smart_contract_auditor.status",
     "smart_contract_auditor.wake",
+    "RepairOrchestrator.execute",
+    "MemoryManager.civilization_is_risky",
+    "MemoryManager.civilization_recall",
+    "MemoryManager.civilization_record_failure",
+    "MemoryManager.civilization_remember",
     "MemoryManager.clear_working",
     "MemoryManager.forget",
     "MemoryManager.get_all_facts",
@@ -582,6 +592,8 @@
     "MemoryManager.remember_fact",
     "MemoryManager.search_semantic",
     "MemoryManager.suggest_what_to_remember",
+    "MemoryManager.vector_recall",
+    "MemoryManager.vector_remember",
     "ToolSystem.execute_tool",
     "ToolSystem.get_tool",
     "ToolSystem.list_tools",
@@ -677,7 +689,6 @@
     "Monitor.alert_callback",
     "Monitor.call_ai_func",
     "Monitor.emergency_stop",
-    "Monitor.get_learning_summary",
     "Monitor.get_status",
     "Monitor.manual_repair",
     "Monitor.start",
