@@ -36,6 +36,7 @@ class LLMClient:
         self.providers = []
         self.rate_limiter = TokenBucket(rate=30, per_seconds=60)  # 每分鐘 30 次
         self._last_user_msg = ""  # 供 router 分類用
+        self._working_provider = None  # 上次成功的 provider，下次優先試
 
         # 🥇 OpenRouter 免費模型（優先，不燒錢）
         or_key = os.getenv("OPENROUTER_API_KEY")
@@ -179,8 +180,15 @@ class LLMClient:
         if not safe:
             safe = [{"role": "user", "content": str(messages)}]
 
-        # 若有用戶指定模型，優先嘗試
+        # 上次成功的 provider 優先嘗試（跳過 rate-limited 浪費）
         ordered_providers = list(self.providers)
+        if self._working_provider:
+            cached = next((p for p in ordered_providers if p["name"] == self._working_provider), None)
+            if cached:
+                ordered_providers.remove(cached)
+                ordered_providers.insert(0, cached)
+
+        # 若有用戶指定模型，優先於快取
         if self.preferred_model:
             pref = next((p for p in ordered_providers if p["name"] == self.preferred_model), None)
             if pref:
@@ -196,6 +204,7 @@ class LLMClient:
                     timeout=15
                 )
                 if r.status_code == 200:
+                    self._working_provider = p["name"]
                     try:
                         return r.json().get("choices", [{}])[0].get("message", {}).get("content", "")
                     except (KeyError, IndexError, TypeError, json.JSONDecodeError):
@@ -207,6 +216,9 @@ class LLMClient:
                 print(f"⚠️ {p['name']} {r.status_code}")
             except Exception as e:
                 print(f"⚠️ {p['name']}: {str(e)[:30]}")
+            # 如果目前 provider 是快取且失敗，清除快取，繼續試下一個
+            if self._working_provider and p["name"] == self._working_provider:
+                self._working_provider = None
         return "⚠️ 錯誤：所有模型不可用"
 
     def call_smart(self, user_msg: str, messages, temperature=0.7) -> str:
