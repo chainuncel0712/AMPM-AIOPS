@@ -204,8 +204,9 @@ class ProactiveExecutor:
         if not pending:
             return
 
-        # 按優先級排序（數字越小越優先）
-        pending.sort(key=lambda t: (t["priority"], t["created_at"]))
+        # 按優先級排序（high > medium > low）
+        prio_map = {"high": 0, "medium": 1, "low": 2}
+        pending.sort(key=lambda t: (prio_map.get(t["priority"], 99), t["created_at"]))
 
         task = pending[0]
         task["status"] = "in_progress"
