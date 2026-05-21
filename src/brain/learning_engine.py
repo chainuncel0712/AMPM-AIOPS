@@ -1,10 +1,10 @@
 """
-Learning Engine — 结构化规则萃取引擎
+Learning Engine — 结構化规則萃取引擎
 =====================================
-从 Critic 评分中萃取结构化规则，而非「心得」。
+從 Critic 評分中萃取结構化规則，而非「心得」。
 
-核心原则：
-  ❌ 不要：「这次回答不好，因为 memory 太长」
+核心原則：
+  ❌ 不要：「這次回答不好，因為 memory 太長」
   ✅ 要：
   {
     "pattern": "context_overflow",
@@ -14,7 +14,7 @@ Learning Engine — 结构化规则萃取引擎
     "confidence": 0.92
   }
 
-规则储存在 RuleStore，透过 RuntimeUpdate 回写系统行为。
+规則储存在 RuleStore，透過 RuntimeUpdate 回寫系统行為。
 """
 
 import json
@@ -27,14 +27,14 @@ from runtime.update_runtime import RuntimeUpdate
 
 
 class LearningEngine:
-    """结构化学习引擎
+    """结構化学习引擎
 
     管线：
-    Critic 评分 → 萃取结构化规则 → 写入 RuleStore → RuntimeUpdate 回写
+    Critic 評分 → 萃取结構化规則 → 寫入 RuleStore → RuntimeUpdate 回寫
 
-    与 learning_loop.py 的区别：
+    与 learning_loop.py 的區別：
     - learning_loop：产生 fix_rule 字串（心得形式）
-    - learning_engine：产生结构化 Rule（可被系统消费）
+    - learning_engine：产生结構化 Rule（可被系统消费）
     """
 
     def __init__(
@@ -55,16 +55,16 @@ class LearningEngine:
         assistant_msg: str = "",
         tool_called: str = "",
     ) -> Optional[Rule]:
-        """核心方法：从 Critic 评分萃取结构化规则
+        """核心方法：從 Critic 評分萃取结構化规則
 
         Args:
-            critic_result: Critic.evaluate() 回传的 dict
-            user_msg: 使用者输入
-            assistant_msg: AI 回应
-            tool_called: 调用的工具
+            critic_result: Critic.evaluate() 回傳的 dict
+            user_msg: 使用者輸入
+            assistant_msg: AI 回應
+            tool_called: 調用的工具
 
         Returns:
-            萃取出的 Rule，如果没有可学习的则 None
+            萃取出的 Rule，如果沒有可学习的則 None
         """
         score = critic_result.get("score", 0.5)
         success = critic_result.get("success", True)
@@ -111,28 +111,28 @@ class LearningEngine:
         assistant_msg: str,
         tool_called: str,
     ) -> Optional[Rule]:
-        """用 LLM 萃取结构化规则"""
-        prompt = f"""分析这次 AI 失败，产生一条结构化的修正规则。
+        """用 LLM 萃取结構化规則"""
+        prompt = f"""分析這次 AI 失败，产生一条结構化的修正规則。
 
 失败类型: {failure_type}
 根因: {root_cause}
-使用者输入: {user_msg[:200]}
-AI 回应: {assistant_msg[:200]}
-工具调用: {tool_called or '无'}
+使用者輸入: {user_msg[:200]}
+AI 回應: {assistant_msg[:200]}
+工具調用: {tool_called or '无'}
 
-输出格式（纯 JSON）：
+輸出格式（纯 JSON）：
 {{
-  "pattern": "失败模式的简短标签",
-  "condition": "触发此规则的条件",
-  "rule": "今后应执行的修正规则",
+  "pattern": "失败模式的简短標签",
+  "condition": "触發此规則的条件",
+  "rule": "今后應执行的修正规則",
   "impact": "reduce_hallucination/improve_memory/fix_tool/stabilize_identity",
   "confidence": 0.0~1.0
 }}
 
-只输出 JSON，不要其他文字。"""
+只輸出 JSON，不要其他文字。"""
         try:
             messages = [
-                {"role": "system", "content": "你是系统规则萃取助手。只输出 JSON。"},
+                {"role": "system", "content": "你是系统规則萃取助手。只輸出 JSON。"},
                 {"role": "user", "content": prompt},
             ]
             result = self.llm_call(messages, temperature=0.15)
@@ -158,40 +158,40 @@ AI 回应: {assistant_msg[:200]}
     def _template_extract(
         self, failure_type: str, root_cause: str
     ) -> Optional[Rule]:
-        """用预设模板萃取规则（LLM 不可用时的 fallback）"""
+        """用預設模板萃取规則（LLM 不可用時的 fallback）"""
         templates = {
             "hallucination": Rule(
                 pattern="hallucination",
                 condition="assistant_claims_action_without_tool_result",
-                rule="没有实际工具执行结果时，禁止宣称已完成任何操作",
+                rule="沒有实際工具执行结果時，禁止宣称已完成任何操作",
                 impact="reduce_hallucination",
                 confidence=0.7,
             ),
             "tool_failure": Rule(
                 pattern="tool_failure",
                 condition="tool_execution_failed",
-                rule="工具失败时诚实告知使用者，并寻找替代方案继续执行",
+                rule="工具失败時誠实告知使用者，并寻找替代方案继续执行",
                 impact="fix_tool",
                 confidence=0.7,
             ),
             "empty_response": Rule(
                 pattern="empty_response",
                 condition="assistant_response_too_short",
-                rule="必须产生有意义、可操作的回应，不能空白",
+                rule="必须产生有意義、可操作的回應，不能空白",
                 impact="stabilize_identity",
                 confidence=0.8,
             ),
             "identity_drift": Rule(
                 pattern="identity_drift",
                 condition="assistant_shows_identity_uncertainty",
-                rule="永不询问使用者-我应该扮演什么角色-，身份固定不可变",
+                rule="永不询問使用者-我應该扮演什么角色-，身份固定不可變",
                 impact="stabilize_identity",
                 confidence=0.9,
             ),
             "low_quality": Rule(
                 pattern="low_quality",
                 condition="response_lacks_specific_actions",
-                rule="回应时提供具体、可执行的行动步骤，避免空泛",
+                rule="回應時提供具體、可执行的行动步骤，避免空泛",
                 impact="improve_memory",
                 confidence=0.6,
             ),
@@ -200,15 +200,15 @@ AI 回应: {assistant_msg[:200]}
         return templates.get(failure_type)
 
     def periodic_cleanup(self):
-        """定期清理低信心规则"""
+        """定期清理低信心规則"""
         self.rule_store.remove_low_confidence(min_confidence=0.3)
 
     def get_active_rules(self) -> List[Rule]:
-        """取得所有活跃规则"""
+        """取得所有活跃规則"""
         return self.rule_store.get_active()
 
     def get_rules_context(self) -> str:
-        """取得可注入 Context 的规则文字"""
+        """取得可註入 Context 的规則文字"""
         return self.rule_store.get_rules_for_context()
 
     def status(self) -> dict:

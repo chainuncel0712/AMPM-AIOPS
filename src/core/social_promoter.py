@@ -217,7 +217,7 @@ class SocialPromoterOrgan(BrainComponent):
             "setup_guide": cfg["setup_guide"],
             "profile_tips": {
                 "大頭貼建議": "使用高解析度品牌 Logo（至少 400x400 px），避免過多文字",
-                "個人簡介優化": f"當前簡介字數 {len(bio)} 字，{'符合' if len(bio) <= cfg['char_limit'] else '超出'}平台限制 {cfg['char_limit']} 字",
+                "個人簡介優化": f"當前簡介字數 {len(bio)} 字，{'符合' if len(bio) <= cfg['char_limit'] else '超出'}平台限製 {cfg['char_limit']} 字",
                 "內容風格指引": cfg["content_style"],
                 "最佳發文時段_UTC": cfg["best_hours"],
                 "支援媒體類型": cfg["media_support"],
@@ -235,7 +235,7 @@ class SocialPromoterOrgan(BrainComponent):
     ) -> dict:
         """建立一個跨平台行銷活動，為每個指定平台產生最佳化的貼文模板。
 
-        針對各平台特性自動調整文案風格、字數限制與內容格式：
+        針對各平台特性自動調整文案風格、字數限製與內容格式：
         - Twitter：280 字以內，精簡有力
         - Instagram：視覺優先搭配豐富話題標籤
         - LinkedIn：專業商業語氣，條列重點

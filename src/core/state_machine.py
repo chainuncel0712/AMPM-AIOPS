@@ -27,7 +27,7 @@ class LifeCycleManager:
         self.is_running = False
         self.thread = None
         
-        # 狀態對應的處理函數（稍後由外部注入或預設）
+        # 狀態對應的處理函數（稍後由外部註入或預設）
         self.handlers: Dict[State, Callable] = {
             State.IDLE: self._handle_idle,
             State.OBSERVE: self._handle_observe,
@@ -67,7 +67,7 @@ class LifeCycleManager:
         print("🧬 [LifeCycle] 生命週期狀態機已停止")
 
     def trigger(self, input_data=None):
-        """外部觸發：當收到使用者訊息時，強制進入 OBSERVE 狀態"""
+        """外部觸發：當收到使用者訊息時，強製進入 OBSERVE 狀態"""
         print(f"⚡ [LifeCycle] 收到外部觸發: {input_data[:30]}...")
         self.context["input_data"] = input_data
         self._transition_to(State.OBSERVE)
@@ -143,7 +143,7 @@ class LifeCycleManager:
         self._transition_to(State.PLAN) if intent == "task" else self._transition_to(State.EXECUTE)
 
     def _handle_plan(self):
-        """PLAN: 制定計畫。拆解任務"""
+        """PLAN: 製定計畫。拆解任務"""
         # 需要更複雜的任務才拆解，簡單任務直接跳過
         self.context["plan"] = {"steps": 1, "type": "direct"}
         self._transition_to(State.SIMULATE)

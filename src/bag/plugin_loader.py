@@ -7,7 +7,7 @@ class PluginLoader(BaseOrgan):
         self._plugins = {}
 
     def load(self, name: str, executor, config: dict = None):
-        """装入一个外挂工具"""
+        """装入一個外挂工具"""
         self._plugins[name] = {
             "executor": executor,
             "config": config or {},

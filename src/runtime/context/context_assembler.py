@@ -1,14 +1,14 @@
 """
 Context Assembler — 统筹组裝器
 ===============================
-这是 Context Layer 的核心入口。
-每次 LLM 呼叫前，都必须通过此组裝器建立完整的 messages 清单。
+這是 Context Layer 的核心入口。
+每次 LLM 呼叫前，都必须通過此组裝器建立完整的 messages 清單。
 
 正确流程：
   User Message
-  → Conversation Window (记录本轮)
+  → Conversation Window (记录本輪)
   → Memory Selector (Retrieve → Score → Filter → Compress)
-  → Persona Injection (固定身份注入)
+  → Persona Injection (固定身份註入)
   → Prompt Assembly (组裝 messages)
   → LLM
 
@@ -77,30 +77,30 @@ class ContextAssembler:
         include_goals: bool = True,
         extra_system: Optional[str] = None,
     ) -> List[Dict[str, str]]:
-        """组裝完整 messages 清单（核心方法）
+        """组裝完整 messages 清單（核心方法）
 
         每次叫用都：
-        1. 注入固定身份 + 人格
+        1. 註入固定身份 + 人格
         2. 呼叫 Memory Selector：Retrieve → Score → Filter → Compress
-        3. 撷取对话历史
-        4. 撷取目标方向
-        5. 组裝为 messages
+        3. 撷取對話曆史
+        4. 撷取目標方向
+        5. 组裝為 messages
 
         Args:
-            user_msg: 使用者当前输入
+            user_msg: 使用者當前輸入
             include_memory: 是否检索记忆
-            include_goals: 是否包含目标
-            extra_system: 额外系统提示（如工具清单）
+            include_goals: 是否包含目標
+            extra_system: 额外系统提示（如工具清單）
 
         Returns:
-            完整 messages 清单，直接传给 LLMClient.call()
+            完整 messages 清單，直接傳给 LLMClient.call()
         """
-        # 1. 固定身份 + 人格（永远不变）
+        # 1. 固定身份 + 人格（永遠不變）
         identity = self.persona_builder.build_identity_messages()
         persona = self.persona_builder.build_persona_message()
 
         # 2. 记忆 → Memory Selector（Retrieve → Score → Filter → Compress）
-        # 先同步 RuntimeUpdate 演化后的权重
+        # 先同步 RuntimeUpdate 演化后的權重
         if self.runtime_update:
             self.memory_selector.sync_weights(
                 self.runtime_update.get_memory_weights()
@@ -109,12 +109,12 @@ class ContextAssembler:
         if include_memory:
             memory_context = self.memory_selector.select(query=user_msg)
 
-        # 3. 对话历史摘要
+        # 3. 對話曆史摘要
         history_summary = self.conversation_window.get_summary()
         if history_summary and memory_context:
             memory_context = f"{history_summary}\n\n{memory_context}"
 
-        # 4. Compass 方向/目标
+        # 4. Compass 方向/目標
         compass_context = ""
         if include_goals and self.compass:
             try:
@@ -122,11 +122,11 @@ class ContextAssembler:
             except Exception:
                 pass
 
-        # 5. RuntimeUpdate 學習規則 (自動注入，不用手動傳 extra_system)
+        # 5. RuntimeUpdate 學習規則 (自動註入，不用手動傳 extra_system)
         if not extra_system and self.runtime_update:
             extra_system = self.runtime_update.get_extra_system_prompt() or None
 
-        # 5. 对话历史 messages
+        # 5. 對話曆史 messages
         history_messages = self.conversation_window.build_messages(n=200)
 
         # 6. 组裝
@@ -150,21 +150,21 @@ class ContextAssembler:
         return messages
 
     def record_response(self, assistant_msg: str, user_msg: str = ""):
-        """记录本轮对话到 ConversationWindow"""
+        """记录本輪對話到 ConversationWindow"""
         self.conversation_window.add_turn(
             user_msg=user_msg,
             assistant_msg=assistant_msg,
         )
 
     def write_memory(self, user_msg: str, assistant_msg: str):
-        """将对话分类写入记忆（读写统一入口）
+        """将對話分类寫入记忆（读寫统一入口）
 
-        MemoryWriter 负责分析对话内容，自动分类写入：
+        MemoryWriter 负责分析對話内容，自动分类寫入：
         - identity_memory (身份/偏好)
-        - semantic_memory (知识事实)
+        - semantic_memory (知識事实)
         - episodic_memory (事件)
-        - working_memory (短期缓冲)
-        - vector_memory (语义搜索)
+        - working_memory (短期缓衝)
+        - vector_memory (語義搜索)
         """
         self.memory_writer.write(
             user_msg=user_msg,
@@ -224,7 +224,7 @@ class ContextAssembler:
         return messages
 
     def clear_conversation(self):
-        """清空对话视窗（开始新话题）"""
+        """清空對話视窗（开始新話题）"""
         self.conversation_window.clear()
 
     def get_status(self) -> dict:

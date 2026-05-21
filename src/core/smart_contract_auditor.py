@@ -28,14 +28,14 @@ class SmartContractAuditorOrgan(BrainComponent):
         "owner_takeover": {
             "name": "所有權奪取 (Owner Takeover)",
             "severity": "critical",
-            "description": "合約所有權轉移機制存在漏洞，攻擊者可竊取合約控制權",
+            "description": "合約所有權轉移機製存在漏洞，攻擊者可竊取合約控製權",
             "pattern_hint": "onlyOwner 修飾器邏輯缺陷或 transferOwnership 無時間鎖",
             "base_risk": 25,
         },
         "unlimited_mint": {
             "name": "無限鑄造 (Unlimited Mint)",
             "severity": "critical",
-            "description": "鑄造函數未做權限控制或數量限制，可無限增發代幣",
+            "description": "鑄造函數未做權限控製或數量限製，可無限增發代幣",
             "pattern_hint": "mint() 函數缺少 onlyOwner 或總量上限檢查",
             "base_risk": 28,
         },
@@ -70,7 +70,7 @@ class SmartContractAuditorOrgan(BrainComponent):
         "timelock_bypass": {
             "name": "時間鎖繞過 (Timelock Bypass)",
             "severity": "critical",
-            "description": "管理員可在時間鎖冷卻期內執行交易或完全繞過延遲機制",
+            "description": "管理員可在時間鎖冷卻期內執行交易或完全繞過延遲機製",
             "pattern_hint": "TimelockController 的 minDelay 設置為 0 或可被修改",
             "base_risk": 22,
         },
@@ -239,11 +239,11 @@ class SmartContractAuditorOrgan(BrainComponent):
 
         # 六大維度評分 (0-100, 越高越危險)
         dimensions = {
-            "權限控制 (Access Control)": self._derive_seed(address, "access") * 40,
+            "權限控製 (Access Control)": self._derive_seed(address, "access") * 40,
             "資金安全 (Asset Safety)": self._derive_seed(address, "asset") * 50,
             "邏輯正確性 (Logic Correctness)": self._derive_seed(address, "logic") * 35,
             "依賴風險 (Dependency Risk)": self._derive_seed(address, "dependency") * 30,
-            "升級機制 (Upgradeability)": self._derive_seed(address, "upgrade") * 25,
+            "升級機製 (Upgradeability)": self._derive_seed(address, "upgrade") * 25,
             "外部互動 (External Interaction)": self._derive_seed(address, "external") * 45,
         }
 

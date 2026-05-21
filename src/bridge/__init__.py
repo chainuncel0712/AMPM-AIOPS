@@ -2,7 +2,7 @@
 Bridge Layer — 公私倉之間唯一合法通道
 ======================================
 職責：
-  1. 權限控制 — public 不能直接呼叫 private
+  1. 權限控製 — public 不能直接呼叫 private
   2. API 轉換 — 標準化請求格式
   3. 安全檢查 — data sanitization, prompt filtering
   4. Feature gating — community / pro / enterprise 分流

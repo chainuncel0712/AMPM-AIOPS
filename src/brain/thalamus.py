@@ -1,4 +1,4 @@
-"""丘腦 — 訊息路由器 + 模型調度 + 閾值控制
+"""丘腦 — 訊息路由器 + 模型調度 + 閾值控製
 取代盲目 fallback，一條訊息只打一個模型。
 """
 import threading
@@ -85,7 +85,7 @@ class Thalamus(BaseOrgan):
         return {"category": category, "provider": provider}
 
     def should_skip_review(self, category: str, confidence: float = 1.0) -> bool:
-        """閾值控制：簡單對話不需要自我審查"""
+        """閾值控製：簡單對話不需要自我審查"""
         if category in ("chat", "system"):
             return True
         return confidence > 0.9

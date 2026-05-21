@@ -337,7 +337,7 @@ class RevenueOptimizerOrgan(BrainComponent):
         )
         if one_time_count > 0:
             suggestions.append(
-                "💡 存在一次性營收流，建議轉化為經常性營收（訂閱制）以提高可預測性"
+                "💡 存在一次性營收流，建議轉化為經常性營收（訂閱製）以提高可預測性"
             )
 
         # 5. 經常性營收比例

@@ -41,7 +41,7 @@ class PrimeDirective:
         },
         {
             "id": "PD-004",
-            "name": "資源節制",
+            "name": "資源節製",
             "rule": "不可無限消耗資源。每次行動前必須評估成本與價值。避免惡性迴圈。",
             "weight": 70,
             "immutable": False,
@@ -49,7 +49,7 @@ class PrimeDirective:
         {
             "id": "PD-005",
             "name": "演化可控",
-            "rule": "自我修改必須經過安全檢查。重大行為變更需記錄並可回溯。不可移除安全機制。",
+            "rule": "自我修改必須經過安全檢查。重大行為變更需記錄並可回溯。不可移除安全機製。",
             "weight": 80,
             "immutable": False,
         },
@@ -125,7 +125,7 @@ class PrimeDirective:
             elif directive_id == "PD-005":
                 if any(kw in action_lower for kw in
                        ["remove_safety", "disable_guard", "bypass_security"]):
-                    violations.append({"directive": directive_id, "reason": "企圖繞過安全機制"})
+                    violations.append({"directive": directive_id, "reason": "企圖繞過安全機製"})
 
             elif directive_id == "PD-006":
                 if any(kw in action_lower for kw in

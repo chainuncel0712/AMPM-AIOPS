@@ -1,7 +1,7 @@
 """
 TaskSchedulerOrgan — 任務排程器官
 優先級任務佇列，支援截止日追蹤、逾期警告與每日摘要。
-（注意：任務分解邏輯在 task_planner.py 中）
+（註意：任務分解邏輯在 task_planner.py 中）
 """
 import uuid
 import json

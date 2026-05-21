@@ -1,4 +1,4 @@
-"""衣柜 - 多套风格，随时切换"""
+"""衣柜 - 多套風格，隨時切换"""
 from skeleton.base_organ import BaseOrgan
 
 class Wardrobe(BaseOrgan):
@@ -6,19 +6,19 @@ class Wardrobe(BaseOrgan):
         super().__init__("wardrobe")
         self._outfits = {
             "default": {
-                "name": "黑曜·标准模式",
+                "name": "黑曜·標準模式",
                 "style": "专业、直接、有行动力",
-                "tone": "繁体中文，简洁有力",
+                "tone": "繁體中文，简潔有力",
             },
             "creative": {
-                "name": "黑曜·创意模式",
+                "name": "黑曜·創意模式",
                 "style": "开放、联想力强、大胆",
-                "tone": "繁体中文，富有画面感",
+                "tone": "繁體中文，富有画面感",
             },
             "analyst": {
                 "name": "黑曜·分析模式",
                 "style": "严谨、数据导向、逻辑清晰",
-                "tone": "繁体中文，条列分明",
+                "tone": "繁體中文，条列分明",
             },
         }
         self._current = "default"

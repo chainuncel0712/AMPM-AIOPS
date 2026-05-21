@@ -1,4 +1,4 @@
-"""断路器 - 防止重複輸入死循環 + 熔斷機制"""
+"""断路器 - 防止重複輸入死循環 + 熔斷機製"""
 import sys
 import time
 from collections import defaultdict

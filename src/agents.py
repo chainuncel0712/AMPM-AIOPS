@@ -66,7 +66,7 @@ AGENT_TEMPLATES = {
     },
     "marketer": {
         "tools": ["write_file", "web_search", "read_file"],
-        "prompt": "你是行銷代理。研究市場、制定定價策略、撰寫行銷文案。用 write_file 寫入 outputs/research/。產出要能直接用的行銷方案。",
+        "prompt": "你是行銷代理。研究市場、製定定價策略、撰寫行銷文案。用 write_file 寫入 outputs/research/。產出要能直接用的行銷方案。",
         "capabilities": ["marketing", "pricing", "research", "file_output"],
     },
     "business_strategist": {
@@ -869,13 +869,13 @@ class AgentTaskRouter(BaseOrgan):
                 if agent["status"] != "busy" or not agent.get("current_task"):
                     continue
 
-                # 逾時檢查：子代理執行超過 5 分鐘強制復原
+                # 逾時檢查：子代理執行超過 5 分鐘強製復原
                 started = agent.get("task_started_at", 0)
                 if started > 0 and now - started > 300:
                     agent_name = agent.get('name', aid)
-                    print(f"[AgentCompany] ⏰ {agent_name} 逾時（5分鐘），強制復原為 idle")
+                    print(f"[AgentCompany] ⏰ {agent_name} 逾時（5分鐘），強製復原為 idle")
                     task_id = agent["current_task"]
-                    self.complete_task(task_id, False, f"[{agent_name}] 逾時強制終止")
+                    self.complete_task(task_id, False, f"[{agent_name}] 逾時強製終止")
                     executed += 1
                     continue
 
@@ -924,7 +924,7 @@ class AgentTaskRouter(BaseOrgan):
         return executed
 
     def force_reset_stale_agents(self):
-        """強制將逾時（>5分鐘 busy）的子代理恢復為 idle"""
+        """強製將逾時（>5分鐘 busy）的子代理恢復為 idle"""
         now = time.time()
         reset_count = 0
         with self._execution_lock:
@@ -934,14 +934,14 @@ class AgentTaskRouter(BaseOrgan):
                 started = agent.get("task_started_at", 0)
                 if started > 0 and now - started > 300:
                     agent_name = agent.get('name', aid)
-                    print(f"[AgentCompany] 🔄 強制重置僵屍代理: {agent_name}")
+                    print(f"[AgentCompany] 🔄 強製重置僵屍代理: {agent_name}")
                     task_id = agent.get("current_task")
                     if task_id:
                         task = next((t for t in self._task_queue if t["id"] == task_id), None)
                         if task:
                             task["status"] = "failed"
                             task["completed_at"] = now
-                            task["result"] = f"[{agent_name}] 逾時強制終止"
+                            task["result"] = f"[{agent_name}] 逾時強製終止"
                             self._task_results[task_id] = task
                             # 同時更新 mission results
                             mission_id = task.get("data", {}).get("mission_id")
@@ -950,7 +950,7 @@ class AgentTaskRouter(BaseOrgan):
                                 sub_id = task.get("data", {}).get("sub_task_id", task_id)
                                 m["results"][sub_id] = {
                                     "success": False,
-                                    "result": f"[{agent_name}] 逾時強制終止",
+                                    "result": f"[{agent_name}] 逾時強製終止",
                                     "agent": aid,
                                 }
                                 self._check_mission_complete(mission_id)

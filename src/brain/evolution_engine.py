@@ -1,15 +1,15 @@
 """
-Evolution Engine — 进化引擎
+Evolution Engine — 進化引擎
 ============================
-负责：从失败模式中检测规律，演化系统行为。
+负责：從失败模式中检測规律，演化系统行為。
 
-不是记录，而是修改行为。
+不是记录，而是修改行為。
 3 条修改路径：
-1. planner strategy — 改任务规划策略
-2. memory weighting — 改记忆评分权重
-3. tool priority — 改工具调用优先级
+1. planner strategy — 改任務规劃策略
+2. memory weighting — 改记忆評分權重
+3. tool priority — 改工具調用優先级
 
-与 Learning Loop 的关系：
+与 Learning Loop 的關系：
   Learning Loop → fix_rules → Evolution Engine → behavior mutation
 """
 
@@ -18,9 +18,9 @@ from typing import Any, Dict, List, Optional
 
 
 class EvolutionEngine:
-    """进化引擎 — 从学习结果中演化行为
+    """進化引擎 — 從学习结果中演化行為
 
-    检测重复失败模式，调整系统参数。
+    检測重復失败模式，調整系统参数。
     不只记录，真的改。
     """
 
@@ -36,13 +36,13 @@ class EvolutionEngine:
         self.planner_strategies: List[str] = []
 
     def detect_patterns(self, learning_records: List[Dict]) -> List[Dict]:
-        """从学习记录中检测重复失败模式
+        """從学习记录中检測重復失败模式
 
         Args:
             learning_records: LearningLoop.records
 
         Returns:
-            检测到的重复模式列表
+            检測到的重復模式列表
         """
         pattern_counts: Dict[str, int] = {}
         pattern_contexts: Dict[str, List] = {}
@@ -57,7 +57,7 @@ class EvolutionEngine:
 
         detected = []
         for key, count in pattern_counts.items():
-            if count >= 3:  # 重复出现 3 次以上才视为模式
+            if count >= 3:  # 重復出现 3 次以上才视為模式
                 self.patterns[key] = {
                     "count": count,
                     "first_seen": pattern_contexts[key][0].get("timestamp", ""),
@@ -72,11 +72,11 @@ class EvolutionEngine:
         return detected
 
     def mutate_memory_weights(self, failure_patterns: List[Dict]) -> Dict[str, float]:
-        """演化记忆权重
+        """演化记忆權重
 
-        如果 hallucination 频繁发生 → 降低 recency 权重（别太信最近记忆）
-        如果回应太泛 → 提高 relevance 权重
-        如果忘记重要事实 → 提高 importance 权重
+        如果 hallucination 頻繁發生 → 降低 recency 權重（別太信最近记忆）
+        如果回應太泛 → 提高 relevance 權重
+        如果忘记重要事实 → 提高 importance 權重
         """
         old_weights = dict(self.memory_weights)
 
@@ -101,10 +101,10 @@ class EvolutionEngine:
         return self.memory_weights
 
     def mutate_tool_priorities(self, failure_patterns: List[Dict]) -> Dict[str, float]:
-        """演化工具优先级
+        """演化工具優先级
 
-        如果某工具频繁失败 → 降低优先级
-        如果某工具结果很好 → 提高优先级
+        如果某工具頻繁失败 → 降低優先级
+        如果某工具结果很好 → 提高優先级
         """
         for p in failure_patterns:
             key = p.get("pattern", "")
@@ -118,18 +118,18 @@ class EvolutionEngine:
         return self.tool_priorities
 
     def mutate_planner_strategies(self, failure_patterns: List[Dict]) -> List[str]:
-        """演化规划策略
+        """演化规劃策略
 
-        根据失败模式调整规划优先顺序
+        根据失败模式調整规劃優先順序
         """
         for p in failure_patterns:
             key = p.get("pattern", "")
             if "hallucination" in key:
-                strategy = "执行前验证工具可用性"
+                strategy = "执行前验證工具可用性"
                 if strategy not in self.planner_strategies:
                     self.planner_strategies.append(strategy)
             elif "tool_failure" in key:
-                strategy = "优先选择稳定工具"
+                strategy = "優先選择稳定工具"
                 if strategy not in self.planner_strategies:
                     self.planner_strategies.append(strategy)
 
@@ -139,10 +139,10 @@ class EvolutionEngine:
     def evolve(self, learning_records: List[Dict]) -> Dict[str, Any]:
         """完整演化周期
 
-        1. 检测模式
-        2. 演化记忆权重
-        3. 演化工具优先级
-        4. 演化规划策略
+        1. 检測模式
+        2. 演化记忆權重
+        3. 演化工具優先级
+        4. 演化规劃策略
 
         Returns:
             本次演化的所有修改
@@ -150,7 +150,7 @@ class EvolutionEngine:
         patterns = self.detect_patterns(learning_records)
 
         if not patterns:
-            return {"mutated": False, "reason": "未检测到重复失败模式"}
+            return {"mutated": False, "reason": "未检測到重復失败模式"}
 
         result: Dict[str, Any] = {
             "mutated": True,
@@ -174,7 +174,7 @@ class EvolutionEngine:
             self.mutations = self.mutations[-500:]
 
     def get_current_config(self) -> Dict:
-        """取得当前所有演化后的配置"""
+        """取得當前所有演化后的配置"""
         return {
             "memory_weights": self.memory_weights,
             "tool_priorities": self.tool_priorities,

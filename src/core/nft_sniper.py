@@ -205,7 +205,7 @@ class NFTSniperOrgan(BrainComponent):
         lines = [f"📋 活躍搶鑄監控 ({len(active)} 個):"]
         for addr, col in active.items():
             chain_name = SUPPORTED_CHAINS.get(col["chain"], {}).get("name", col["chain"])
-            budget = f"{col['max_price_eth']:.3f} ETH" if col["max_price_eth"] > 0 else "無限制"
+            budget = f"{col['max_price_eth']:.3f} ETH" if col["max_price_eth"] > 0 else "無限製"
             lines.append(
                 f"  ▸ {col['contract'][:8]}...{addr[-6:]}\n"
                 f"    鏈: {chain_name} | 鑄造價: {col['estimated_mint_price_eth']:.4f} ETH\n"

@@ -11,7 +11,7 @@ class MemoryCleaner(BaseOrgan):
         self.memory.clear_working()
 
     def forget_old(self, days: int = 30):
-        """遗忘超过指定天数不重要的記憶"""
+        """遗忘超過指定天数不重要的記憶"""
         self.memory.forget(min_importance=0.2)
 
     def status(self) -> dict:

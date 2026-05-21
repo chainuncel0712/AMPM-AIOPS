@@ -194,7 +194,7 @@ class Observer:
 # ===== Execution Context =====
 
 class ExecutionContext:
-    """單一執行權威 — 整個系統唯一控制鏈"""
+    """單一執行權威 — 整個系統唯一控製鏈"""
 
     PHASES = ["security", "intent", "route", "execute", "respond", "remember"]
 

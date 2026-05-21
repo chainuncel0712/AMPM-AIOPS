@@ -25,7 +25,7 @@ class Memory:
         # 最後整理時間
         self.last_organize = datetime.now()
         
-        # ===== 新增：被動觸發機制狀態 =====
+        # ===== 新增：被動觸發機製狀態 =====
         self.trigger_count = 0  # 觸發次數
         self.last_trigger_time = None  # 上一次觸發時間
         self.trigger_history = []  # 觸發歷史記錄
@@ -59,7 +59,7 @@ class Memory:
             self._save(self.working_file, self.working)
         self._check_if_need_organize()
         
-        # ===== 新增：根據重要性觸發被動機制 =====
+        # ===== 新增：根據重要性觸發被動機製 =====
         if importance > 0.8:
             self._trigger_passive("high_importance_memory", {
                 "importance": importance,
@@ -93,7 +93,7 @@ class Memory:
         self.semantic = self.semantic[:500]  # 最多 500 條
         self._save(self.semantic_file, self.semantic)
         
-        # ===== 新增：根據重要性觸發被動機制 =====
+        # ===== 新增：根據重要性觸發被動機製 =====
         if importance > 0.8:
             self._trigger_passive("high_importance_fact", {
                 "importance": importance,
@@ -121,7 +121,7 @@ class Memory:
                 self.episodic = self.episodic[-500:]
             self._save(self.episodic_file, self.episodic)
             
-            # ===== 新增：壓縮時觸發被動機制 =====
+            # ===== 新增：壓縮時觸發被動機製 =====
             self._trigger_passive("memory_compressed", {
                 "compressed_count": len(to_compress),
                 "remaining_working": len(self.working)
@@ -160,7 +160,7 @@ class Memory:
         
         print(f"🧠 記憶整理完成：{before} -> {len(self.semantic)} 條事實")
         
-        # ===== 新增：整理時觸發被動機制 =====
+        # ===== 新增：整理時觸發被動機製 =====
         self._trigger_passive("memory_organized", {
             "before": before,
             "after": len(self.semantic),
@@ -224,7 +224,7 @@ class Memory:
         
         self._save(self.semantic_file, self.semantic)
         
-        # ===== 新增：遺忘時觸發被動機制 =====
+        # ===== 新增：遺忘時觸發被動機製 =====
         self._trigger_passive("memory_forgotten", {
             "keyword": keyword,
             "before": before,
@@ -236,7 +236,7 @@ class Memory:
         self.working = []
         self._save(self.working_file, self.working)
         
-        # ===== 新增：清空時觸發被動機制 =====
+        # ===== 新增：清空時觸發被動機製 =====
         self._trigger_passive("working_memory_cleared", {})
     
     def get_stats(self) -> Dict:
@@ -249,10 +249,10 @@ class Memory:
             "trigger_stats": self.get_trigger_stats()
         }
     
-    # ===== 新增：觸發被動機制 =====
+    # ===== 新增：觸發被動機製 =====
     def _trigger_passive(self, trigger_type, data):
         """
-        觸發一個被動機制
+        觸發一個被動機製
         
         參數：
             trigger_type: 觸發類型
@@ -277,7 +277,7 @@ class Memory:
             print(f"🧠 被動觸發（第 {self.trigger_count} 次）：{trigger_type}")
             
         except Exception as e:
-            print(f"⚠️ 觸發被動機制時發生錯誤：{e}")
+            print(f"⚠️ 觸發被動機製時發生錯誤：{e}")
     
     # ===== 新增：取得觸發統計 =====
     def get_trigger_stats(self) -> Dict:

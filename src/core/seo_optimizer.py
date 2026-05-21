@@ -116,7 +116,7 @@ class SEOOptimizerOrgan(BrainComponent):
         # 路徑深度
         path_segments = [s for s in parsed.path.split("/") if s]
         if len(path_segments) > 3:
-            issues.append("URL 路徑過深，建議控制在 3 層以內")
+            issues.append("URL 路徑過深，建議控製在 3 層以內")
             score -= 10
 
         # HTTPS

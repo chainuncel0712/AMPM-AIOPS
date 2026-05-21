@@ -1,7 +1,7 @@
 """
 Stable Mode — 生產鎖定模式
 =============================
-啟用後強制：
+啟用後強製：
   - 禁止 self-modify（code / prompt / config）
   - 禁止 dynamic routing change
   - 禁止 plugin auto-load

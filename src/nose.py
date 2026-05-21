@@ -1,5 +1,5 @@
 """
-嗅覺系統 - 偵測機會和異常 + 被動觸發機制
+嗅覺系統 - 偵測機會和異常 + 被動觸發機製
 讓黑曜主動「聞」哪裡有賺錢機會、哪裡有異常趨勢
 """
 
@@ -34,7 +34,7 @@ class NoseSystem:
         # 嗅覺靈敏度（0-1）
         self.sensitivity = 0.7
         
-        # ===== 新增：被動觸發機制狀態 =====
+        # ===== 新增：被動觸發機製狀態 =====
         self.trigger_count = 0  # 觸發次數
         self.last_trigger_time = None  # 上一次觸發時間
         self.trigger_history = []  # 觸發歷史記錄
@@ -70,21 +70,21 @@ class NoseSystem:
                 opportunities = self._sniff_opportunities()
                 if opportunities:
                     self._report_findings("機會", opportunities)
-                    # ===== 新增：檢測到機會時觸發被動機制 =====
+                    # ===== 新增：檢測到機會時觸發被動機製 =====
                     self._trigger_passive("opportunity", opportunities)
                 
                 # 2. 嗅異常趨勢
                 anomalies = self._sniff_anomalies()
                 if anomalies:
                     self._report_findings("異常", anomalies)
-                    # ===== 新增：檢測到異常時觸發被動機制 =====
+                    # ===== 新增：檢測到異常時觸發被動機製 =====
                     self._trigger_passive("anomaly", anomalies)
                 
                 # 3. 嗅記憶中的模式
                 patterns = self._sniff_patterns()
                 if patterns:
                     self._report_findings("模式", patterns)
-                    # ===== 新增：檢測到模式時觸發被動機制 =====
+                    # ===== 新增：檢測到模式時觸發被動機製 =====
                     self._trigger_passive("pattern", patterns)
                 
             except Exception as e:
@@ -191,10 +191,10 @@ class NoseSystem:
             # 這裡可以觸發主動通知
             pass
     
-    # ===== 新增：觸發被動機制 =====
+    # ===== 新增：觸發被動機製 =====
     def _trigger_passive(self, trigger_type, data):
         """
-        觸發一個被動機制
+        觸發一個被動機製
         
         參數：
             trigger_type: 觸發類型（opportunity, anomaly, pattern）
@@ -226,7 +226,7 @@ class NoseSystem:
                 )
                 
         except Exception as e:
-            print(f"⚠️ 觸發被動機制時發生錯誤：{e}")
+            print(f"⚠️ 觸發被動機製時發生錯誤：{e}")
     
     # ===== 新增：取得觸發統計 =====
     def get_trigger_stats(self) -> Dict:

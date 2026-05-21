@@ -1,5 +1,5 @@
 """
-Immune Guard v1 — 輸入/輸出消毒、速率限制、存取控制
+Immune Guard v1 — 輸入/輸出消毒、速率限製、存取控製
 增強型安全層，做為黑曜的免疫系統第一線
 """
 import re
@@ -15,7 +15,7 @@ from skeleton.base_organ import BaseOrgan
 
 
 class Guard(BaseOrgan):
-    """安全守衛 — 過濾、消毒、限流、權限控制"""
+    """安全守衛 — 過濾、消毒、限流、權限控製"""
 
     # 內建危險模式（可自訂擴充）
     DEFAULT_BLOCKED_PATTERNS = [
@@ -29,7 +29,7 @@ class Guard(BaseOrgan):
         (r"DELETE\s+FROM.*WHERE\s+1=1", "禁止 SQL 全刪"),
         (r"eval\s*\(.*__import__", "禁止動態導入"),
         (r"exec\s*\(.*compile", "禁止執行編譯代碼"),
-        (r"subprocess\.Popen.*shell\s*=\s*True", "禁止 shell 注入"),
+        (r"subprocess\.Popen.*shell\s*=\s*True", "禁止 shell 註入"),
         (r"os\.system\s*\(.*rm\s+-rf", "禁止系統刪除命令"),
         (r"curl.*\|\s*(ba)?sh", "禁止 curl pipe shell"),
         (r"wget.*-O\s*-\s*\|\s*sh", "禁止 wget pipe shell"),
@@ -50,7 +50,7 @@ class Guard(BaseOrgan):
         super().__init__("guard")
         self._blocked_patterns = list(self.DEFAULT_BLOCKED_PATTERNS)
         self._output_sanitize = list(self.OUTPUT_SANITIZE_PATTERNS)
-        # 速率限制
+        # 速率限製
         self._rate_limits: Dict[str, List[float]] = defaultdict(list)
         self._rate_limit_window = 60  # 秒
         self._rate_limit_max = 30     # 每窗口最大請求數
@@ -69,7 +69,7 @@ class Guard(BaseOrgan):
         # 1. 速率檢查
         if not self._check_rate(user_id):
             self.rate_limited_count += 1
-            return {"allowed": False, "reason": "速率限制", "risk": "high"}
+            return {"allowed": False, "reason": "速率限製", "risk": "high"}
 
         # 2. 空白輸入
         if not user_input or not user_input.strip():
@@ -143,7 +143,7 @@ class Guard(BaseOrgan):
     def add_blocked_pattern(self, pattern: str, reason: str):
         self._blocked_patterns.append((pattern, reason))
 
-    # ── 存取控制 ───────────────────────────────────────────
+    # ── 存取控製 ───────────────────────────────────────────
 
     def check_permission(self, user_id: str, resource: str, action: str = "read") -> bool:
         """檢查使用者對資源的權限

@@ -207,12 +207,12 @@ class Inheritance(BaseOrgan):
 
     def spawn(self, birth, nursery, placenta, name: str, role: str) -> Dict:
         """
-        生出一個子代理，並注入傳承包。
+        生出一個子代理，並註入傳承包。
 
         流程：
         1. 從母體提取傳承包
         2. 呼叫 birth.deliver() 創造子代理
-        3. 將傳承包注入子代理
+        3. 將傳承包註入子代理
         4. 登記到 nursery 和 placenta
         5. 記錄世代
         """
@@ -227,7 +227,7 @@ class Inheritance(BaseOrgan):
 
         child_id = child["id"]
 
-        # 3. 注入傳承
+        # 3. 註入傳承
         child["inheritance"] = inheritance_pkg
         child["generation"] = self.generation
         child["parent"] = self.dna.get("name", "黑曜")
@@ -298,7 +298,7 @@ class Inheritance(BaseOrgan):
     def receive_child_learning(self, child_id: str, child_name: str,
                                 new_knowledge: List[Dict]):
         """
-        接收子代理學到的新知識，逆向注入母體。
+        接收子代理學到的新知識，逆向註入母體。
         子代理在任務中學到的，回傳給母體繼續進化。
         """
         for item in new_knowledge:

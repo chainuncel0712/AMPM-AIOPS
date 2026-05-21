@@ -1,4 +1,4 @@
-"""胎盘 - 母体与子代理之间的信息与资源交换"""
+"""胎盘 - 母體与子代理之間的信息与资源交换"""
 from skeleton.base_organ import BaseOrgan
 
 class Placenta(BaseOrgan):
@@ -12,13 +12,13 @@ class Placenta(BaseOrgan):
         self._children = {}  # id -> agent info
 
     def send_task(self, child_id: str, task: str) -> str:
-        """派任务给子代理，并返回结果"""
+        """派任務给子代理，并返回结果"""
         child = self._children.get(child_id)
         if not child:
             return f"找不到子代理: {child_id}"
 
-        # 构建子代理专用的系统提示
-        system_prompt = child.get("prompt", "完成分配的任务。")
+        # 構建子代理专用的系统提示
+        system_prompt = child.get("prompt", "完成分配的任務。")
         tools_allowed = child.get("tools", [])
         tool_list_str = "\n".join([f"- {t}" for t in tools_allowed]) if tools_allowed else "无特殊工具"
 
@@ -27,11 +27,11 @@ class Placenta(BaseOrgan):
             {"role": "user", "content": task}
         ]
         response = self.llm.call(messages)
-        # 如果回复中包含工具调用，执行工具并二次调用
+        # 如果回復中包含工具調用，执行工具并二次調用
         return response
 
     def adopt(self, child_info: dict):
-        """登记一个子代理"""
+        """登记一個子代理"""
         self._children[child_info["id"]] = child_info
 
     def remove(self, child_id: str):

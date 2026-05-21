@@ -1,10 +1,10 @@
-"""器官注册表 - 兼容新旧器官"""
+"""器官註册表 - 兼容新旧器官"""
 class Registry:
     def __init__(self):
         self._organs = {}
 
     def add(self, organ):
-        # 如果器官没有 name 属性，用类名作为名字
+        # 如果器官沒有 name 属性，用类名作為名字
         name = getattr(organ, 'name', None)
         if not name:
             name = type(organ).__name__.lower()

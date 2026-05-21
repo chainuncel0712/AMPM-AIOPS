@@ -1,4 +1,4 @@
-"""语气控制 - 让回覆保持一致的语调"""
+"""語气控製 - 讓回覆保持一致的語調"""
 from skeleton.base_organ import BaseOrgan
 
 class Voice(BaseOrgan):
@@ -10,7 +10,7 @@ class Voice(BaseOrgan):
         self._tone = tone
 
     def get_tone_prompt(self) -> str:
-        return f"语气：{self._tone}"
+        return f"語气：{self._tone}"
 
     def status(self) -> dict:
         return {"name": self.name, "alive": self.is_alive(), "tone": self._tone}

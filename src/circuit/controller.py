@@ -1,5 +1,5 @@
 """
-循環控制器 (Phase 7: 降級為 logging/monitoring only)
+循環控製器 (Phase 7: 降級為 logging/monitoring only)
 =====================================================
 此模組已不被主動呼叫。所有安全檢查已移入 ContextAssembler pipeline。
 保留僅供監控與紀錄用途，不影響主流程。

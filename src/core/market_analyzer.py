@@ -96,10 +96,10 @@ class MarketAnalyzerOrgan(BrainComponent):
         # 情緒判定
         if change_val > 3 and rsi > 60:
             sentiment = "貪婪 🤑"
-            advice = "市場過熱，注意回調風險"
+            advice = "市場過熱，註意回調風險"
         elif change_val < -3 and rsi < 40:
             sentiment = "恐懼 😨"
-            advice = "市場超賣，可關注抄底機會"
+            advice = "市場超賣，可關註抄底機會"
         elif abs(change_val) < 1.5 and 40 <= rsi <= 60:
             sentiment = "中性 😐"
             advice = "市場方向不明，建議觀望"

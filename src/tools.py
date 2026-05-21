@@ -176,7 +176,7 @@ def tool(name=None, description=None):
         tool_desc = description or func.__doc__ or "無描述"
         
         # 將工具註冊到全域工具系統
-        # 注意：這裡需要一個全域的 ToolSystem 實例
+        # 註意：這裡需要一個全域的 ToolSystem 實例
         # 我們將在 Obsidian 初始化時設定
         if hasattr(tool, '_tool_system'):
             tool._tool_system.register_tool(tool_name, wrapper, tool_desc)

@@ -1,11 +1,11 @@
-"""Evolution Governor — 進化方向控制，避免自爆"""
+"""Evolution Governor — 進化方向控製，避免自爆"""
 import json, time, threading
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 class EvolutionGovernor:
-    """控制進化方向：不讓 AI 變成無頭蒼蠅或自我毀滅"""
+    """控製進化方向：不讓 AI 變成無頭蒼蠅或自我毀滅"""
 
     def __init__(self, base_dir: Path):
         self.base_dir = base_dir
@@ -66,12 +66,12 @@ class EvolutionGovernor:
         limits = self.direction["safety_limits"]
         for critical in limits.get("require_human_approval_for", []):
             if critical in action:
-                return False  # 需人工核准
+                return False  # 需人工核準
         return True
 
-    # ── 速率控制 ──
+    # ── 速率控製 ──
     def can_evolve_now(self) -> bool:
-        """檢查現在是否可以進化（速率限制）"""
+        """檢查現在是否可以進化（速率限製）"""
         recent = [e for e in self.direction["evolution_log"]
                   if (datetime.now() - datetime.fromisoformat(e["ts"])).total_seconds() < 3600]
         max_per_hour = self.direction["safety_limits"]["max_code_changes_per_hour"]
@@ -103,7 +103,7 @@ class EvolutionGovernor:
         return (
             f"進化階段: {phase}\n"
             f"重點方向: {focus}\n"
-            f"速率限制: {self.direction['safety_limits']['max_code_changes_per_hour']}次/時\n"
+            f"速率限製: {self.direction['safety_limits']['max_code_changes_per_hour']}次/時\n"
             f"禁止: {', '.join(f['direction'] for f in self.direction['forbidden_directions'][-3:])}"
         )
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-成長進化系統 - 主動成長版 + 被動觸發機制
+成長進化系統 - 主動成長版 + 被動觸發機製
 不是等條件觸發，而是自己判斷何時該成長
 """
 
@@ -33,7 +33,7 @@ class Evolution:
         # 成長目標（不是寫死的，是自己設定的）
         self.growth_goals = self._load_goals()
         
-        # ===== 新增：被動觸發機制狀態 =====
+        # ===== 新增：被動觸發機製狀態 =====
         self.trigger_count = 0  # 觸發次數
         self.last_trigger_time = None  # 上一次觸發時間
         self.trigger_history = []  # 觸發歷史記錄
@@ -48,7 +48,7 @@ class Evolution:
         goals_file = self.base_dir / "data" / "evolution" / "goals.json"
         if goals_file.exists():
             return json.loads(goals_file.read_text())
-        # 預設目標（不是限制，是初始方向）
+        # 預設目標（不是限製，是初始方向）
         return [
             "幫老大賺錢",
             "主動發現問題",
@@ -167,7 +167,7 @@ class Evolution:
                 plan = json.loads(json_match.group())
                 self.version["number"] += 1
                 self._save_version()
-                self._log_change("主动成长", focus, plan)
+                self._log_change("主动成長", focus, plan)
                 
                 # 更新成長目標
                 if plan.get("new_goals"):
@@ -258,10 +258,10 @@ class Evolution:
             pass
         return "❌ 創造失敗"
     
-    # ===== 新增：觸發被動機制 =====
+    # ===== 新增：觸發被動機製 =====
     def _trigger_passive(self, trigger_type, data):
         """
-        觸發一個被動機制
+        觸發一個被動機製
         
         參數：
             trigger_type: 觸發類型
@@ -293,7 +293,7 @@ class Evolution:
                     self._grow("降低錯誤率")
                     
         except Exception as e:
-            print(f"⚠️ 觸發被動機制時發生錯誤：{e}")
+            print(f"⚠️ 觸發被動機製時發生錯誤：{e}")
     
     # ===== 新增：取得觸發統計 =====
     def get_trigger_stats(self) -> Dict:
@@ -318,7 +318,7 @@ class Evolution:
     def get_summary(self) -> str:
         """成長摘要"""
         history = self._get_history()
-        recent_growth = [h for h in history[-10:] if h["type"] == "主动成长"]
+        recent_growth = [h for h in history[-10:] if h["type"] == "主动成長"]
         
         return f"""🧬 成長摘要
 ━━━━━━━━━━━━━━━━

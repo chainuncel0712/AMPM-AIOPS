@@ -54,8 +54,8 @@ def run_agent_executor(obsidian, agent, task):
     final_result = None
     for round_num in range(5):
         if _time.time() > DEADLINE:
-            print(f"[AgentCompany] {agent_name} ⏰ 逾時，強制終止")
-            return f"[{agent_name}] ⏰ 執行逾時（5分鐘），已強制終止"
+            print(f"[AgentCompany] {agent_name} ⏰ 逾時，強製終止")
+            return f"[{agent_name}] ⏰ 執行逾時（5分鐘），已強製終止"
 
         try:
             result = obsidian.llm.call(messages, temperature=0.3)

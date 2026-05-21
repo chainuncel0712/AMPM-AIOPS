@@ -11,7 +11,7 @@ class Birth(BaseOrgan):
         self.agent_manager = agent_manager
 
     def deliver(self, name: str, role: str, parent_id: str = None, tools: list = None) -> dict:
-        """生出一个子代理"""
+        """生出一個子代理"""
         agent = self.agent_manager.create_agent(name=name, role=role, parent_id=parent_id)
         if agent:
             return {

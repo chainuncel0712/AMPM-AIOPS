@@ -1,9 +1,9 @@
 """
-Rule Store — 结构化规则库
+Rule Store — 结構化规則庫
 ==========================
-持久化储存系统从失败中学习的修正规则。
+持久化储存系统從失败中学习的修正规則。
 
-规则格式（结构化，不是心得）：
+规則格式（结構化，不是心得）：
 {
   "id": "rule_001",
   "pattern": "context_overflow",
@@ -28,7 +28,7 @@ from typing import Dict, List, Optional
 
 
 class Rule:
-    """单条规则"""
+    """單条规則"""
 
     def __init__(
         self,
@@ -81,7 +81,7 @@ class Rule:
 
 
 class RuleStore:
-    """规则库 — 持久化储存和管理系统规则"""
+    """规則庫 — 持久化储存和管理系统规則"""
 
     def __init__(self, rules_file: str = "data/rules/runtime_rules.json"):
         self.rules_file = Path(rules_file)
@@ -106,7 +106,7 @@ class RuleStore:
         )
 
     def add(self, rule: Rule) -> str:
-        """添加规则，自动去重"""
+        """添加规則，自动去重"""
         for existing in self.rules.values():
             if existing.pattern == rule.pattern and existing.rule == rule.rule:
                 existing.confidence = max(existing.confidence, rule.confidence)
@@ -122,7 +122,7 @@ class RuleStore:
         return self.rules.get(rule_id)
 
     def get_active(self) -> List[Rule]:
-        """取得所有启用的规则"""
+        """取得所有啟用的规則"""
         return [r for r in self.rules.values() if r.enabled]
 
     def get_by_pattern(self, pattern: str) -> List[Rule]:
@@ -146,7 +146,7 @@ class RuleStore:
             self._save()
 
     def record_application(self, rule_id: str):
-        """记录规则被应用"""
+        """记录规則被應用"""
         rule = self.rules.get(rule_id)
         if rule:
             rule.applied_count += 1
@@ -154,19 +154,19 @@ class RuleStore:
             self._save()
 
     def get_rules_for_context(self) -> str:
-        """产生可注入 Context 的规则摘要（只取前 5 条高信心）"""
+        """产生可註入 Context 的规則摘要（只取前 5 条高信心）"""
         active = sorted(self.get_active(), key=lambda r: -r.confidence)[:5]
         if not active:
             return ""
 
-        lines = ["[规则摘要]"]
+        lines = ["[规則摘要]"]
         for r in active:
             lines.append(f"- {r.rule[:80]}")
 
         return "\n".join(lines)
 
     def get_rules_for_tools(self) -> List[str]:
-        """取得影响工具使用的规则"""
+        """取得影响工具使用的规則"""
         tool_rules = []
         for r in self.get_active():
             if "tool" in r.impact.lower() or "tool" in r.pattern.lower():
@@ -174,7 +174,7 @@ class RuleStore:
         return tool_rules
 
     def get_rules_for_planner(self) -> List[str]:
-        """取得影响规划策略的规则"""
+        """取得影响规劃策略的规則"""
         planner_rules = []
         for r in self.get_active():
             if "planner" in r.impact.lower() or "plan" in r.pattern.lower():
@@ -182,7 +182,7 @@ class RuleStore:
         return planner_rules
 
     def remove_low_confidence(self, min_confidence: float = 0.3):
-        """删除低信心规则"""
+        """删除低信心规則"""
         to_remove = []
         for rid, rule in self.rules.items():
             if rule.confidence < min_confidence and rule.applied_count == 0:

@@ -1,4 +1,4 @@
-"""大腦皮層 - 工具執行版 + LangGraph 整合 + 被動觸發機制"""
+"""大腦皮層 - 工具執行版 + LangGraph 整合 + 被動觸發機製"""
 
 # ===== 路徑設定：將 src/ 目錄加入 Python 模組搜尋路徑 =====
 import sys  # 匯入系統模組，用於修改 Python 路徑
@@ -41,14 +41,14 @@ class Cortex(BaseOrgan):
         self.eye.init()
         self.reviewer = SelfReview(llm_client, contradiction)
         self.repairer = SelfRepair(llm_client, persona, compass, context_assembler=context_assembler)
-        # 稍後由外部注入 langgraph 引擎
+        # 稍後由外部註入 langgraph 引擎
         self.langgraph = None
         
-        # ===== 新增：被動觸發機制狀態 =====
+        # ===== 新增：被動觸發機製狀態 =====
         self.last_user_msg = None  # 上一次的使用者訊息
         self.last_assistant_reply = None  # 上一次的助理回覆
         self.conversation_count = 0  # 對話計數器
-        self.learning_counter = 0  # 每 N 次对话触发一次进化
+        self.learning_counter = 0  # 每 N 次對話触發一次進化
     
     def think(self, user_msg: str) -> str:
         """思考介面：優先使用 LangGraph 引擎"""
@@ -61,7 +61,7 @@ class Cortex(BaseOrgan):
         return self.process(user_msg)
     
     def process(self, user_msg: str, send_func=None) -> str:
-        # ===== stable 模式：委派給 ExecutionContext（單一控制鏈）=====
+        # ===== stable 模式：委派給 ExecutionContext（單一控製鏈）=====
         if hasattr(self, 'execution_context') and self.execution_context:
             return self.execution_context.handle(user_msg, send_func)
 
@@ -303,7 +303,7 @@ class Cortex(BaseOrgan):
                     user_msg=user_msg,
                     assistant_msg=reply or "",
                 )
-            # 每 10 次对话触发进化
+            # 每 10 次對話触發進化
             self.learning_counter += 1
             if self.learning_counter >= 10 and self.evolution_engine:
                 self.learning_counter = 0
@@ -420,7 +420,7 @@ class Cortex(BaseOrgan):
                 issues.append("回覆包含失敗訊息")
                 suggestions.append("請重新嘗試")
             
-            # 使用自我修復機制重新生成回覆
+            # 使用自我修復機製重新生成回覆
             repaired_reply = self.repairer.repair(
                 user_msg=user_msg,
                 bad_reply=bad_reply or "",

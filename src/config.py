@@ -1,5 +1,5 @@
 """
-AM&PM 控制台 2.0 - 全功能配置檔 (安全版)
+AM&PM 控製台 2.0 - 全功能配置檔 (安全版)
 所有金鑰從 .env 讀取，不寫死在程式碼中
 """
 
@@ -57,7 +57,7 @@ class Config:
         # ========== 自訂金鑰 ==========
         self.lianshu_key = os.getenv("LIANSHU_KEY", "")
         
-        # ========== 系統限制 ==========
+        # ========== 系統限製 ==========
         self.max_agents = int(os.getenv("MAX_AGENTS", "50"))
         self.max_depth = int(os.getenv("MAX_DEPTH", "5"))
         self.max_api_calls_per_minute = int(os.getenv("MAX_API_CALLS_PER_MINUTE", "30"))

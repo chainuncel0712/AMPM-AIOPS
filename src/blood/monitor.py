@@ -15,12 +15,12 @@ class VitalMonitor:
                 if hasattr(organ, 'is_alive') and not organ.is_alive():
                     result["dead"].append(name)
                     continue
-                # 尝试获取状态
+                # 嘗試获取状态
                 if hasattr(organ, 'status'):
                     stat = organ.status()
                     result["healthy"].append(name)
                 else:
-                    result["healthy"].append(name)  # 无 status 也视为健康
+                    result["healthy"].append(name)  # 无 status 也视為健康
             except Exception as e:
                 result["warning"].append(f"{name}: {e}")
         return result

@@ -128,7 +128,7 @@ class SelfAwareness(BaseOrgan):
         return [{k: v} for k, v in self.capabilities.items() if v["level"] >= 0.7]
 
     def add_known_limit(self, limit: str):
-        """記錄一個已知的自身限制"""
+        """記錄一個已知的自身限製"""
         if limit not in self.known_limits:
             self.known_limits.append(limit)
 
@@ -213,7 +213,7 @@ class SelfAwareness(BaseOrgan):
         if dead:
             lines.append(f"⚠️ 死亡器官：{', '.join(dead[:5])}")
         if self.known_limits:
-            lines.append(f"我的限制：{'；'.join(self.known_limits[:3])}")
+            lines.append(f"我的限製：{'；'.join(self.known_limits[:3])}")
         return "\n".join(lines)
 
     # =========================================

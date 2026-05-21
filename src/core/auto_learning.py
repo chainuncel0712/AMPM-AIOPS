@@ -180,7 +180,7 @@ class AutoLearningOrgan(BrainComponent):
         all_topics = {
             "Python 基礎",
             "Python 進階",
-            "版本控制 Git",
+            "版本控製 Git",
             "Linux 系統管理",
             "Docker 容器化",
             "CI/CD 自動化",

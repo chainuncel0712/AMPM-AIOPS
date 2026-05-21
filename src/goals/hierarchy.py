@@ -22,7 +22,7 @@ class GoalHierarchy:
     DEFAULT_HIERARCHY = {
         "L0_survival": {
             "priority": 0, "name": "生存",
-            "goals": ["保持核心程序運行", "防止資源耗盡", "保護安全機制不被移除"],
+            "goals": ["保持核心程序運行", "防止資源耗盡", "保護安全機製不被移除"],
             "immutable": True,
         },
         "L1_stability": {

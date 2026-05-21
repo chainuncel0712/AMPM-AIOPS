@@ -1,4 +1,4 @@
-"""下視丘 - 自主神經系統，負責定時維護 + 記憶任務執行 + 被動觸發機制"""
+"""下視丘 - 自主神經系統，負責定時維護 + 記憶任務執行 + 被動觸發機製"""
 from skeleton.base_organ import BaseOrgan
 from datetime import datetime
 from runtime.context.persona_builder import RUNTIME_IDENTITY, RUNTIME_RULES
@@ -14,7 +14,7 @@ class Hypothalamus(BaseOrgan):
         self.tasks = tasks
         self.call_ai = call_ai_func
         
-        # ===== 新增：被動觸發機制狀態 =====
+        # ===== 新增：被動觸發機製狀態 =====
         self.failed_tasks = []  # 記錄失敗的任務
         self.last_repair_time = None  # 上一次修復時間
 

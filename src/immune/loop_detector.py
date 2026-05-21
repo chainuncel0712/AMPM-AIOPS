@@ -36,7 +36,7 @@ class LoopDetector(BaseOrgan):
         """進入工具呼叫，檢查是否觸發循環"""
         now = time.time()
 
-        # 檢查深度限制
+        # 檢查深度限製
         self._call_stack.append(tool_name)
         if len(self._call_stack) > self._max_depth:
             self._call_stack.pop()

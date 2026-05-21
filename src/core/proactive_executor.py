@@ -188,7 +188,7 @@ class ProactiveExecutor:
         # 檢查是否有逾時的 mission（5 分鐘沒完成就放棄）
         self._cancel_stale_missions(timeout_seconds=300)
 
-        # 限制同時進行中的任務數量
+        # 限製同時進行中的任務數量
         active_mission_count = sum(
             1 for k in self._pending_missions
             if not str(k).endswith("_started") and isinstance(self._pending_missions.get(k), str)
@@ -228,7 +228,7 @@ class ProactiveExecutor:
         if agents:
             stats = agents.get_global_stats() if hasattr(agents, "get_global_stats") else {}
             busy_agents = stats.get("agents_busy", 0)
-            if busy_agents < 15:  # 放寬限制，允許更多子代理並行
+            if busy_agents < 15:  # 放寬限製，允許更多子代理並行
                 try:
                     # 策略提示：根據過去類似任務結果調整
                     ec = getattr(self.obsidian, "evolution_cycle", None) or self.obsidian.organs.get("evolution_cycle")
@@ -282,7 +282,7 @@ class ProactiveExecutor:
             task["updated_at"] = datetime.now().isoformat()
             planner.tasks._save_to_disk()
 
-            # 強制重置 agent_company 中對應的僵屍代理
+            # 強製重置 agent_company 中對應的僵屍代理
             agents = self.agents
             if agents and hasattr(agents, 'force_reset_stale_agents'):
                 agents.force_reset_stale_agents()
@@ -688,7 +688,7 @@ class ProactiveExecutor:
         if not biz_strategy or not biz_strategy.exists():
             planner.tasks.add_task(
                 title="商業策略：定價與行銷規劃",
-                description="用 web_search 研究電子書/童書定價策略、Amazon KDP 抽成、促銷方案。制定定價和行銷計畫。用 write_file 存入 outputs/research/business_strategy.md，至少 600 字。",
+                description="用 web_search 研究電子書/童書定價策略、Amazon KDP 抽成、促銷方案。製定定價和行銷計畫。用 write_file 存入 outputs/research/business_strategy.md，至少 600 字。",
                 priority=2,
             )
             print("[ProactiveExecutor] 📝 自動建立：商業策略任務")
@@ -779,7 +779,7 @@ class ProactiveExecutor:
                     if hours_pending > 24:
                         problems.append({
                             "title": f"逾期任務警報",
-                            "description": f"任務 {task['id']}「{task['title']}」已 pending {hours_pending:.0f} 小時，需要關注",
+                            "description": f"任務 {task['id']}「{task['title']}」已 pending {hours_pending:.0f} 小時，需要關註",
                             "priority": 2,
                         })
         except Exception:

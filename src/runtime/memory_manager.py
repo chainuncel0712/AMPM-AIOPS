@@ -235,7 +235,7 @@ class MemoryManager:
         return deduped
 
     def get_context(self, query: str = "", limit: int = 5) -> str:
-        """取得記憶上下文（給 LLM system prompt 注入用）"""
+        """取得記憶上下文（給 LLM system prompt 註入用）"""
         items = self.recall(query=query, limit=limit)
         if not items:
             return ""
@@ -309,7 +309,7 @@ class MemoryManager:
                 "range": f"{overflow[0].get('time','?')} ~ {overflow[-1].get('time','?')}",
                 "compressed_at": datetime.now().isoformat(),
                 "importance": 0.5,
-                "tags": ["对话", "conversation"],
+                "tags": ["對話", "conversation"],
             }
             self.episodic.append(summary)
             if len(self.episodic) > self.max_episodic:

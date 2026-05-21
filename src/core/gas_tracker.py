@@ -21,7 +21,7 @@ class GasTrackerOrgan(BrainComponent):
     1. 即時 Gas 查詢 — 查詢單一網路的 Gas 價格
     2. 全域 Gas 掃描 — 同時查詢所有支援網路的 Gas
     3. 最低 Gas 定位 — 自動推薦當前 Gas 最低的網路
-    4. 快取機制 — 30 秒內重複查詢直接回傳快取結果
+    4. 快取機製 — 30 秒內重複查詢直接回傳快取結果
     """
 
     SUPPORTED_NETWORKS: Dict[str, Dict[str, str]] = {

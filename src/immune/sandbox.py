@@ -1,5 +1,5 @@
 """
-Sandbox Execution v1 — 隔離執行、資源限制、清理
+Sandbox Execution v1 — 隔離執行、資源限製、清理
 在受限環境中安全執行程式碼/命令，防止系統破壞
 """
 import os
@@ -148,14 +148,14 @@ class Sandbox(BaseOrgan):
             if pattern in code_lower:
                 return {"allowed": False, "reason": f"偵測到禁止模式: {pattern}"}
 
-        # 長度限制
+        # 長度限製
         if len(code) > 50000:
             return {"allowed": False, "reason": "程式碼過長"}
 
         return {"allowed": True}
 
     def _setup_resource_limits(self):
-        """設定資源限制（POSIX only）"""
+        """設定資源限製（POSIX only）"""
         try:
             mem_bytes = self._limits["max_memory_mb"] * 1024 * 1024
             resource.setrlimit(resource.RLIMIT_AS, (mem_bytes, mem_bytes))
@@ -226,7 +226,7 @@ class Sandbox(BaseOrgan):
         except Exception as e:
             return {"success": False, "error": str(e), "stdout": "", "stderr": ""}
 
-    # ── 限制管理 ───────────────────────────────────────────
+    # ── 限製管理 ───────────────────────────────────────────
 
     def set_limits(self, **kwargs):
         self._limits.update(kwargs)

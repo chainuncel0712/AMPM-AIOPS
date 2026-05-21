@@ -1,5 +1,5 @@
 """
-Control Plane — 統一控制層
+Control Plane — 統一控製層
 ===========================
 Single call point for all cross-cutting concerns:
   - Module permission check (gatekeeper)

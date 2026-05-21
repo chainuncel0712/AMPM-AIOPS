@@ -198,12 +198,12 @@ class DailyGrowthReportOrgan(BrainComponent):
                     "evolution_score": "建議執行一次進化循環提升分數",
                     "tasks_completed": "建議檢查排程任務是否正常執行",
                     "errors": "建議使用 self_repair 修復已知錯誤",
-                    "uptime": "建議檢查 crash_recovery 機制是否正常",
+                    "uptime": "建議檢查 crash_recovery 機製是否正常",
                     "revenue": "建議使用 revenue_optimizer 優化營收策略",
                     "users": "建議加強行銷活動吸引新用戶",
                     "engagement": "建議優化內容策略提升用戶互動",
                 }
-                lines.append(f"  - {suggestion_map.get(k, f'檢討 {k} 落後原因並制定改善計畫')}")
+                lines.append(f"  - {suggestion_map.get(k, f'檢討 {k} 落後原因並製定改善計畫')}")
         else:
             lines.append("  🎉 所有指標目前達標或接近目標，繼續保持！")
 

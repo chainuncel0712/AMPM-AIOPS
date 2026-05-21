@@ -18,7 +18,7 @@ class ConversationManager(BaseOrgan):
     功能：
     1. 管理多輪對話歷史
     2. 自動摘要 — 超過 N 輪後自動壓縮
-    3. 上下文視窗 — 限制 token 上限
+    3. 上下文視窗 — 限製 token 上限
     4. 重要訊息標記 — 不會被摘要掉的關鍵訊息
     """
 
@@ -169,7 +169,7 @@ class ConversationManager(BaseOrgan):
             return self.history[-n:]
 
     # =========================================
-    # 對話控制
+    # 對話控製
     # =========================================
 
     def clear(self):

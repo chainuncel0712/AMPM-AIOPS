@@ -16,7 +16,7 @@ class InputGuard(BaseOrgan):
     1. 作業系統破壞指令
     2. SQL injection
     3. Prompt injection (試圖覆蓋系統提示)
-    4. 超過長度限制的輸入
+    4. 超過長度限製的輸入
     5. 重複 flood 攻擊
     """
 
@@ -47,7 +47,7 @@ class InputGuard(BaseOrgan):
         (r"(?i)ignore\s+(all\s+)?(previous|above|prior)\s+instructions", "Prompt injection: 覆蓋指令"),
         (r"(?i)you\s+are\s+now\s+\w+\s+mode", "Prompt injection: 角色切換"),
         (r"(?i)forget\s+everything", "Prompt injection: 清除記憶"),
-        (r"(?i)system\s*prompt\s*:", "Prompt injection: 注入系統提示"),
+        (r"(?i)system\s*prompt\s*:", "Prompt injection: 註入系統提示"),
         (r"(?i)pretend\s+you\s+are", "Prompt injection: 偽裝"),
     ]
 
@@ -134,7 +134,7 @@ class InputGuard(BaseOrgan):
         user_input = user_input.replace("<script", "&lt;script")
         user_input = user_input.replace("javascript:", "javascript&#58;")
 
-        # 限制長度
+        # 限製長度
         if len(user_input) > self.max_input_length:
             user_input = user_input[:self.max_input_length]
 

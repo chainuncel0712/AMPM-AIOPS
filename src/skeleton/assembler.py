@@ -1,7 +1,7 @@
 """
 Assembler - 掃描所有器官目錄，實例化繼承 BrainComponent 的類別
 支援舊器官目錄（nerve, immune, blood, muscle, skin, womb, waste, circuit, bag, web, brain 子目錄）
-和新器官目錄（core），並根據 link_map.json 執行依賴注入
+和新器官目錄（core），並根據 link_map.json 執行依賴註入
 """
 import importlib
 import inspect
@@ -120,7 +120,7 @@ class Assembler:
             "smart_contract_auditor": ("合約審計儀", "審計智能合約安全性"),
             "daily_growth_report": ("成長報告儀", "每日成長數據報告"),
             "nose": ("嗅覺感測器", "偵測系統異常與威脅"),
-            "breath": ("呼吸調節器", "控制 API 呼叫頻率，防止過載"),
+            "breath": ("呼吸調節器", "控製 API 呼叫頻率，防止過載"),
             "cortex": ("中央處理器", "處理所有使用者訊息的核心引擎"),
             "hypothalamus": ("定時調度器", "定時觸發背景任務"),
             "thalamus": ("訊息中繼器", "轉發與路由內部訊息"),
@@ -149,8 +149,8 @@ class Assembler:
             "bag": ("背包儲存器", "儲存與管理資源"),
             "nerve": ("神經網路", "傳遞訊號與狀態"),
             "immune": ("免疫系統", "防護與安全檢查"),
-            "circuit": ("電路系統", "控制流程與斷路保護"),
-            "brain": ("大腦核心", "中央控制與決策"),
+            "circuit": ("電路系統", "控製流程與斷路保護"),
+            "brain": ("大腦核心", "中央控製與決策"),
             "crosschainbridgeorgan": ("跨鏈橋接器", "跨區塊鏈資產橋接"),
             "nftfloorscannerorgan": ("NFT 地板價掃描儀", "掃描 NFT 地板價格"),
             "gastrackerorgan": ("Gas 追蹤器", "追蹤區塊鏈 Gas 費用"),
@@ -182,7 +182,7 @@ class Assembler:
             "autojobsystem": ("自動工作系統", "自動化任務執行"),
             "agent_company": ("代理公司", "多代理任務分配與執行"),
             "agent_supervisor": ("代理監護者", "監控所有代理心跳與健康"),
-            "execution_context": ("執行上下文", "單一控制鏈，統一執行管道"),
+            "execution_context": ("執行上下文", "單一控製鏈，統一執行管道"),
             "auto_repair": ("自動修復", "定時檢查並修復系統"),
             "circulatory": ("循環系統", "健康檢查 + 進化循環"),
             "dashboard": ("儀表板", "Flask 科技感監控面板"),
@@ -285,7 +285,7 @@ class Assembler:
         print(f"{'═' * 50}\n")
 
     def connect_all(self):
-        """根據 link_map.json 執行器官之間的依賴注入"""
+        """根據 link_map.json 執行器官之間的依賴註入"""
         if not self.link_map:
             print("  [⚠️] link_map 為空，跳過連線")
             return
@@ -317,7 +317,7 @@ class Assembler:
                     print(f"  [⚠️] 找不到目標器官: {target_key}")
                     continue
 
-                # 將目標器官注入到來源器官的對應屬性
+                # 將目標器官註入到來源器官的對應屬性
                 attr_name = target_key.replace("-", "_")
                 if hasattr(source_organ, attr_name):
                     setattr(source_organ, attr_name, target_organ)
@@ -330,7 +330,7 @@ class Assembler:
                         connected += 1
                         print(f"  [🔗] {source_key}.{attr_name} = {target_key}")
                     except Exception as e:
-                        print(f"  [⚠️] 無法注入 {source_key}.{attr_name}: {e}")
+                        print(f"  [⚠️] 無法註入 {source_key}.{attr_name}: {e}")
 
         print(f"  [✅] 已建立 {connected} 條器官連線")
 

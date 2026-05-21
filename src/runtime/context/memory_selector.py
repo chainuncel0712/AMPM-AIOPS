@@ -1,14 +1,14 @@
 """
-Memory Selector — 记忆进入 Context 的唯一入口
+Memory Selector — 记忆進入 Context 的唯一入口
 ===============================================
-这是系统最关键的一层。
+這是系统最關键的一層。
 
-架构原则：
+架構原則：
   Memory ≠ Input
   Memory → Context → Input
 
 Memory 不是直接给 LLM 的。
-Memory 是给 Context「用来挑选的」。
+Memory 是给 Context「用來挑選的」。
 
 正确管线：
   Memory (raw data)
@@ -32,13 +32,13 @@ from runtime.context.summarizer import Summarizer
 
 
 class MemorySelector:
-    """记忆选择器 — 从原始记忆到精炼上下文的完整管线
+    """记忆選择器 — 從原始记忆到精炼上下文的完整管线
 
-    整合四个步骤：
-    1. Retrieve  — 从多源记忆系统捞候选
+    整合四個步骤：
+    1. Retrieve  — 從多源记忆系统捞候選
     2. Score     — relevance + recency + importance
     3. Filter    — 取 top-N
-    4. Compress  — 压缩为摘要，避免爆 token
+    4. Compress  — 壓缩為摘要，避免爆 token
     """
 
     def __init__(
@@ -59,7 +59,7 @@ class MemorySelector:
         self.max_output = max_output
 
     def sync_weights(self, weights: dict):
-        """同步权重 — 让 RuntimeUpdate 的演化结果生效"""
+        """同步權重 — 讓 RuntimeUpdate 的演化结果生效"""
         if not weights:
             return
         if "relevance" in weights:
@@ -70,7 +70,7 @@ class MemorySelector:
             self.scorer.importance_weight = weights["importance"]
 
     def select(self, query: str, top_n: int = None) -> str:
-        """核心方法：记忆 → 选择 → 压缩 → 输出摘要"""
+        """核心方法：记忆 → 選择 → 壓缩 → 輸出摘要"""
         if top_n is None:
             top_n = self.max_output
 
@@ -89,11 +89,11 @@ class MemorySelector:
         return summary
 
     def _retrieve_all(self, query: str) -> List[Dict]:
-        """第一步：从所有记忆来源捞候选
+        """第一步：從所有记忆來源捞候選
 
-        来源：
+        來源：
         - Memory 工作记忆 (working)
-        - Memory 语义记忆 (semantic)
+        - Memory 語義记忆 (semantic)
         - VectorMemory 向量搜尋
         - EpisodicMemory 事件记忆
         """
@@ -170,12 +170,12 @@ class MemorySelector:
         return must_include + result
 
     def _compress(self, items: List[Dict], query: str = "") -> str:
-        """第四步：将精选记忆压缩为一段精炼摘要
+        """第四步：将精選记忆壓缩為一段精炼摘要
 
-        输出格式：
-          [working] 最近对话摘要
-          [semantic] 使用者叫 Hao，喜欢自然语气
-          [episodic] 昨天修了 VPS CPU 问题
+        輸出格式：
+          [working] 最近對話摘要
+          [semantic] 使用者叫 Hao，喜歡自然語气
+          [episodic] 昨天修了 VPS CPU 問题
         """
         if not items:
             return ""
@@ -189,9 +189,9 @@ class MemorySelector:
 
         parts = []
         labels = {
-            "working": "最近对话",
+            "working": "最近對話",
             "semantic": "已知事实",
-            "vector": "相关知识",
+            "vector": "相關知識",
             "episodic": "最近事件",
         }
 
@@ -208,7 +208,7 @@ class MemorySelector:
         return result
 
     def _item_to_text(self, item: Dict) -> str:
-        """将单条记忆转换为文字"""
+        """将單条记忆轉换為文字"""
         user = item.get("user", "")
         assistant = item.get("assistant", "")
         if user:

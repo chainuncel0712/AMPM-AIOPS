@@ -326,7 +326,7 @@ class EvolutionCycle:
             if info not in self.state["absorbed_info"]:
                 self.state["absorbed_info"].append(info)
 
-        # 限制數量
+        # 限製數量
         if len(self.state["absorbed_info"]) > 100:
             self.state["absorbed_info"] = self.state["absorbed_info"][-100:]
 
@@ -398,7 +398,7 @@ class EvolutionCycle:
                 self.state["good_info"].append(info)
                 self.state["evolution_score"] += 1
 
-        # 限制數量
+        # 限製數量
         if len(self.state["good_info"]) > 200:
             self.state["good_info"] = self.state["good_info"][-200:]
 
@@ -412,7 +412,7 @@ class EvolutionCycle:
                 self.state["bad_info"].append(info)
                 self.state["evolution_score"] -= 1
 
-        # 限制數量
+        # 限製數量
         if len(self.state["bad_info"]) > 100:
             self.state["bad_info"] = self.state["bad_info"][-100:]
 

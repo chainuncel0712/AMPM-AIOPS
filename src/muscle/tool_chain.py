@@ -173,7 +173,7 @@ class ToolChain(BaseOrgan):
             return {"success": False, "error": f"條件評估失敗: {e}"}
 
     def _execute_loop(self, step: Dict, context: Dict) -> Dict:
-        """迴圈執行 — 有最大迭代限制"""
+        """迴圈執行 — 有最大迭代限製"""
         max_iterations = step.get("max_iterations", 10)
         body = step.get("body", [])
         results = []

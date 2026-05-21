@@ -137,7 +137,7 @@ class CivilizationController:
             }, ensure_ascii=False, indent=2))
 
     def get_engine(self, name: str) -> Optional[Any]:
-        """惰性載入引擎，搭配 ResourceGovernor 的喚醒機制"""
+        """惰性載入引擎，搭配 ResourceGovernor 的喚醒機製"""
         if name in self.engines:
             engine = self.engines[name]
             # Auto-wake if asleep

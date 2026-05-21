@@ -7,7 +7,7 @@ class ToolGarbage(BaseOrgan):
         self.tools = tools_system
 
     def clean(self, days: int = 30) -> str:
-        """清理从未使用过的工具"""
+        """清理從未使用過的工具"""
         unused = [name for name, info in self.tools.registry.items()
                   if info.get("use_count", 0) == 0]
         if unused:
@@ -15,7 +15,7 @@ class ToolGarbage(BaseOrgan):
                 self.tools.registry.pop(name, None)
             self.tools._save_registry()
             return f"已淘汰工具：{', '.join(unused)}"
-        return "没有需要淘汰的工具"
+        return "沒有需要淘汰的工具"
 
     def status(self) -> dict:
         return {"name": self.name, "alive": self.is_alive()}

@@ -31,7 +31,7 @@ class EvolutionCycleOrgan(BaseOrgan):
     - 使用者需求永遠第一優先
     - 禁止單次循環超過 5 項增強
     - 禁止刪除系統核心檔案
-    - 禁止修改自身安全機制程式碼
+    - 禁止修改自身安全機製程式碼
     """
 
     # ===== 安全閾值 =====
@@ -500,9 +500,9 @@ class EvolutionCycleOrgan(BaseOrgan):
         規則：
         1. 使用者需求永遠第一優先 — 不攔使用者直接指令
         2. 禁止危險操作（rm -rf, shutdown 等）
-        3. 保護核心檔案（不可修改安全機制本身）
-        4. 速率限制（每循環最多 5 項增強）
-        5. 總量限制（超過 100 次增強後需人工審核）
+        3. 保護核心檔案（不可修改安全機製本身）
+        4. 速率限製（每循環最多 5 項增強）
+        5. 總量限製（超過 100 次增強後需人工審核）
 
         回傳：{"allowed": bool, "reason": str, "must_ask_user": bool}
         """
@@ -526,15 +526,15 @@ class EvolutionCycleOrgan(BaseOrgan):
                     "must_ask_user": True,
                 }
 
-        # 速率限制：單次循環不超過 5 項增強
+        # 速率限製：單次循環不超過 5 項增強
         if enhanced_this_cycle >= s["max_enhancements_per_cycle"]:
             return {
                 "allowed": False,
-                "reason": f"⏱️ 速率限制：本循環已達 {s['max_enhancements_per_cycle']} 項增強上限",
+                "reason": f"⏱️ 速率限製：本循環已達 {s['max_enhancements_per_cycle']} 項增強上限",
                 "must_ask_user": False,
             }
 
-        # 總量限制
+        # 總量限製
         total_enhanced = self.state.get("total_enhanced", 0)
         if total_enhanced >= s["max_total_enhancements"]:
             return {

@@ -1,4 +1,4 @@
-"""耳朵 - 听 Telegram 来的讯息"""
+"""耳朵 - 听 Telegram 來的讯息"""
 from skeleton.base_organ import BaseOrgan
 
 class Ear(BaseOrgan):
@@ -8,7 +8,7 @@ class Ear(BaseOrgan):
         self.last_heard = ""
 
     def hear(self, user_id: int, message: str) -> str:
-        """听到一句话，传给大脑"""
+        """听到一句話，傳给大脑"""
         self.last_heard = message
         if self.callback:
             return self.callback(user_id, message)

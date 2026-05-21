@@ -13,7 +13,7 @@ from pathlib import Path
 OUTPUT_ROOT = Path("/home/pop5057273712_gmail_com/AMPM-AIOPS/outputs")
 OUTPUT_ROOT.mkdir(parents=True, exist_ok=True)
 
-# 限制：不允許的指令關鍵字
+# 限製：不允許的指令關鍵字
 FORBIDDEN_COMMANDS = ["rm -rf", "mkfs", "dd if=", "> /dev/", ":(){", "chmod 777", "wget", "curl"]
 
 
@@ -81,7 +81,7 @@ def list_dir(dirpath: str = ".") -> str:
 
 
 def run_command(cmd: str, cwd: str = None) -> str:
-    """執行 shell 指令。有安全限制。預設工作目錄為 outputs/。"""
+    """執行 shell 指令。有安全限製。預設工作目錄為 outputs/。"""
     # 安全檢查
     cmd_lower = cmd.lower()
     for forbidden in FORBIDDEN_COMMANDS:

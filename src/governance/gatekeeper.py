@@ -7,7 +7,7 @@ Gatekeeper — 系統唯一授權入口
 1. 只能從 main.py 的 main() 函數內部啟動
 2. 禁止模組自行 import 後另開 thread / process
 3. 所有 thread 啟動必須註冊到 Gatekeeper
-4. 違反者拋 GatekeeperViolation，系統強制中止
+4. 違反者拋 GatekeeperViolation，系統強製中止
 """
 import os
 import sys
@@ -109,7 +109,7 @@ class Gatekeeper:
     def check_module_permission(cls, module_name: str, action: str) -> bool:
         """
         檢查模組是否有權限執行某動作。
-        回傳 False = 無權限（僅記錄，不強制中止 — 初期階段）。
+        回傳 False = 無權限（僅記錄，不強製中止 — 初期階段）。
         """
         import json
         perm_file = Path(__file__).parent / "permissions.json"

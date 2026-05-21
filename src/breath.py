@@ -1,5 +1,5 @@
 """
-智慧呼吸系統 - 根據模型能力動態調整節奏 + 被動觸發機制
+智慧呼吸系統 - 根據模型能力動態調整節奏 + 被動觸發機製
 """
 import time
 import threading
@@ -25,7 +25,7 @@ class BreathSystem:
         self.is_resting = False
         self.rest_until = None
         
-        # ===== 新增：被動觸發機制狀態 =====
+        # ===== 新增：被動觸發機製狀態 =====
         self.trigger_count = 0  # 觸發次數
         self.last_trigger_time = None  # 上一次觸發時間
         self.trigger_history = []  # 觸發歷史記錄
@@ -97,10 +97,10 @@ class BreathSystem:
     # ===== 新增：被動觸發檢查 =====
     def _check_passive_triggers(self):
         """
-        檢查是否需要觸發被動機制
+        檢查是否需要觸發被動機製
         
         這個方法會在每次呼吸循環中被呼叫，
-        檢查各種條件是否需要觸發被動機制。
+        檢查各種條件是否需要觸發被動機製。
         """
         try:
             now = datetime.now()
@@ -113,7 +113,7 @@ class BreathSystem:
                 })
                 self._start_rest(30)  # 休息 30 秒
             
-            # 檢查 2：API 呼叫頻率過高時觸發限制
+            # 檢查 2：API 呼叫頻率過高時觸發限製
             if self.api_calls_this_minute > self.max_api_calls_per_minute * 0.8:
                 self._trigger_passive("api_rate_high", {
                     "current_rate": self.api_calls_this_minute,
@@ -130,10 +130,10 @@ class BreathSystem:
         except Exception as e:
             print(f"⚠️ 被動觸發檢查錯誤：{e}")
     
-    # ===== 新增：觸發被動機制 =====
+    # ===== 新增：觸發被動機製 =====
     def _trigger_passive(self, trigger_type, data):
         """
-        觸發一個被動機制
+        觸發一個被動機製
         
         參數：
             trigger_type: 觸發類型
@@ -158,7 +158,7 @@ class BreathSystem:
             print(f"⚡ 被動觸發（第 {self.trigger_count} 次）：{trigger_type}")
             
         except Exception as e:
-            print(f"⚠️ 觸發被動機制時發生錯誤：{e}")
+            print(f"⚠️ 觸發被動機製時發生錯誤：{e}")
     
     # ===== 新增：取得觸發統計 =====
     def get_trigger_stats(self) -> Dict:

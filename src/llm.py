@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class TokenBucket:
-    """Token Bucket 速率限制器"""
+    """Token Bucket 速率限製器"""
     def __init__(self, rate: int, per_seconds: int = 60):
         self.rate = rate
         self.per_seconds = per_seconds
@@ -222,7 +222,7 @@ class LLMClient:
         if self.breath:
             self.breath.record_api_call()
 
-        # 速率限制
+        # 速率限製
         if not self.rate_limiter.consume():
             wait = self.rate_limiter.wait_time()
             if wait > 0:
@@ -264,7 +264,7 @@ class LLMClient:
                     except (KeyError, IndexError, TypeError, json.JSONDecodeError):
                         return "⚠️ API 回應格式異常"
                 if r.status_code == 429:
-                    print(f"⚠️ {p['name']} 速率限制，等待...")
+                    print(f"⚠️ {p['name']} 速率限製，等待...")
                     time.sleep(5)
                     continue
                 print(f"⚠️ {p['name']} {r.status_code}")
@@ -289,7 +289,7 @@ class LLMClient:
                             except (KeyError, IndexError, TypeError, json.JSONDecodeError):
                                 return "⚠️ API 回應格式異常"
                         if r.status_code == 429:
-                            print(f"⚠️ {p['name']} 速率限制（重試），等待...")
+                            print(f"⚠️ {p['name']} 速率限製（重試），等待...")
                             time.sleep(5)
                             continue
                         print(f"⚠️ {p['name']} {r.status_code}（重試）")
@@ -349,7 +349,7 @@ class LLMClient:
                                 except (KeyError, IndexError, TypeError, json.JSONDecodeError):
                                     continue
                             if r.status_code == 429:
-                                print(f"⚠️ {p['name']} 速率限制，換備援")
+                                print(f"⚠️ {p['name']} 速率限製，換備援")
                                 time.sleep(1)
                                 continue
                             print(f"⚠️ {p['name']} {r.status_code}，換備援")

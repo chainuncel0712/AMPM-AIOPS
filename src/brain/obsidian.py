@@ -171,7 +171,7 @@ class Obsidian:
 
         self.execution_context = ExecutionContext(self) if self.mode == "stable" else None
         if self.execution_context:
-            print("⚡ ExecutionContext (單一控制鏈): 就緒")
+            print("⚡ ExecutionContext (單一控製鏈): 就緒")
 
         self.cortex = self.organs_registry.add(Cortex(
             self.llm, self.memory, self.compass, self.decisions, self.tasks,

@@ -586,7 +586,7 @@ class DomainIdentityOrgan(BrainComponent):
                         for r in self.MX_RECORDS
                     ],
                     "setup_steps": [
-                        "登入網域註冊商或 DNS 代管商控制台",
+                        "登入網域註冊商或 DNS 代管商控製台",
                         "刪除所有現有 MX 記錄",
                         f"新增以上 {len(self.MX_RECORDS)} 筆 MX 記錄，嚴格依照優先級順序",
                         "儲存後等候 DNS 傳播（通常 1-2 小時，最長 48 小時）",
@@ -630,7 +630,7 @@ class DomainIdentityOrgan(BrainComponent):
                         "選擇你的域名，點擊「產生新紀錄」",
                         "選擇 DKIM 金鑰位元長度：2048-bit（建議）",
                         "複製產生的 DNS 主機名稱（google._domainkey）與 TXT 記錄值",
-                        "於 DNS 控制台新增 TXT 記錄",
+                        "於 DNS 控製台新增 TXT 記錄",
                         "回到 Google Admin Console，點擊「開始驗證」",
                         "驗證通過後 DKIM 即生效，約需 24-48 小時全面傳播",
                     ],
@@ -785,7 +785,7 @@ class DomainIdentityOrgan(BrainComponent):
                 },
                 "mta_sts": {
                     "enabled": False,
-                    "recommendation": "建議啟用 MTA-STS 以強制 TLS 傳輸加密。",
+                    "recommendation": "建議啟用 MTA-STS 以強製 TLS 傳輸加密。",
                 },
                 "bimi": {
                     "enabled": False,
@@ -795,7 +795,7 @@ class DomainIdentityOrgan(BrainComponent):
             "recommendations": [
                 "啟用 DNSSEC 以強化 DNS 安全性",
                 "啟用 MTA-STS (RFC 8461) 確保郵件傳輸加密",
-                "設定 CAA 記錄限制憑證頒發機構：0 issue \"letsencrypt.org\"",
+                "設定 CAA 記錄限製憑證頒發機構：0 issue \"letsencrypt.org\"",
                 "監控憑證透明度日誌 (Certificate Transparency Logs) 以偵測惡意憑證",
             ],
         }
@@ -837,7 +837,7 @@ class DomainIdentityOrgan(BrainComponent):
                     "rgb": "rgb(245, 158, 11)",
                     "hsl": "hsl(38, 92%, 50%)",
                     "usage": "告警狀態、CTA 按鈕、重點提示、徽章",
-                    "psychology": "琥珀色在 AIOps 場景中暗示需要注意的異常狀態，同時具備溫暖的視覺引導力。",
+                    "psychology": "琥珀色在 AIOps 場景中暗示需要註意的異常狀態，同時具備溫暖的視覺引導力。",
                 },
                 "success": {
                     "name": "Emerald",

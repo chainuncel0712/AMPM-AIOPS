@@ -33,7 +33,7 @@ PUBLISHER_PLATFORMS: Dict[str, Dict[str, Any]] = {
         "payout_threshold": "$10",
         "best_for": "Apple 生態系使用者，高收入國家讀者群",
         "childrens_book_support": "支援 Read Aloud 朗讀功能與固定版面 EPUB，適合兒童繪本",
-        "setup_guide": "透過 iTunes Connect 或 Apple Books for Authors 上架。兒童書需注意固定版面 EPUB 之圖片解析度須達 300 DPI。",
+        "setup_guide": "透過 iTunes Connect 或 Apple Books for Authors 上架。兒童書需註意固定版面 EPUB 之圖片解析度須達 300 DPI。",
     },
     "google_play_books": {
         "name": "Google Play Books",
@@ -57,11 +57,11 @@ PUBLISHER_PLATFORMS: Dict[str, Dict[str, Any]] = {
         "territories": ["全球 190+ 國家，加拿大、日本、歐洲為主要市場"],
         "accepted_formats": ["EPUB 3.0"],
         "isbn_required": False,
-        "tax_requirements": "加拿大與日本市場適用當地稅制",
+        "tax_requirements": "加拿大與日本市場適用當地稅製",
         "payout_threshold": "$50",
-        "best_for": "加拿大、日本與歐洲市場，Kobo Plus 訂閱制額外收入",
+        "best_for": "加拿大、日本與歐洲市場，Kobo Plus 訂閱製額外收入",
         "childrens_book_support": "支援固定版面 EPUB 與 Kobo Kids 分類",
-        "setup_guide": "透過 Kobo Writing Life 平台上架。加入 Kobo Plus 訂閱制可增加曝光。兒童書使用 Kobo Kids 類別有專屬促銷機會。",
+        "setup_guide": "透過 Kobo Writing Life 平台上架。加入 Kobo Plus 訂閱製可增加曝光。兒童書使用 Kobo Kids 類別有專屬促銷機會。",
     },
     "barnes_noble": {
         "name": "Barnes & Noble Press",
@@ -131,7 +131,7 @@ PUBLISHER_PLATFORMS: Dict[str, Dict[str, Any]] = {
         "payout_threshold": "$5",
         "best_for": "同時發行電子書與按需印刷（POD）紙本書",
         "childrens_book_support": "支援全彩色按需印刷，適合兒童繪本之紙本與電子書雙軌發行",
-        "setup_guide": "Lulu 提供免費 ISBN 或使用自有 ISBN。兒童繪本紙本需注意出血設定（0.125 英吋）與 CMYK 色彩模式。",
+        "setup_guide": "Lulu 提供免費 ISBN 或使用自有 ISBN。兒童繪本紙本需註意出血設定（0.125 英吋）與 CMYK 色彩模式。",
     },
     "ingramspark": {
         "name": "IngramSpark",
@@ -150,7 +150,7 @@ PUBLISHER_PLATFORMS: Dict[str, Dict[str, Any]] = {
     "publishdrive": {
         "name": "PublishDrive",
         "url": "https://publishdrive.com",
-        "royalty_rate": "70%–100%（訂閱制聚合商，月費約 $19–$99）",
+        "royalty_rate": "70%–100%（訂閱製聚合商，月費約 $19–$99）",
         "royalty_numeric": 1.0,
         "territories": ["全球（Amazon、Apple、Google、Kobo 等 400+ 線上書店與圖書館）"],
         "accepted_formats": ["EPUB 3.0"],
@@ -159,7 +159,7 @@ PUBLISHER_PLATFORMS: Dict[str, Dict[str, Any]] = {
         "payout_threshold": "$100",
         "best_for": "大量出版且需要全球廣泛經銷的專業作者",
         "childrens_book_support": "支援固定版面 EPUB 上架至所有合作通路",
-        "setup_guide": "訂閱制模式（月費制），適合每月有穩定出版量的作者。平台提供 AI 翻譯與行銷工具（部分方案另收費）。",
+        "setup_guide": "訂閱製模式（月費製），適合每月有穩定出版量的作者。平台提供 AI 翻譯與行銷工具（部分方案另收費）。",
     },
     "streetlib": {
         "name": "StreetLib",
@@ -201,7 +201,7 @@ PUBLISHER_PLATFORMS: Dict[str, Dict[str, Any]] = {
         "payout_threshold": "€25",
         "best_for": "德語市場（DACH 地區：德奧瑞）最大電子書平台",
         "childrens_book_support": "支援兒童書分類與固定版面 EPUB，德語兒童書市場需求強勁",
-        "setup_guide": "需先與 Tolino 合作之經銷商（如 Bookwire、Neobooks）簽約上架。德語市場注重 ISBN 與書目完整性。",
+        "setup_guide": "需先與 Tolino 合作之經銷商（如 Bookwire、Neobooks）簽約上架。德語市場註重 ISBN 與書目完整性。",
     },
     "overdrive": {
         "name": "OverDrive / Libby",
@@ -417,7 +417,7 @@ class EbookPublisherOrgan(BrainComponent):
             formats: 目標輸出格式清單（epub / mobi / pdf）
 
         Returns:
-            dict: 含各格式技術規格、檔案大小限制與平台相容性對照。
+            dict: 含各格式技術規格、檔案大小限製與平台相容性對照。
         """
         if manuscript_id not in self._books:
             raise KeyError(f"找不到稿件: {manuscript_id}")
@@ -556,7 +556,7 @@ class EbookPublisherOrgan(BrainComponent):
             territories: 銷售地區清單，None 則使用平台預設全球發行
 
         Returns:
-            dict: 含該平台之上架必要條件、預估版稅與注意事項。
+            dict: 含該平台之上架必要條件、預估版稅與註意事項。
         """
         if manuscript_id not in self._books:
             raise KeyError(f"找不到稿件: {manuscript_id}")
@@ -623,7 +623,7 @@ class EbookPublisherOrgan(BrainComponent):
             "territories": territory_list,
             "requirements_checklist": {
                 "isbn_required": cfg["isbn_required"],
-                "isbn_note": "需自行購買 Bowker (美國) 或各國 ISBN 機構之 ISBN。兒童書不同版本（EPUB/PDF）需不同 ISBN。" if cfg["isbn_required"] else "平台提供免費 ASIN 或內部識別碼，但建議仍自行購買 ISBN 以保留完整版權控制",
+                "isbn_note": "需自行購買 Bowker (美國) 或各國 ISBN 機構之 ISBN。兒童書不同版本（EPUB/PDF）需不同 ISBN。" if cfg["isbn_required"] else "平台提供免費 ASIN 或內部識別碼，但建議仍自行購買 ISBN 以保留完整版權控製",
                 "tax_forms": cfg["tax_requirements"],
                 "accepted_formats": cfg["accepted_formats"],
                 "payout_threshold": cfg["payout_threshold"],

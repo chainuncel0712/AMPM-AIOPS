@@ -1,5 +1,5 @@
 """
-Event Log — 強制行為記錄
+Event Log — 強製行為記錄
 =========================
 每一次 decision / tool call / memory write 都要有：
 - action_id (唯一)

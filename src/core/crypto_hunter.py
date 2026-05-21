@@ -722,7 +722,7 @@ class CryptoHunterOrgan(BrainComponent):
         suggestions = [
             f"⏰ 優先參與交易所 Launchpad (無常虧損風險)",
             f"🔍 檢查已追蹤地址的空投狀態",
-            f"📊 關注 {new_chain_name} 生態新專案",
+            f"📊 關註 {new_chain_name} 生態新專案",
             f"💼 分散持有不同鏈原生代幣以備 Gas 費",
         ]
         for s in suggestions:

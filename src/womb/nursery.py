@@ -1,4 +1,4 @@
-"""托儿所 - 管理所有子代理的状态"""
+"""托兒所 - 管理所有子代理的状态"""
 from skeleton.base_organ import BaseOrgan
 
 class Nursery(BaseOrgan):
@@ -17,7 +17,7 @@ class Nursery(BaseOrgan):
                 for cid, info in self._agents.items()]
 
     def clean_orphans(self, placenta):
-        """清理胎盘里已经没有但在托儿所还存在的孤儿"""
+        """清理胎盘里已经沒有但在托兒所還存在的孤兒"""
         for cid in list(self._agents.keys()):
             if cid not in placenta._children:
                 self.unregister(cid)

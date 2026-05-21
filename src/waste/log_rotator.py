@@ -1,4 +1,4 @@
-"""排泄 - 日志轮替，防止日志过大"""
+"""排泄 - 日志輪替，防止日志過大"""
 from skeleton.base_organ import BaseOrgan
 from pathlib import Path
 
@@ -9,7 +9,7 @@ class LogRotator(BaseOrgan):
         self.max_size = max_size_mb * 1024 * 1024
 
     def rotate(self):
-        """如果日志超过限制，进行轮替"""
+        """如果日志超過限製，進行輪替"""
         for log_file in self.log_dir.glob("*.log"):
             if log_file.stat().st_size > self.max_size:
                 backup = log_file.with_suffix(".log.old")

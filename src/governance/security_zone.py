@@ -1,7 +1,7 @@
 """
-Security Zone — 三層硬切強制器
+Security Zone — 三層硬切強製器
 ================================
-強制模組只能在所屬層級執行：
+強製模組只能在所屬層級執行：
 - Decision：只能 think / plan / route
 - Execution：只能 run_tool / execute
 - Memory：只能 read / write
@@ -35,7 +35,7 @@ class SecurityZone:
 
     # 每個 action 的「專屬 zone」— 只有該 zone 的 module 可以執行
     ACTION_OWNERSHIP = {
-        # Execution 專屬（decision/memory 不准 call）
+        # Execution 專屬（decision/memory 不準 call）
         "run_tool": "execution",
         "execute_command": "execution",
         "write_file": "execution",
@@ -43,7 +43,7 @@ class SecurityZone:
         "execute": "execution",
         "execute_only": "execution",
         "provide_capability": "execution",
-        # Decision 專屬（execution/memory 不准碰）
+        # Decision 專屬（execution/memory 不準碰）
         "make_decision": "decision",
         "modify_routing": "decision",
         "modify_plan": "decision",

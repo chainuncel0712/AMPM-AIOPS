@@ -1,5 +1,5 @@
 """
-License Key System — 離線驗證 + 補餘機制
+License Key System — 離線驗證 + 補餘機製
 =========================================
 Tiers: community (免費) / pro / enterprise
 """

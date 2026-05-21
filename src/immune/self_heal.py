@@ -1,4 +1,4 @@
-"""自我修复 — 决策層：判斷要修什麼，不負責執行"""
+"""自我修復 — 決策層：判斷要修什麼，不負責執行"""
 from skeleton.base_organ import BaseOrgan
 
 

@@ -1,4 +1,4 @@
-"""脸 - 回覆格式控制"""
+"""脸 - 回覆格式控製"""
 from skeleton.base_organ import BaseOrgan
 
 class Face(BaseOrgan):

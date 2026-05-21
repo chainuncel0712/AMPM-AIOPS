@@ -36,7 +36,7 @@ class ProactiveLearnerOrgan(BrainComponent):
 
     HEADLINE_TEMPLATES: Dict[str, List[str]] = {
         "Google News": [
-            "{topic} 突破性進展引發業界關注",
+            "{topic} 突破性進展引發業界關註",
             "最新研究：{topic} 將改變未來十年產業格局",
             "{topic} 市場規模預計在 2026 年達到新高",
             "專家警告：{topic} 領域人才缺口持續擴大",
@@ -82,7 +82,7 @@ class ProactiveLearnerOrgan(BrainComponent):
         ],
         "CoinMarketCap": [
             "{topic} 交易量飆升，單日突破 5 億美元",
-            "CMC 社群評分：{topic} 蟬聯本週最受關注項目",
+            "CMC 社群評分：{topic} 蟬聯本週最受關註項目",
             "{topic} 新增上架 12 家交易所，流動性大增",
             "巨鯨地址大量囤積 {topic}，鏈上數據顯示異常",
             "{topic} 市值排名躍升至前 50，分析師上調目標價",
@@ -120,7 +120,7 @@ class ProactiveLearnerOrgan(BrainComponent):
                 "核心概念：理解基本術語與運作原理",
                 "環境建置：安裝必要工具與依賴套件",
                 "第一個範例：實作最小可行範例以建立信心",
-                "常見陷阱：注意初學者常犯的 5 個錯誤",
+                "常見陷阱：註意初學者常犯的 5 個錯誤",
             ],
             "next_steps": [
                 "完成一個小型實作專案 (2-4 小時)",
@@ -156,7 +156,7 @@ class ProactiveLearnerOrgan(BrainComponent):
             ],
             "notes": [
                 "前沿趨勢：掌握領域最新研究與技術突破",
-                "架構決策：學習在限制條件下做出最佳技術選擇",
+                "架構決策：學習在限製條件下做出最佳技術選擇",
                 "導師角色：如何有效地指導初階與中階學習者",
                 "商業價值：理解技術投資的 ROI 與商業影響",
             ],
@@ -332,7 +332,7 @@ class ProactiveLearnerOrgan(BrainComponent):
 
         彙整當日重要資訊，包含：
         - 5 則最重要的新聞頭條
-        - 3 個值得關注的趨勢
+        - 3 個值得關註的趨勢
         - 2 個潛在商業機會
         - 1 個需警惕的風險
 
@@ -791,7 +791,7 @@ class ProactiveLearnerOrgan(BrainComponent):
         opportunity_pool = [
             {
                 "title": "AI 自動化內容創作平台",
-                "description": "利用生成式 AI 為小型企業自動產生行銷文案、社群貼文與 SEO 文章，月訂閱制商業模式。",
+                "description": "利用生成式 AI 為小型企業自動產生行銷文案、社群貼文與 SEO 文章，月訂閱製商業模式。",
                 "related_interests": ["AI", "business automation", "passive income"],
                 "timeframe": "3-6 個月 MVP",
                 "action": "研究現有競品 (Jasper, Copy.ai)，找出差異化切入點",
@@ -802,7 +802,7 @@ class ProactiveLearnerOrgan(BrainComponent):
                 "description": "開發跨交易所的價差套利機器人，利用閃電貸與智能合約實現零本金套利。",
                 "related_interests": ["crypto", "DeFi", "blockchain", "passive income"],
                 "timeframe": "2-4 個月開發與測試",
-                "action": "研究 MEV 與閃電貸機制，選擇 Polygon 或 Arbitrum 作為首發鏈",
+                "action": "研究 MEV 與閃電貸機製，選擇 Polygon 或 Arbitrum 作為首發鏈",
                 "base_potential": 7,
             },
             {
@@ -823,7 +823,7 @@ class ProactiveLearnerOrgan(BrainComponent):
             },
             {
                 "title": "區塊鏈供應鏈追蹤 SaaS",
-                "description": "為中小型製造業提供基於區塊鏈的供應鏈透明化解決方案，月費制 SaaS。",
+                "description": "為中小型製造業提供基於區塊鏈的供應鏈透明化解決方案，月費製 SaaS。",
                 "related_interests": ["blockchain", "business automation"],
                 "timeframe": "6-12 個月",
                 "action": "針對食品與藥品產業進行市場驗證，尋找首位企業客戶",
@@ -879,7 +879,7 @@ class ProactiveLearnerOrgan(BrainComponent):
         risk_pool = [
             {
                 "title": "AI 監管政策不確定性",
-                "description": "全球多國加速制定 AI 監管法案，可能影響 AI 相關商業模式的合規成本與市場準入。",
+                "description": "全球多國加速製定 AI 監管法案，可能影響 AI 相關商業模式的合規成本與市場準入。",
                 "mitigation": "密切追蹤歐盟 AI Act 與美國行政命令進展，預先建立合規框架。",
                 "base_severity": 7,
             },
@@ -892,7 +892,7 @@ class ProactiveLearnerOrgan(BrainComponent):
             {
                 "title": "市場競爭白熱化",
                 "description": "大型科技公司加速進入 AI 與 Web3 領域，可能擠壓新創團隊的生存空間。",
-                "mitigation": "專注利基市場，建立社群壁壘，快速迭代以維持競爭優勢。",
+                "mitigation": "專註利基市場，建立社群壁壘，快速迭代以維持競爭優勢。",
                 "base_severity": 6,
             },
             {

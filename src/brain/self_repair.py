@@ -1,4 +1,4 @@
-"""自我修復層 - 回覆品質不佳時，用更強模型重新生成 + 被動觸發機制"""
+"""自我修復層 - 回覆品質不佳時，用更強模型重新生成 + 被動觸發機製"""
 from skeleton.base_organ import BaseOrgan
 from datetime import datetime  # 導入 datetime 用於時間戳記
 
@@ -10,7 +10,7 @@ class SelfRepair(BaseOrgan):
         self.compass = compass
         self.context_assembler = context_assembler
         
-        # ===== 新增：被動觸發機制狀態 =====
+        # ===== 新增：被動觸發機製狀態 =====
         self.repair_count = 0  # 修復次數
         self.last_repair_time = None  # 上一次修復時間
         self.repair_history = []  # 修復歷史記錄

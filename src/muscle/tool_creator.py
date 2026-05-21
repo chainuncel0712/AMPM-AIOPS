@@ -1,4 +1,4 @@
-"""肌肉 - 自创工具能力"""
+"""肌肉 - 自創工具能力"""
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -11,11 +11,11 @@ class ToolCreator(BaseOrgan):
         self.call_ai = call_ai_func
 
     def create_from_need(self, need: str) -> str:
-        """根据需求自动创造新工具"""
+        """根据需求自动創造新工具"""
         return self.tools.create_tool_from_need(need, self.call_ai)
 
     def learn(self, name: str, description: str, code: str) -> str:
-        """直接学一个新工具"""
+        """直接学一個新工具"""
         return self.tools.learn_tool(name, description, "custom", code)
 
     def status(self) -> dict:

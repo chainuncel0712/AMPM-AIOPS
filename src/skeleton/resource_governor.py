@@ -18,7 +18,7 @@ ResourceGovernor — 資源總督
 
 自動休眠策略：
 - 超過 5 分鐘未使用 → 休眠
-- 記憶體超過預算 → 強制休眠最低優先級的層
+- 記憶體超過預算 → 強製休眠最低優先級的層
 """
 import gc
 import json
@@ -205,7 +205,7 @@ class ResourceGovernor:
         """
         自動平衡記憶體使用量。
         1. 檢查閒置層 → 休眠
-        2. 若仍超過總預算 → 強制休眠最低優先級的非 CORE 層
+        2. 若仍超過總預算 → 強製休眠最低優先級的非 CORE 層
         """
         with self._lock:
             self.recalc_usage()
@@ -226,7 +226,7 @@ class ResourceGovernor:
                         actions.append(f"sleep_idle:{name} (idle {int(idle_s)}s, freed {freed}MB)")
                         freed_total += freed
 
-            # Step 2: 若仍超標，強制休眠
+            # Step 2: 若仍超標，強製休眠
             self.recalc_usage()
             if self.current_usage_mb > self.total_budget_mb:
                 over = self.current_usage_mb - self.total_budget_mb
