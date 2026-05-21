@@ -1,0 +1,38 @@
+AI‑BOS Core — License Notice
+
+Copyright (C) 2026 AMPM Labs / chainuncel0712
+
+This project is licensed under the GNU Affero General Public License v3.0 (AGPL‑3.0)
+with the following additional restrictions:
+
+1. **Commercial Use Prohibited**
+   Commercial use, including SaaS, resale, hosting, or integration into paid products,
+   is prohibited without a separate commercial license.
+
+2. **Proprietary Components**
+   The Immune System, Governance Layer, Evolution Engine, and Civilization Memory
+   are proprietary components and may not be re‑implemented, reverse‑engineered,
+   or distributed based on this open‑source core.
+
+3. **Copyleft**
+   Any forks or modifications must remain open‑source under AGPL‑3.0.
+
+For commercial licensing, contact: chainuncel0712@gmail.com
+
+---
+
+                    GNU AFFERO GENERAL PUBLIC LICENSE
+                       Version 3, 19 November 2007
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
