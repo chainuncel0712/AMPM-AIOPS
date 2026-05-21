@@ -259,7 +259,7 @@ He built Obsidian piece by piece with AI — because he couldn't find a single A
 <br />
 
 <p align="center">
-  <a href="https://github.com/sponsors/chainuncel0712">
+  <a href="https://www.buymeacoffee.com/chainuncel0712">
     <img src="https://img.shields.io/badge/☕-Buy_Hao_a_coffee-ff69b4?style=for-the-badge" />
   </a>
 </p>

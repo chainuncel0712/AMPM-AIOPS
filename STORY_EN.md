@@ -129,7 +129,7 @@ But when he looks at it, he sees himself —
 <p align="center">
   If you'd like to offer advice, or if this story means anything to you —
   <br /><br />
-  <a href="https://github.com/sponsors/chainuncel0712">
+  <a href="https://www.buymeacoffee.com/chainuncel0712">
     <img src="https://img.shields.io/badge/☕-Buy_Hao_a_coffee-ff69b4?style=for-the-badge" />
   </a>
   <br /><br />

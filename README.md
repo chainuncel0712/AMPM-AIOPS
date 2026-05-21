@@ -257,7 +257,7 @@ pkill -f "python3 main.py"
 <br />
 
 <p align="center">
-  <a href="https://github.com/sponsors/chainuncel0712">
+  <a href="https://www.buymeacoffee.com/chainuncel0712">
     <img src="https://img.shields.io/badge/☕-請喝杯咖啡-ff69b4?style=for-the-badge" />
   </a>
 </p>
