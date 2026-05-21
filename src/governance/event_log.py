@@ -126,10 +126,11 @@ class EventLog:
                 result.extend(subtree)
             return result
 
-    def replay(self, start_id: str = None, end_id: str = None) -> List[Dict]:
+    def replay(self, start_id: str = None, end_id: str = None, limit: int = None) -> List[Dict]:
         """
         重播：回傳時間序列表。
         如果指定 start_id / end_id，則只回傳該區間。
+        limit: 最多回傳筆數（最新的 N 筆）。
         """
         with self._lock:
             events = list(self._events)
@@ -139,6 +140,8 @@ class EventLog:
         if end_id:
             end_idx = next((i for i, e in enumerate(events) if e["action_id"] == end_id), len(events))
             events = events[:end_idx + 1]
+        if limit:
+            events = events[-limit:]
         return events
 
     def last_rollback_point(self) -> Optional[str]:

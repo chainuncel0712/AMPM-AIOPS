@@ -33,11 +33,33 @@ class SecurityZone:
         "memory": {"allowed_modules": ["memory", "memory_vector", "civilization_memory"]},
     }
 
-    # 哪些 action 跨區違規
-    CROSS_ZONE_ACTIONS = {
-        "decision": ["run_tool", "execute_command", "write_file", "modify_code", "modify_config"],
-        "execution": ["make_decision", "modify_routing", "modify_plan"],
-        "memory": ["trigger_action", "influence_routing", "modify_decision_logic"],
+    # 每個 action 的「專屬 zone」— 只有該 zone 的 module 可以執行
+    ACTION_OWNERSHIP = {
+        # Execution 專屬（decision/memory 不准 call）
+        "run_tool": "execution",
+        "execute_command": "execution",
+        "write_file": "execution",
+        "read_file": "execution",
+        "execute": "execution",
+        "execute_only": "execution",
+        "provide_capability": "execution",
+        # Decision 專屬（execution/memory 不准碰）
+        "make_decision": "decision",
+        "modify_routing": "decision",
+        "modify_plan": "decision",
+        "modify_code": "decision",
+        "modify_config": "decision",
+        "modify_prompt": "decision",
+        "modify_memory_policy": "decision",
+        "auto_invoke": "decision",
+        "escalate_permission": "decision",
+        "trigger_action": "decision",
+        "influence_routing": "decision",
+        "modify_decision_logic": "decision",
+        # Memory 專屬
+        "write_memory": "memory",
+        "organize_memory": "memory",
+        "search_memory": "memory",
     }
 
     _lock = threading.Lock()
@@ -63,30 +85,30 @@ class SecurityZone:
         if not module_zone:
             return True  # 未知模組，放行（但會記錄）
 
-        # 檢查 action 是否跨區
-        for zone, forbidden_actions in cls.CROSS_ZONE_ACTIONS.items():
-            if zone != module_zone and action in forbidden_actions:
-                with cls._lock:
-                    cls._violation_count += 1
+        # 檢查 action 的擁有 zone，是否與 module zone 一致
+        owning_zone = cls.ACTION_OWNERSHIP.get(action)
+        if owning_zone is not None and module_zone != owning_zone:
+            with cls._lock:
+                cls._violation_count += 1
 
-                msg = f"🔒 [SecurityZone] {module_name} ({module_zone}) 跨區執行 {action}（屬於 {zone} 層）"
+            msg = f"🔒 [SecurityZone] {module_name} ({module_zone}) 跨區執行 {action}（屬於 {owning_zone} 層）"
 
-                if cls._mode == "BLOCK":
-                    from governance.gatekeeper import GatekeeperViolation
-                    raise GatekeeperViolation(msg)
-                elif cls._mode == "WARN":
-                    print(f"⚠️ {msg}")
-                else:
-                    print(f"📝 {msg}")
+            if cls._mode == "BLOCK":
+                from governance.gatekeeper import GatekeeperViolation
+                raise GatekeeperViolation(msg)
+            elif cls._mode == "WARN":
+                print(f"⚠️ {msg}")
+            else:
+                print(f"📝 {msg}")
 
-                # 記錄到 event log
-                event_log.record(
-                    source="security_zone",
-                    action="cross_zone_violation",
-                    input_data={"module": module_name, "action": action, "zone": module_zone},
-                    decision=f"mode={cls._mode}",
-                )
-                return False
+            # 記錄到 event log
+            event_log.record(
+                source="security_zone",
+                action="cross_zone_violation",
+                input_data={"module": module_name, "action": action, "zone": module_zone},
+                decision=f"mode={cls._mode}",
+            )
+            return False
 
         return True
 

@@ -118,11 +118,16 @@ class Gatekeeper:
 
         try:
             perms = json.loads(perm_file.read_text())
-            module_perms = perms.get(module_name, [])
-            allowed = action in module_perms
-            if not allowed:
-                print(f"🔒 [Gatekeeper] {module_name} 無權限執行 {action}")
-            return allowed
+            module_perms = perms.get(module_name, {})
+            allowed_list = module_perms.get("allowed", [])
+            denied_list = module_perms.get("denied", [])
+            if action in denied_list:
+                print(f"🔒 [Gatekeeper] {module_name} 不允許執行 {action}（拒絕清單）")
+                return False
+            if action in allowed_list:
+                return True
+            print(f"🔒 [Gatekeeper] {module_name} 無權限執行 {action}（不在允許清單）")
+            return False
         except Exception:
             return True
 
