@@ -215,7 +215,32 @@ class LLMClient:
                     continue
                 print(f"⚠️ {p['name']} {r.status_code}")
             except Exception as e:
-                print(f"⚠️ {p['name']}: {str(e)[:30]}")
+                err = str(e)[:80]
+                print(f"⚠️ {p['name']}: {err}")
+                # 瞬斷（HTTPSConnectionPool 等）retry 一次
+                if "HTTPSConnectionPool" in err or "ConnectionError" in err or "timeout" in err.lower():
+                    print(f"↻ {p['name']} 瞬斷，1 秒後重試...")
+                    time.sleep(1)
+                    try:
+                        r = requests.post(
+                            p["ep"],
+                            headers={"Authorization": f"Bearer {p['key']}", "Content-Type": "application/json"},
+                            json={"model": p["model"], "messages": safe, "temperature": temperature, "max_tokens": 4000},
+                            timeout=20
+                        )
+                        if r.status_code == 200:
+                            self._working_provider = p["name"]
+                            try:
+                                return r.json().get("choices", [{}])[0].get("message", {}).get("content", "")
+                            except (KeyError, IndexError, TypeError, json.JSONDecodeError):
+                                return "⚠️ API 回應格式異常"
+                        if r.status_code == 429:
+                            print(f"⚠️ {p['name']} 速率限制（重試），等待...")
+                            time.sleep(5)
+                            continue
+                        print(f"⚠️ {p['name']} {r.status_code}（重試）")
+                    except Exception as e2:
+                        print(f"⚠️ {p['name']} 重試仍失敗: {str(e2)[:30]}")
             # 如果目前 provider 是快取且失敗，清除快取，繼續試下一個
             if self._working_provider and p["name"] == self._working_provider:
                 self._working_provider = None

@@ -230,7 +230,14 @@ class ProactiveExecutor:
             busy_agents = stats.get("agents_busy", 0)
             if busy_agents < 15:  # 放寬限制，允許更多子代理並行
                 try:
-                    mission_id = agents.launch_mission(desc)
+                    # 策略提示：根據過去類似任務結果調整
+                    ec = getattr(self.obsidian, "evolution_cycle", None) or self.obsidian.organs.get("evolution_cycle")
+                    hint = ""
+                    if ec and hasattr(ec, "get_strategy_hint"):
+                        hint = ec.get_strategy_hint(str(task.get("title", "")) + " " + desc)
+                    enriched_desc = f"{hint}\n\n{desc}" if hint else desc
+
+                    mission_id = agents.launch_mission(enriched_desc)
                     if mission_id:
                         tid = str(task["id"])
                         self._pending_missions[tid] = mission_id
@@ -475,6 +482,8 @@ class ProactiveExecutor:
 
             status = mission.get("status", "")
 
+            ec = getattr(self.obsidian, "evolution_cycle", None) or self.obsidian.organs.get("evolution_cycle")
+
             if status == "completed":
                 # 驗證：任務是否真的產出了檔案？
                 task = planner.tasks.get(task_id, {})
@@ -497,6 +506,12 @@ class ProactiveExecutor:
                 planner.tasks.complete_task(task_id)
                 completed_ids.append(task_id)
 
+                # 回饋到進化循環
+                if ec and hasattr(ec, "absorb_feedback"):
+                    ec.absorb_feedback(task_id, task.get("title", ""), "completed",
+                                       success_count, total,
+                                       output_files=[], duration=0)
+
                 self._notify_user(
                     f"✅ 黑曜完成任務\n"
                     f"📋 {task.get('title', task_id)}\n"
@@ -509,9 +524,21 @@ class ProactiveExecutor:
                 self._current_mission_id = None
 
             elif status == "failed":
+                task = planner.tasks.get(task_id, {})
                 planner.tasks.update_task_status(task_id, "pending")
                 completed_ids.append(task_id)
                 print(f"[ProactiveExecutor] ❌ 任務失敗: {task_id}")
+
+                # 回饋到進化循環（含失敗原因）
+                fail_reason = ""
+                results = mission.get("results", {})
+                for r in results.values():
+                    if not r.get("success"):
+                        fail_reason = str(r.get("result", ""))[:100]
+                        break
+                if ec and hasattr(ec, "absorb_feedback"):
+                    ec.absorb_feedback(task_id, task.get("title", ""), "failed",
+                                       meta={"reason": fail_reason})
 
                 self._current_task_id = None
                 self._current_mission_id = None
@@ -520,19 +547,26 @@ class ProactiveExecutor:
             self._pending_missions.pop(tid, None)
 
     def _verify_output_exists(self, desc: str) -> bool:
-        """檢查任務描述中指定的輸出路徑是否真的有檔案產生。"""
+        """檢查任務描述中指定的輸出路徑是否真的有檔案產生，且內容足夠。"""
         import os
+        paths_to_check = []
         for keyword in ["存入 ", "存到 ", "outputs/"]:
             idx = desc.find(keyword)
             if idx >= 0:
                 path_str = desc[idx + len(keyword):].strip().split()[0].rstrip("。.,")
                 if path_str:
                     full_path = Path(__file__).parent.parent.parent / path_str
-                    if full_path.exists():
-                        return True
-                    # 也檢查 outputs/ 下的同名檔案
+                    paths_to_check.append(full_path)
                     alt_path = Path(__file__).parent.parent.parent / "outputs" / path_str.replace("outputs/", "")
-                    return alt_path.exists()
+                    paths_to_check.append(alt_path)
+
+        if paths_to_check:
+            for p in paths_to_check:
+                if p.exists() and p.stat().st_size >= 500:
+                    return True
+            # 有指定路徑但沒有合格的檔案
+            print(f"[ProactiveExecutor] ⚠️ 驗證失敗: 指定路徑的檔案不存在或太小")
+            return False
         return True  # 如果任務描述沒指定路徑，先信任子代理回報
 
     # ── 0. 確保永遠有商業任務 ──────────────────────────────

@@ -69,6 +69,8 @@ class EvolutionCycleOrgan(BaseOrgan):
         self.learnings_file = self.data_dir / "learnings.json"
         self.bad_file = self.data_dir / "excluded.json"
         self.absorbed_fingerprints_file = self.data_dir / "absorbed_fingerprints.json"
+        self.feedback_file = self.data_dir / "feedback.json"
+        self.strategy_file = self.data_dir / "strategies.json"
 
         self._lock = threading.Lock()
         self._load_state()
@@ -115,6 +117,113 @@ class EvolutionCycleOrgan(BaseOrgan):
         if len(data) > max_items:
             data = data[-max_items:]
         path.write_text(json.dumps(data, ensure_ascii=False, indent=2))
+
+    # =========================================
+    # 回饋吸收 (feedback) — 從 ProactiveExecutor 接收任務結果
+    # =========================================
+
+    def absorb_feedback(self, task_id: str, title: str, status: str,
+                        success_count: int = 0, total_count: int = 0,
+                        output_files: list = None, duration: float = 0,
+                        meta: dict = None):
+        """接收 ProactiveExecutor 的任務執行回饋，供進化循環使用。"""
+        feedback = {
+            "task_id": str(task_id),
+            "title": title[:100],
+            "status": status,
+            "success_count": success_count,
+            "total_count": total_count,
+            "output_files": output_files or [],
+            "duration": round(duration, 1),
+            "meta": meta or {},
+            "timestamp": datetime.now().isoformat(),
+        }
+        all_feedback = self._load_json(self.feedback_file)
+        all_feedback.append(feedback)
+        self._save_json(self.feedback_file, all_feedback, max_items=200)
+        print(f"[EvolutionCycle] 📥 吸收任務回饋: {title[:40]} → {status}")
+
+        # 同時記錄策略記憶
+        self.record_strategy(title, status, {
+            "task_id": str(task_id),
+            "success_count": success_count,
+            "total_count": total_count,
+            "reason": (meta or {}).get("reason", ""),
+        })
+
+    # =========================================
+    # 策略記憶 (strategy memory) — 記住任務失敗模式
+    # =========================================
+
+    def record_strategy(self, task_title: str, outcome: str, meta: dict = None):
+        """記錄任務執行的策略與結果，供未來參考。"""
+        keywords = self._extract_keywords(task_title)
+        entry = {
+            "keywords": keywords,
+            "task_title": task_title[:100],
+            "outcome": outcome,
+            "meta": meta or {},
+            "recorded_at": datetime.now().isoformat(),
+        }
+        all_strategies = self._load_json(self.strategy_file)
+        all_strategies.append(entry)
+        self._save_json(self.strategy_file, all_strategies, max_items=300)
+
+    def _extract_keywords(self, text: str) -> list:
+        """從任務標題提取關鍵字分類。"""
+        text_lower = text.lower()
+        keywords = []
+        categories = {
+            "research": ["研究", "搜尋", "查", "分析", "research", "search", "analyze"],
+            "writing": ["寫", "內容", "創作", "文章", "故事", "電子書", "書", "write", "content", "chapter", "ebook"],
+            "code": ["程式", "程式碼", "網站", "部署", "code", "website", "deploy", "html", "api"],
+            "design": ["設計", "美術", "配色", "logo", "插畫", "design", "illust"],
+            "business": ["商業", "行銷", "定價", "策略", "business", "marketing", "pricing"],
+            "marketing": ["行銷", "廣告", "推廣", "marketing", "promotion"],
+            "maintenance": ["修復", "檢查", "更新", "fix", "check", "update", "maintenance"],
+        }
+        for cat, kws in categories.items():
+            if any(kw in text_lower for kw in kws):
+                keywords.append(cat)
+        return keywords or ["general"]
+
+    def get_strategy_hint(self, task_desc: str) -> str:
+        """根據過去類似任務的執行結果，回傳策略提示。"""
+        keywords = self._extract_keywords(task_desc)
+        if not keywords:
+            return ""
+
+        all_strategies = self._load_json(self.strategy_file)
+        if not all_strategies:
+            return ""
+
+        # 找相同分類的最近 10 筆
+        relevant = [s for s in all_strategies[-50:]
+                    if any(kw in s.get("keywords", []) for kw in keywords)]
+
+        if not relevant:
+            return ""
+
+        failed = [s for s in relevant if s.get("outcome") == "failed"]
+        completed = [s for s in relevant if s.get("outcome") == "completed"]
+
+        hints = []
+        if len(failed) > len(completed):
+            hints.append("⚠️ 此類任務過去失敗率高，建議降低期望、多加驗證步驟")
+        if len(failed) > 3:
+            hints.append("🔁 此類任務已連續失敗多次，考慮更換執行策略")
+        if len(completed) >= 3 and len(failed) == 0:
+            hints.append("✅ 此類任務過去成功率很高，可以信任標準流程")
+
+        fail_reasons = set()
+        for f in failed:
+            reason = f.get("meta", {}).get("reason", "")
+            if reason:
+                fail_reasons.add(reason[:60])
+        if fail_reasons:
+            hints.append(f"📌 過去失敗原因: {'; '.join(list(fail_reasons)[:3])}")
+
+        return " | ".join(hints) if hints else ""
 
     # =========================================
     # 步驟 1：吸收 (absorb)
@@ -186,7 +295,26 @@ class EvolutionCycleOrgan(BaseOrgan):
         except Exception:
             pass
 
-        # 4. 動態網頁搜尋（每週期變換查詢主題）
+        # 4. 從執行回饋吸收（每次循環取最新回饋）
+        try:
+            all_feedback = self._load_json(self.feedback_file)
+            for fb in all_feedback[-10:]:
+                fp = hash(fb.get("title", "") + fb.get("status", ""))
+                if fp not in seen_fingerprints:
+                    seen_fingerprints.add(fp)
+                    key = f"feedback:{fb.get('task_id', '')}"
+                    if key not in seen:
+                        seen.add(key)
+                        sources.append({
+                            "source": "mission_feedback",
+                            "content": f"任務「{fb.get('title','')}」{fb.get('status','')} "
+                                       f"({fb.get('success_count',0)}/{fb.get('total_count',0)} 子任務成功)",
+                            "absorbed_at": datetime.now().isoformat(),
+                        })
+        except Exception:
+            pass
+
+        # 5. 動態網頁搜尋（每週期變換查詢主題）
         topics = [
             "AI agent autonomous business model 2026",
             "free LLM API for AI agents 2026",
@@ -554,6 +682,13 @@ class EvolutionCycleOrgan(BaseOrgan):
                         pipeline_stages.add("service_flow")
                 except:
                     pass
+
+        # 從回饋計算任務成功率
+        all_feedback = self._load_json(self.feedback_file)
+        recent = [f for f in all_feedback if f.get("status") in ("completed", "failed")]
+        if recent:
+            success = sum(1 for f in recent if f["status"] == "completed")
+            score += int((success / len(recent)) * 50)  # 成功率最高 50 分
 
         # 計分
         score += total_files * 5  # 每個檔案 5 分

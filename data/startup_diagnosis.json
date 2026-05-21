@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-05-21T01:42:29.306624",
+  "timestamp": "2026-05-21T01:54:25.906671",
   "total_organs": 81,
   "organs": [
     {
@@ -408,7 +408,7 @@
       "alive": true
     }
   ],
-  "tools_count": 1186,
+  "tools_count": 1189,
   "tools": [
     "planner.add_task",
     "planner.complete_task",
@@ -1011,15 +1011,18 @@
     "rebirth.try_upgrade_organ",
     "rebirth.wake",
     "evolution_cycle.absorb",
+    "evolution_cycle.absorb_feedback",
     "evolution_cycle.disable",
     "evolution_cycle.enable",
     "evolution_cycle.enhance",
     "evolution_cycle.exclude",
+    "evolution_cycle.get_strategy_hint",
     "evolution_cycle.get_summary",
     "evolution_cycle.is_alive",
     "evolution_cycle.is_asleep",
     "evolution_cycle.learn",
     "evolution_cycle.memory_estimate_mb",
+    "evolution_cycle.record_strategy",
     "evolution_cycle.remember",
     "evolution_cycle.resource_status",
     "evolution_cycle.run_cycle",
