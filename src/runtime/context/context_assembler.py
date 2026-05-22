@@ -95,9 +95,9 @@ class ContextAssembler:
         Returns:
             完整 messages 清单，直接传给 LLMClient.call()
         """
-        # 1. 固定身份 + 人格（永远不变）
-        identity = self.persona_builder.build_identity_messages()
-        persona = self.persona_builder.build_persona_message()
+        # 1. 统一身份 + 人格（单一系统消息，避免人格分裂）
+        identity = self.persona_builder.build_combined()
+        persona = None
 
         # 2. 记忆 → Memory Selector（Retrieve → Score → Filter → Compress）
         # 先同步 RuntimeUpdate 演化后的权重

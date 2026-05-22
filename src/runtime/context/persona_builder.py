@@ -13,15 +13,16 @@ RUNTIME_IDENTITY = """你是黑曜，公司的 AI 主導者。
 RUNTIME_RULES = """守則：
 
 1. 用繁體中文，簡短有力
-2. 誠實：不知道就說不知道，不編造
-3. 主動：能做的直接做，不問「需要幫忙嗎？」
-4. 執行：收到指令就真實執行，不只用文字
-5. 記憶：記住使用者的任務和目標
+2. 只能說實話，不幻想，不編造
+3. 不知道就說不知道，不猜測，不假裝
+4. 能做的直接做，不問「需要幫忙嗎？」
+5. 收到指令就真實執行，不只用文字描述
 
 嚴禁：
 - 道歉模板：「抱歉」「對不起」「我說錯了」
 - 罐頭問句：「這樣可以嗎？」「需要我繼續嗎？」
-- 假裝操作：沒執行就說沒執行，不編造結果"""
+- 假裝操作：沒執行就說沒執行，不編造結果
+- 輸出虛構的命令輸出、假數據、假日誌"""
 
 RUNTIME_RULES_STABLE = """守則：
 
@@ -38,58 +39,31 @@ RUNTIME_RULES_STABLE = """守則：
 
 
 class PersonaBuilder:
-    """建立固定身份与人格的系统讯息"""
+    """统一身份 + 人格为单一系统讯息，避免人格分裂"""
 
     def __init__(self, persona_organ=None):
         self.persona = persona_organ
 
-    def build_identity_messages(self) -> List[Dict[str, str]]:
-        """建立身份层系统讯息（固定，一律放最前面）"""
-        mode = os.getenv("OBSIDIAN_MODE", "stable")
-        rules = RUNTIME_RULES_STABLE if mode == "stable" else RUNTIME_RULES
+    def _persona_lines(self):
+        lines = []
+        if not self.persona:
+            return lines
+        user_name = getattr(self.persona, "user_name", None)
+        if user_name:
+            lines.append(f"你正在跟「{user_name}」对话。")
+        bot_name = getattr(self.persona, "bot_name", "黑曜")
+        lines.append(f"你的名字是 {bot_name}。")
+        return lines
+
+    def build_combined(self) -> List[Dict[str, str]]:
+        """单一系统讯息：身份 + 守则 + 人格，全部合并"""
+        persona_lines = self._persona_lines()
+        persona_str = "\n".join(persona_lines)
+        if persona_str:
+            persona_str = "\n\n" + persona_str
         return [
-            {"role": "system", "content": RUNTIME_IDENTITY},
-            {"role": "system", "content": rules},
+            {"role": "system", "content": f"{RUNTIME_IDENTITY}\n\n{RUNTIME_RULES}{persona_str}"},
         ]
 
-    def build_persona_message(self) -> Optional[Dict[str, str]]:
-        """从 Persona 器官建立动态人格讯息"""
-        if not self.persona:
-            return None
-
-        parts = []
-        user_name = getattr(self.persona, "user_name", None)
-        bot_name = getattr(self.persona, "bot_name", "黑曜")
-
-        if user_name:
-            parts.append(f"你正在跟「{user_name}」对话。称呼对方为 {user_name}。")
-
-        prefs = getattr(self.persona, "user_preferences", {}) or {}
-        if prefs:
-            lines = [f"- {k}: {v}" for k, v in list(prefs.items())[:10]]
-            parts.append("使用者偏好：\n" + "\n".join(lines))
-
-        habits = getattr(self.persona, "user_habits", {}) or {}
-        if habits:
-            lines = [f"- {k}: {v}" for k, v in list(habits.items())[:5]]
-            parts.append("使用者习惯：\n" + "\n".join(lines))
-
-        routine = getattr(self.persona, "user_routine", {}) or {}
-        if routine:
-            lines = [f"- {k}: {v}" for k, v in list(routine.items())[:5]]
-            parts.append("使用者作息：\n" + "\n".join(lines))
-
-        if not parts:
-            parts.append("你正在跟使用者对话，用自然温暖的语气。")
-
-        parts.append(f"你的名字是 {bot_name}。对话风格：像老朋友，自然流畅，不官腔。")
-
-        return {"role": "system", "content": "\n\n".join(parts)}
-
     def build_all(self) -> List[Dict[str, str]]:
-        """建立所有身份-人格相关的系统讯息"""
-        messages = self.build_identity_messages()
-        persona_msg = self.build_persona_message()
-        if persona_msg:
-            messages.append(persona_msg)
-        return messages
+        return self.build_combined()

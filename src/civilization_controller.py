@@ -1,3 +1,4 @@
+# [kernel] belongs in AMPM-KERNEL — multi-agent orchestration layer
 """
 CivilizationController — AI 文明總控
 =====================================

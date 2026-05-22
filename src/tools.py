@@ -1,3 +1,6 @@
+# [public] AMPM-AIOPS public tool interface
+# Internal execution policies and routing hooks stripped — moved to AMPM-KERNEL
+
 import json
 import os
 from pathlib import Path

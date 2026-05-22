@@ -1,0 +1,60 @@
+# AMPM-AIOPS File/Directory Category Markers
+# Phase 1: Tagging — do not move until Phase 2
+
+# ── KERNEL (belongs in AMPM-KERNEL) ──────────────────────
+src/brain/                  = kernel  # Decision hub: Cortex, Thalamus, Insula
+src/governance/             = kernel  # Permission engine, firewall, policies
+src/runtime/                = kernel  # Execution env, context assembly
+src/core/                   = kernel  # Agent intelligence, auto learning
+src/evolution/              = kernel  # Adaptive logic, self optimization
+src/decisions/              = kernel  # Decision flow, priority, orchestration
+src/agents.py               = kernel  # Multi-agent control
+src/llm.py                  = kernel  # LLM routing
+src/memory.py               = kernel  # Memory system
+src/memory_vector.py        = kernel  # Vector memory
+src/models.py               = kernel  # Data models
+src/executor.py             = kernel  # Execution engine
+src/handler.py              = kernel  # Event handler
+src/breath.py               = kernel  # Throttle regulator
+src/nose.py                 = kernel  # Input filter
+src/civilization_controller.py = kernel  # Multi-agent orchestration
+src/config.py               = kernel  # (moved to KERNEL already, keep public parts)
+
+# ── PUBLIC (retain in AMPM-AIOPS) ────────────────────────
+src/dashboard/              = public  # Lite monitoring UI
+src/tools.py                = public  # Tool interface & public decorators
+src/tool_decorators/        = public  # Public tool decorators
+src/monitor.py              = public  # Lite monitoring
+src/skeleton/               = public  # Framework scaffold
+src/lifecycle/              = public  # Lifecycle interface
+assets/                     = public  # Static resources
+scripts/                    = public  # Install/setup scripts
+*.md                        = public  # Documentation
+
+# ── EXPERIMENTAL (evaluate later) ─────────────────────────
+src/bag/                    = experimental
+src/blood/                  = experimental
+src/bridge/                 = experimental
+src/circuit/                = experimental
+src/civilization_memory/    = experimental
+src/compass/                = experimental
+src/dna_system/             = experimental
+src/economy/                = experimental
+src/goals/                  = experimental
+src/immune/                 = experimental
+src/meta/                   = experimental
+src/muscle/                 = experimental
+src/nerve/                  = experimental
+src/organs/                 = experimental
+src/pro/                    = experimental
+src/simulation/             = experimental
+src/skin/                   = experimental
+src/society/                = experimental
+src/studio/                 = experimental
+src/tasks/                  = experimental
+src/temporal/               = experimental
+src/trust/                  = experimental
+src/waste/                  = experimental
+src/web/                    = experimental
+src/womb/                   = experimental
+src/commerce/               = experimental
