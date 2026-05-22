@@ -268,17 +268,9 @@ def main():
         print(f"  [❌] 科技感儀表板啟動失敗: {e}")
     print()
     
-    # 步驟 2.9：啟動主動執行器（自動找任務、執行、回報）
-    print("🤖 步驟 2.9/3: 啟動主動執行器...")
-    try:
-        from core.proactive_executor import ProactiveExecutor
-        proactive = ProactiveExecutor(obsidian)
-        obsidian.proactive = proactive
-        proactive.start()
-        print("  [✅] 主動執行器已啟動 — 黑曜將主動找任務並執行")
-    except Exception as e:
-        print(f"  [❌] 主動執行器啟動失敗: {e}")
-        obsidian.proactive = None
+    # 步驟 2.9：主動執行器（暫時停用以減輕 LLM 負擔）
+    print("🤖 步驟 2.9/3: 主動執行器（已停用，避免搶 LLM）...")
+    obsidian.proactive = None
     print()
 
      # 健康報告（科技感風格）
@@ -372,51 +364,19 @@ def main():
                     else:
                         raise StopIteration("fallthrough")
                 except StopIteration:
-                    # ── 反饋偵測：覺得產出不對，說「重做/改/不是我要的」──
-                    feedback_kw = ["不對", "重做", "不是我要的", "修改", "改一下", "這個不行",
-                                   "redo", "fix", "改", "不是這樣", "錯了", "quality"]
-                    is_feedback = any(kw in msg for kw in feedback_kw)
-
-                    # ── 判斷是否為任務請求 ──
-                    task_keywords = ["幫我", "查", "找", "搜", "分析", "寫", "做", "研究",
-                                     "build", "code", "規劃", "生成", "建立", "設計", "部署",
-                                     "任務", "幫我查", "幫我找", "幫我分析", "幫我寫"]
-                    is_task = any(kw in msg for kw in task_keywords) or is_feedback
-
-                    if is_task:
-                        # ── 任務路徑：不聊天，直接執行 ──
-                        reply = "🚀 執行中，完成後會通知你..."
-                        try:
-                            agents = getattr(obsidian, 'agents', None)
-                            if agents and hasattr(agents, 'launch_mission'):
-                                agents.launch_mission(msg)
-                                agents.execute_assigned_tasks()
-                        except Exception as e:
-                            _sys.stdout.write(f"[Bot] 任務啟動失敗: {e}\n")
-                    else:
-                        # ── 聊天路徑：正常 LLM 回覆 ──
-                        try:
-                            if obsidian.langgraph and hasattr(obsidian.langgraph, 'process'):
-                                _sys.stdout.write(f"[Bot] 使用 LangGraph 引擎\n")
-                                reply = obsidian.langgraph.process(msg)
-                            elif hasattr(obsidian, 'cortex') and obsidian.cortex and hasattr(obsidian.cortex, 'think'):
-                                _sys.stdout.write(f"[Bot] 使用 Cortex 引擎\n")
-                                reply = obsidian.cortex.think(msg)
-                            else:
-                                reply = "🤔 我目前無法處理這個請求，因為思考引擎尚未初始化。"
-                        except Exception as e:
-                            _sys.stdout.write(f"[Bot] 引擎錯誤: {e}\n")
-                            reply = f"⚠️ {translate_error(e)}"
-
-                        # ── 掃描回覆中的承諾，自動執行 ──
-                        try:
-                            agents = getattr(obsidian, 'agents', None)
-                            if agents and hasattr(agents, 'scan_and_execute_promises') and reply:
-                                extra = agents.scan_and_execute_promises(reply)
-                                if extra:
-                                    reply += extra
-                        except Exception:
-                            pass
+                    # ── 統一回覆路徑：單一 LLM 呼叫，不多代理打架 ──
+                    try:
+                        if obsidian.langgraph and hasattr(obsidian.langgraph, 'process'):
+                            _sys.stdout.write(f"[Bot] 使用 LangGraph 引擎\n")
+                            reply = obsidian.langgraph.process(msg)
+                        elif hasattr(obsidian, 'cortex') and obsidian.cortex and hasattr(obsidian.cortex, 'think'):
+                            _sys.stdout.write(f"[Bot] 使用 Cortex 引擎\n")
+                            reply = obsidian.cortex.think(msg)
+                        else:
+                            reply = "🤔 思考引擎尚未初始化。"
+                    except Exception as e:
+                        _sys.stdout.write(f"[Bot] 引擎錯誤: {e}\n")
+                        reply = f"⚠️ {translate_error(e)}"
 
                 _sys.stdout.write(f"[Bot] 回覆: {reply[:100]}\n")
                 _sys.stdout.flush()
