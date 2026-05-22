@@ -54,9 +54,9 @@
       "description": "根據自我修正版本，開始真實產出第二章大綱與初稿，包含章節架構、各段要點、敘述風格與範例段落。任務完成後，提供完整的大綱與初稿草稿。",
       "priority": 1,
       "deadline": null,
-      "status": "pending",
+      "status": "in_progress",
       "created_at": "2026-05-22T14:49:36.996906",
-      "updated_at": "2026-05-22T14:49:36.996906",
+      "updated_at": "2026-05-22T15:12:41.810850",
       "completed_at": null,
       "overdue_warned": false
     }
