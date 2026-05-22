@@ -95,4 +95,4 @@ AMPM-AIOPS 是 **公開框架** 層，負責：
 - 所有決策權限都保留在 AMPM-KEL 內
 
 ---
-*Last updated: $(date +%Y-%m-%d) / 最近更新：$(date +%Y-%m-%d)*
+*Last updated: 2026-05-23 / 最近更新：2026-05-23*
