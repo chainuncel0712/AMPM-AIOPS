@@ -42,6 +42,17 @@ tmp/
 temp/
 backup/
 
+# Old junk — cleaned from public repo
+AI-BOS-Core/
+ai-bos/
+ampm-core-src/
+packages/
+plugins/
+tools/
+bin/
+*.bak
+*.bat
+
 # ===== KERNEL — moved to AMPM-KERNEL (private) =====
 src/brain/
 src/governance/
