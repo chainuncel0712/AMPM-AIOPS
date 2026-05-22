@@ -4,7 +4,7 @@ Organ Registry v2 — 器官註冊、版本、健康、依賴管理
 """
 
 import threading
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 from skeleton.registry import Registry
 
@@ -12,13 +12,14 @@ from skeleton.registry import Registry
 class OrganRegistry:
     """
     Organ Registry v2 with multi-organ registration, versioning,
-    health status, and dependency management.
+    health status, dependency management, and lazy loading.
     """
 
     def __init__(self):
         self._registry = Registry()
         self._lock = threading.RLock()
         self._organs: Dict[str, Any] = {}
+        self._factories: Dict[str, Callable[[], Any]] = {}
         self._versions: Dict[str, int] = {}
         self._dependencies: Dict[str, List[str]] = {}
 
@@ -30,16 +31,35 @@ class OrganRegistry:
             self._versions[key] = self._versions.get(key, 0) + 1
         return result
 
+    def register_factory(self, name: str, factory: Callable[[], Any], depends_on: List[str] = None) -> None:
+        """註冊懶載入器官 — 首次 get() 時才實例化"""
+        with self._lock:
+            self._factories[name] = factory
+            if depends_on:
+                self._dependencies[name] = depends_on
+
     def remove(self, name: str) -> bool:
         with self._lock:
             if name in self._organs:
                 del self._organs[name]
                 self._versions[name] = self._versions.get(name, 0) + 1
                 return True
+            self._factories.pop(name, None)
         return False
 
     def get(self, name: str) -> Any:
-        return self._organs.get(name)
+        with self._lock:
+            organ = self._organs.get(name)
+            if organ is not None:
+                return organ
+            factory = self._factories.get(name)
+            if factory is not None:
+                instance = factory()
+                self._organs[name] = instance
+                self._versions[name] = self._versions.get(name, 0) + 1
+                del self._factories[name]
+                return instance
+        return None
 
     def all(self) -> Dict[str, Any]:
         with self._lock:

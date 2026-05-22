@@ -91,7 +91,7 @@ class LangGraphExecutor:
     def _start_background_tasks(self):
         def background_loop():
             while True:
-                time.sleep(30)
+                time.sleep(300)
                 try:
                     self._check_if_anything_to_do()
                 except Exception as e:
@@ -99,9 +99,12 @@ class LangGraphExecutor:
 
         bg_thread = threading.Thread(target=background_loop, daemon=True)
         bg_thread.start()
-        print("[LangGraphExecutor] 背景任務已啟動（每 30 秒檢查一次）")
+        print("[LangGraphExecutor] 背景任務已啟動（每 5 分鐘檢查一次）")
 
     def _check_if_anything_to_do(self):
+        llm = self.agent.get("llm") if self.agent else None
+        if not llm:
+            return
         if self.memory_manager:
             try:
                 facts = self.memory_manager.get_all_facts()

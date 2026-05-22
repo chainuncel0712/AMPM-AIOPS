@@ -20,6 +20,16 @@ except ImportError:
 
 
 class Assembler:
+    EXCLUDED_ORGANS = {
+        "nftairdropcheckerorgan", "nftmarketmakerorgan", "nftwhaletrackerorgan",
+        "cryptohunterorgan", "cryptowalletorgan", "crosschainbridgeorgan",
+        "nftfloorscannerorgan", "gastrackerorgan", "nftmanagerorgan", "nftsniperorgan",
+        "nftairdropchecker", "nftmarketmaker", "nftwhaletracker",
+        "cryptohunter", "cryptowallet", "crosschainbridge",
+        "nftfloorscanner", "gastracker", "nftmanager", "nftsniper",
+        "wealthmanagerorgan", "wealthmanager",
+    }
+
     def __init__(self, base_dir: Optional[Path] = None):
         if base_dir is None:
             base_dir = Path(__file__).resolve().parent.parent  # src/
@@ -193,6 +203,8 @@ class Assembler:
                 try:
                     instance = obj(dna={})
                     organ_name = getattr(instance, "name", name.lower())
+                    if organ_name in self.EXCLUDED_ORGANS:
+                        continue
                     display_name = organ_display_names.get(organ_name, (organ_name, ""))
                     if isinstance(display_name, tuple):
                         name_cn, desc = display_name
