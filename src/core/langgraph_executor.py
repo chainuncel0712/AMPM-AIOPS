@@ -506,12 +506,13 @@ class LangGraphExecutor:
             try:
                 if hasattr(self.brain, 'cortex') and self.brain.cortex:
                     agent_result = self.brain.cortex.think(enriched_msg)
-                    print(f"[LangGraphExecutor] 使用 cortex 處理成功")
-                    if self.memory_manager:
-                        self.memory_manager.remember_fact(
-                            f"自動修復：使用 cortex 處理「{user_msg[:30]}」",
-                            importance=0.9
-                        )
+                    if agent_result and "所有模型不可用" not in agent_result:
+                        print(f"[LangGraphExecutor] 使用 cortex 處理成功")
+                        if self.memory_manager:
+                            self.memory_manager.remember_fact(
+                                f"自動修復：使用 cortex 處理「{user_msg[:30]}」",
+                                importance=0.7
+                            )
             except Exception as e:
                 print(f"[LangGraphExecutor] cortex 處理失敗: {e}")
 
@@ -521,26 +522,13 @@ class LangGraphExecutor:
 
         if agent_result and ("⚠️" in agent_result or "❌" in agent_result or "錯誤" in agent_result or "失敗" in agent_result):
             print(f"[LangGraphExecutor] 檢測到錯誤，自動觸發修復...")
-
-            if self.memory_manager:
-                try:
-                    self.memory_manager.remember_fact(
-                        f"錯誤發生：{agent_result[:100]}",
-                        importance=0.9
-                    )
-                except:
-                    pass
+            # 不記錄錯誤進 semantic，避免垃圾記憶污染
 
             try:
                 error_keywords = agent_result[:100]
                 search_result = self._search_for_answer(error_keywords)
                 if search_result:
                     print(f"[LangGraphExecutor] 找到正確答案: {search_result[:200]}")
-                    if self.memory_manager:
-                        self.memory_manager.remember_fact(
-                            f"錯誤修正：{error_keywords} -> {search_result[:200]}",
-                            importance=0.9
-                        )
                     agent_result = search_result
             except Exception as e:
                 print(f"[LangGraphExecutor] 搜尋正確答案失敗: {e}")
@@ -571,31 +559,19 @@ class LangGraphExecutor:
 
             if self._consecutive_error_count >= 3:
                 print(f"[LangGraphExecutor] 連續錯誤達到 3 次，自動學習教訓...")
-                learn_organ = self.organs.get("self_learn")
-                if learn_organ and hasattr(learn_organ, "learn"):
-                    try:
-                        lesson = f"連續錯誤教訓：使用者說「{user_msg[:50]}」，回覆錯誤「{agent_result[:100]}」"
-                        learn_result = learn_organ.learn(lesson)
-                        print(f"[LangGraphExecutor] 學習結果: {learn_result[:200]}")
-                        if self.memory_manager:
-                            self.memory_manager.remember_fact(
-                                f"學習記錄：{learn_result[:100]}",
-                                importance=0.9
-                            )
-                    except Exception as e:
-                        print(f"[LangGraphExecutor] 學習失敗: {e}")
                 self._consecutive_error_count = 0
         else:
             if hasattr(self, '_consecutive_error_count'):
                 self._consecutive_error_count = 0
 
-        # ===== 統一記憶寫入 =====
+        # ===== 統一記憶寫入（只記好的） =====
         if self.memory_manager and agent_result:
-            try:
-                self.memory_manager.remember(user_msg, agent_result)
-                print(f"[LangGraphExecutor] MemoryManager 記憶寫入完成")
-            except Exception as e:
-                print(f"[LangGraphExecutor] MemoryManager 記憶寫入失敗: {e}")
+            if "所有模型不可用" not in agent_result and "⚠️" not in agent_result:
+                try:
+                    self.memory_manager.remember(user_msg, agent_result)
+                    print(f"[LangGraphExecutor] MemoryManager 記憶寫入完成")
+                except Exception as e:
+                    print(f"[LangGraphExecutor] MemoryManager 記憶寫入失敗: {e}")
 
         if self.context_assembler and agent_result:
             try:
