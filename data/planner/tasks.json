@@ -11,7 +11,19 @@
       "updated_at": "2026-05-21T02:45:15.773780",
       "completed_at": null,
       "overdue_warned": false
+    },
+    "T0014-b294": {
+      "id": "T0014-b294",
+      "title": "生成〈AI 新手如何開始使用 ChatGPT 提升工作效率〉第二章大綱與初稿",
+      "description": "根據第一章內容，產出第2章大綱，並撰寫初稿，包含章節標題與段落要點，形成可直接投入撰寫的文本基礎。",
+      "priority": 1,
+      "deadline": "2026-06-01T23:59:00",
+      "status": "pending",
+      "created_at": "2026-05-22T06:53:53.784417",
+      "updated_at": "2026-05-22T06:53:53.784417",
+      "completed_at": null,
+      "overdue_warned": false
     }
   },
-  "counter": 13
+  "counter": 14
 }
