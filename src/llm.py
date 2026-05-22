@@ -45,8 +45,8 @@ class LLMClient:
         # 🥇 OpenRouter 免費模型（優先，不燒錢）
         or_key = os.getenv("OPENROUTER_API_KEY")
         if or_key:
-            self.providers.append({"name":"OR-Free","key":or_key,"ep":"https://openrouter.ai/api/v1/chat/completions","model":"deepseek/deepseek-v4-flash:free"})
-            self.providers.append({"name":"OR-Llama","key":or_key,"ep":"https://openrouter.ai/api/v1/chat/completions","model":"meta-llama/llama-3.3-70b-instruct:free"})
+            self.providers.append({"name":"OR-Free","key":or_key,"ep":"https://openrouter.ai/api/v1/chat/completions","model":"openrouter/auto"})
+            self.providers.append({"name":"OR-Llama","key":or_key,"ep":"https://openrouter.ai/api/v1/chat/completions","model":"openrouter/auto"})
 
         # 🥈 DeepSeek 直連（備援）
         ds_key = os.getenv("DEEPSEEK_API_KEY")
