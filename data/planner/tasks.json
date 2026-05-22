@@ -23,7 +23,19 @@
       "updated_at": "2026-05-22T06:53:53.784417",
       "completed_at": null,
       "overdue_warned": false
+    },
+    "T0015-296a": {
+      "id": "T0015-296a",
+      "title": "撰寫第二章全文草稿：方法論與實作",
+      "description": "目的：在工具就位後直接產出第二章全文草稿。當前階段先完成章節骨架與要點，待工具就位後展開全文撰寫並回報結案。章節內容包含 2.1-2.7 的草案要點，並附執行預案與範例場景。",
+      "priority": 1,
+      "deadline": null,
+      "status": "pending",
+      "created_at": "2026-05-22T08:01:38.088647",
+      "updated_at": "2026-05-22T08:01:38.088647",
+      "completed_at": null,
+      "overdue_warned": false
     }
   },
-  "counter": 14
+  "counter": 15
 }
