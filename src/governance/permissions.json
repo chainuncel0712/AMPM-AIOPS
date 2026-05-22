@@ -1,0 +1,39 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "description": "黑曜模組權限白名單 — 沒有列出的動作 = 不允許",
+    "rule": "Decision 只能思考 / Execution 只能執行 / Memory 只能存取"
+  },
+  "brain": {
+    "allowed": ["think", "plan", "route_message", "read_memory"],
+    "denied": ["write_file", "execute_shell", "modify_code", "modify_config"]
+  },
+  "meta_cognition": {
+    "allowed": ["observe", "log", "suggest", "simulate_diff"],
+    "denied": ["execute", "modify_code", "modify_routing", "modify_prompt"]
+  },
+  "agents": {
+    "allowed": ["plan", "decompose_task", "assign_agent", "track_progress"],
+    "denied": ["execute_tool", "write_file", "run_command", "modify_memory_policy"]
+  },
+  "executor": {
+    "allowed": ["run_tool", "execute_command", "write_file", "read_file"],
+    "denied": ["make_decision", "modify_routing", "modify_plan"]
+  },
+  "memory": {
+    "allowed": ["read", "write", "search", "organize"],
+    "denied": ["trigger_action", "influence_routing", "modify_decision_logic"]
+  },
+  "tools": {
+    "allowed": ["provide_capability", "execute_only"],
+    "denied": ["make_decision", "auto_invoke", "escalate_permission"]
+  },
+  "evolution_cycle": {
+    "allowed": ["observe", "log", "suggest", "simulate_diff"],
+    "denied": ["modify_code", "modify_config", "modify_prompt", "modify_routing", "auto_apply"]
+  },
+  "proactive_executor": {
+    "allowed": ["scan_tasks", "dispatch_missions", "track_completion", "report_progress"],
+    "denied": ["modify_decision", "modify_routing", "self_escalate"]
+  }
+}
