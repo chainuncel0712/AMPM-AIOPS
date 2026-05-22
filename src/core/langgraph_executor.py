@@ -767,73 +767,64 @@ class LangGraphExecutor:
     # ==================================================================
     # 核心功能：自我反省
     # ==================================================================
-    def _self_reflect(self, user_msg: str, reply: str, depth: int = 0) -> str:
+    def _self_evaluate(self, user_msg: str, reply: str) -> str:
         """
-        自我反省 - 檢查自己的回覆是否正確
-        
-        參數 Parameters:
-            user_msg: 使用者訊息 User message
-            reply: 自己的回覆 Own reply
-            depth: 遞迴深度（避免無限迴圈）
-        
-        回傳 Returns:
-            反省結果 Reflection result
+        自我評估：打分數 + 記錄錯誤類型 → 納入記憶 → 下次不重犯
+        不修改原始回覆，只記錄學習結果。
         """
-        # 限制遞迴深度，避免無限迴圈
-        if depth >= 2:
-            return reply
-        
         try:
             llm = self.agent.get("llm")
             if not llm:
                 return reply
-            
-            # 讓 LLM 檢查自己的回覆
-            reflection_prompt = f"""
-            請檢查以下回覆是否正確：
-            
-            使用者問題：{user_msg}
-            
-            你的回覆：{reply}
-            
-            請分析：
-            1. 回覆是否正確？
-            2. 有沒有錯誤？
-            3. 有沒有可以改進的地方？
-            
-            如果正確，請回傳 "✅ 正確"
-            如果有錯誤，請回傳修正後的版本。
-            """
-            
-            print(f"  [🧠] === REFLECTION PROMPT ===\n{reflection_prompt[:500]}\n  [🧠] === END REFLECTION ===")
+
+            eval_prompt = f"""
+            評估以下回覆的品質，只給 JSON 格式輸出：
+
+使用者問題：{user_msg}
+
+你的回覆：{reply}
+
+{{
+  "score": 0-100,
+  "error_type": "",  // 如有錯誤，分類："虛假聲明"|"未執行工具"|"遺漏資訊"|"邏輯錯誤"|"無"
+  "lesson": ""  // 一句話總結這次學到的教訓，沒有錯誤就留空
+}}
+"""
             if self.context_assembler:
-                sys_msgs = self.context_assembler.get_system_context(
-                    task_hint="你正在自我反省：檢查你的回覆是否正確。"
-                )
-                messages = sys_msgs + [{"role": "user", "content": reflection_prompt}]
-                reflection_result = llm.call(messages)
+                sys_msgs = self.context_assembler.get_system_context(task_hint="你正在做品質評估")
+                msgs = sys_msgs + [{"role": "user", "content": eval_prompt}]
             else:
-                reflection_result = llm.call([{"role": "user", "content": reflection_prompt}])
-            result = str(reflection_result)
-            print(f"  [🧠] === REFLECTION RESPONSE ===\n{result[:300]}\n  [🧠] === END REFLECTION ===")
-            
-            if "✅" in result:
-                print(f"  [🧠] 自我反省：回覆正確")
+                msgs = [{"role": "user", "content": eval_prompt}]
+
+            raw = str(llm.call(msgs))
+            import re, json
+            match = re.search(r'\{.*\}', raw, re.DOTALL)
+            if not match:
+                print(f"  [🧠] 評估解析失敗")
                 return reply
-            else:
-                print(f"  [🧠] 自我反省：發現錯誤，已修正")
-                # 記錄錯誤到記憶
-                if self.memory_manager:
-                    self.memory_manager.remember_fact(
-                        f"自我反省修正：{user_msg[:50]} -> {result[:100]}",
-                        importance=0.9
-                    )
-                # 遞迴檢查修正後的版本，但限制深度
-                return self._self_reflect(user_msg, result, depth + 1)
-        
+
+            result = json.loads(match.group())
+            score = result.get("score", 100)
+            error_type = result.get("error_type", "")
+            lesson = result.get("lesson", "")
+
+            print(f"  [🧠] 評估：得分 {score}/100 錯誤={error_type}")
+
+            if score >= 80 or not error_type or error_type == "無":
+                return reply
+
+            # 記錄錯誤教訓到記憶，下次不再犯
+            if lesson and self.memory_manager:
+                self.memory_manager.remember_fact(
+                    f"📕 [{error_type}] {lesson}",
+                    importance=0.8
+                )
+                print(f"  [🧠] 已記錄教訓：[{error_type}] {lesson[:60]}")
+
         except Exception as e:
-            print(f"  [⚠️] 自我反省失敗: {e}")
-            return reply
+            print(f"  [⚠️] 評估失敗: {e}")
+
+        return reply
 
     # ==================================================================
     # 核心功能：自我修復
@@ -1335,7 +1326,9 @@ class LangGraphExecutor:
                     except Exception as e:
                         print(f"[LangGraphExecutor] 反省失敗: {e}")
         
-        # ===== 核心能力 3：自我反省（已停用，避免 LLM 重複消耗） =====
+        # ===== 核心能力 3：自我評估 — 打分數 + 記錄教訓，不修改回覆 =====
+        if agent_result:
+            agent_result = self._self_evaluate(user_msg, agent_result)
         
         # ===== 修復 5：被動觸發 - 自動 self_repair =====
         if agent_failed or not agent_result:
