@@ -1,35 +1,107 @@
 <div align="center">
-  <h1>🧬 AI-BOS <sup>v1.0.0</sup></h1>
-  <p><strong>Artificial Intelligence Body Operating System</strong></p>
-  <p><em>世界第一個 AI 生命體作業系統 — The World's First AI Life Body Operating System</em></p>
-  <p>
-    <a href="./LICENSE"><img src="https://img.shields.io/badge/license-AGPL%20v3%20%2B%20Custom-blue" alt="License"></a>
-    <a href="#"><img src="https://img.shields.io/badge/organs-54%2B-brightgreen" alt="Organs"></a>
-    <a href="#"><img src="https://img.shields.io/badge/baseline-29%2F29-green" alt="Baseline"></a>
-  </p>
+
+```
+  ╔══════════════════════════════════════════════════════════╗
+  ║                                                          ║
+  ║    █████╗ ██╗    ██╗     ██████╗ ███████╗               ║
+  ║   ██╔══██╗██║    ██║     ██╔══██╗██╔════╝               ║
+  ║   ███████║██║ █╗ ██║     ██████╔╝███████╗               ║
+  ║   ██╔══██║██║███╗██║     ██╔══██╗╚════██║               ║
+  ║   ██║  ██║╚███╔███╔╝     ██████╔╝███████║               ║
+  ║   ╚═╝  ╚═╝ ╚══╝╚══╝      ╚═════╝ ╚══════╝               ║
+  ║                                                          ║
+  ║       🤖  Artificial Intelligence  Body  OS             ║
+  ║                                                          ║
+  ║     機械器官 · 自我進化 · 自動修復 · 54+ 零件            ║
+  ║                                                          ║
+  ╚══════════════════════════════════════════════════════════╝
+
+</div>
+
+<br>
+
+<div align="center">
+
+[![License](https://img.shields.io/badge/授權-AGPLv3%20%2B%20Custom-blue?style=flat-square)](#license)
+[![Organs](https://img.shields.io/badge/🧬_器官-54%2B-brightgreen?style=flat-square)](/#)
+[![Status](https://img.shields.io/badge/🤖_狀態-運轉中-success?style=flat-square)](/#)
+[![Python](https://img.shields.io/badge/🐍_Python-3.10%2B-blue?style=flat-square)](#requirements)
+
+<br>
+
+> **一台擁有器官的機器人。**  
+> 54+ 個機械器官協同運轉 —— 思考、記憶、行動、修復、進化。  
+> 不是框架，是活著的機械生命體。
+
+<br>
+
+```
+         ╭──────────────────────────────╮
+         │         🤖  AI-BOS          │
+         │   ╭──────────────────────╮   │
+         │   │  🧠  動力核心        │   │
+         │   │  💾  資料庫          │   │
+         │   │  🛡️  裝甲系統        │   │
+         │   │  👃  感測陣列        │   │
+         │   │  💪  傳動機構        │   │
+         │   │  🧬  升級艙          │   │
+         │   │  🔧  維修站          │   │
+         │   ╰──────────────────────╯   │
+         ╰──────────────────────────────╯
+```
+
 </div>
 
 ---
 
-# English
+<br>
 
-## What is AI-BOS?
+<div align="center">
 
-**AI-BOS (Artificial Intelligence Body Operating System)** is the first AI operating system designed with a **biological body architecture**.
+# ⚙️ ENGLISH
 
-Unlike traditional AI agent frameworks (LangChain, CrewAI, AutoGen) that rely on function calls and pipeline thinking, AI-BOS treats an AI system as a **complete living organism** with 54+ organs working in unison:
+</div>
 
-| System | Organs | Function |
-|--------|--------|----------|
-| 🧠 Central Nervous | brain, cortex, thalamus | Decision-making, routing, message relay |
-| 💾 Memory System | memory, hippocampus, civilization_memory | Working/semantic/civilization memory |
-| 🛡️ Immune System | firewall, breaker, guard, sandbox | Security, anomaly detection |
-| 🔬 Sensory System | nose, breath, compass | Environment perception, direction |
-| 💪 Muscular System | muscle, executor, tools | Tool execution, action |
-| 🔄 Circulatory System | blood, circulatory, scheduler | Message passing, scheduling |
-| 🧬 Evolution System | evolution, self_evolve, meta_cognition | Self-evolution, meta-cognition |
-| ⚖️ Governance System | gatekeeper, control_plane, audit | Access control, audit trail |
-| 🔧 Repair System | repair_orchestrator, self_heal | Self-healing, recovery orchestration |
+## 🤖 What is AI-BOS?
+
+**AI-BOS is a robot with organs.**
+
+Most AI frameworks treat AI as software — write code, chain prompts, pray it works.  
+AI-BOS treats AI as a **mechanical lifeform** — 54+ robotic organs working as one body.
+
+```
+  ╭──────────────────────────────────────────────────────╮
+  │                                                       │
+  │   🎯 INPUT                                          │
+  │     ↓                                                │
+  │   👃 [感測器] ──→ 🧠 [處理器] ──→ 🛡️ [過濾器]        │
+  │     Sensor        Processor        Shield             │
+  │                        ↓                             │
+  │                   💾 [資料庫]                        │
+  │                     Database                         │
+  │                        ↓                             │
+  │                   💪 [制動器] ──→ 📤 OUTPUT           │
+  │                     Actuator                         │
+  │                                                       │
+  │   🔧 [自檢迴路]   🧬 [升級迴路]   🔄 [循環系統]      │
+  │                                                       │
+  ╰──────────────────────────────────────────────────────╯
+```
+
+> Not a framework. A mechanical lifeform — built to survive, upgrade, and evolve.
+
+### ⚙️ Mechanical Organs
+
+| Module | Function | Status |
+|--------|----------|--------|
+| 🧠 **Processor** (cortex, thalamus) | Thinking, routing, decision | 🔋 Active |
+| 💾 **Storage** (working, semantic, episodic) | Multi-layer memory | 💾 24/7 |
+| 🛡️ **Armor** (firewall, guard) | Security, anomaly shield | 🛡️ Online |
+| 👃 **Sensor** (nose, breath) | Environment scan, pacing | 📡 Scanning |
+| 💪 **Actuator** (executor, tools) | Tool execution, action | ⚡ Ready |
+| 🔄 **Conveyor** (blood, scheduler) | Message bus, timing | ⏱️ Synced |
+| 🧬 **Upgrader** (self_evolve, meta_cognition) | Self-improvement | 📈 Learning |
+| 🔧 **Repair Bay** (self_heal, orchestrator) | Auto-diagnosis, repair | 🛠️ Standby |
 
 ## Architecture
 
@@ -174,25 +246,59 @@ See [LICENSE](./LICENSE), [COPYRIGHT](./COPYRIGHT), [TRADEMARK](./TRADEMARK) for
 
 ---
 
-# 中文
+<div align="center">
 
-## 什麼是 AI-BOS？
+# 🤖 中文
 
-AI-BOS（Artificial Intelligence Body Operating System）是一個以**生物體架構**為設計哲學的 AI 生命體作業系統。
+</div>
 
-有別於傳統 AI Agent 框架（LangChain、CrewAI、AutoGen）的函數呼叫與管線思維，AI-BOS 將 AI 系統視為一個**完整的生命體**，由 54+ 個器官協同運作：
+## 這是什麼？
 
-| 系統 | 器官 | 功能 |
-|------|------|------|
-| 🧠 中樞神經 | brain, cortex, thalamus | 決策、路由、訊息中繼 |
-| 💾 記憶系統 | memory, hippocampus, civilization_memory | 工作/語義/文明三層記憶 |
-| 🛡️ 免疫系統 | firewall, breaker, guard, sandbox | 安全防護、異常檢測 |
-| 🔬 感知系統 | nose, breath, compass | 環境感知、方向判斷 |
-| 💪 行動系統 | muscle, executor, tools | 工具執行、行動力 |
-| 🔄 循環系統 | blood, circulatory, scheduler | 訊息傳遞、排程 |
-| 🧬 演化系統 | evolution, self_evolve, meta_cognition | 自我演化、後設認知 |
-| ⚖️ 治理系統 | gatekeeper, control_plane, audit | 權限控制、審計追蹤 |
-| 🔧 修復系統 | repair_orchestrator, self_heal | 自我修復、復原編排 |
+**AI-BOS = 一台有器官的機器人。**
+
+別人做 AI 是用程式碼寫死工作流。  
+AI-BOS 是把 AI **組裝成機器生命** —— 54+ 個機械器官，像樂高一样組合：
+
+```
+  ╭────────────────────────────────────╮
+  │                                     │
+  │    🤖  AI-BOS 機械生命體           │
+  │                                     │
+  │    🧠  處理器  →  思考、決策        │
+  │    💾  資料庫  →  三層記憶          │
+  │    🛡️  裝甲    →  防禦、過濾        │
+  │    👃  雷達    →  感知、掃描        │
+  │    💪  手臂    →  執行、行動        │
+  │    🔄  輸送帶  →  訊息、排程        │
+  │    🧬  升級艙  →  自我進化          │
+  │    🔧  維修站  →  自動修復          │
+  │                                     │
+  ╰────────────────────────────────────╯
+```
+
+> 不是聊天機器人。是一台會自己長大的機械生命。
+
+### 哪裡不一樣？
+
+| 別人 | AI-BOS |
+|------|--------|
+| 寫死的工作流程 | 機械器官協同運轉 |
+| 出錯等人來修 | 自己進維修站 |
+| 講完就忘 | 資料庫永久儲存 |
+| 工程師手動調參數 | 自己升級自己 |
+
+### 機械器官一覽
+
+| 模組 | 功能 |
+|------|------|
+| 🧠 **處理器**（cortex, thalamus） | 思考、路由、決策 |
+| 💾 **資料庫**（working, semantic, episodic） | 短期＋長期＋文明記憶 |
+| 🛡️ **裝甲**（firewall, guard） | 防毒、防異常 |
+| 👃 **雷達**（nose, breath） | 環境掃描、呼吸調節 |
+| 💪 **手臂**（executor, tools） | 執行工具、採取行動 |
+| 🔄 **輸送帶**（blood, scheduler） | 傳遞訊息、時序管理 |
+| 🧬 **升級艙**（self_evolve, meta_cognition） | 讓自己越來越強 |
+| 🔧 **維修站**（self_heal, orchestrator） | 壞了自己修 |
 
 ## 🏗️ 架構圖
 
