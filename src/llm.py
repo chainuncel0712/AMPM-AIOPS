@@ -45,13 +45,13 @@ class LLMClient:
         # 🥇 OpenRouter 免費模型（優先，不燒錢）
         or_key = os.getenv("OPENROUTER_API_KEY")
         if or_key:
-#            self.providers.append({"name":"OR-Free","key":or_key,"ep":"https://openrouter.ai/api/v1/chat/completions","model":"deepseek/deepseek-v4-flash:free"})
-#            self.providers.append({"name":"OR-Llama","key":or_key,"ep":"https://openrouter.ai/api/v1/chat/completions","model":"meta-llama/llama-3.3-70b-instruct:free"})
+            self.providers.append({"name":"OR-Free","key":or_key,"ep":"https://openrouter.ai/api/v1/chat/completions","model":"deepseek/deepseek-v4-flash:free"})
+            self.providers.append({"name":"OR-Llama","key":or_key,"ep":"https://openrouter.ai/api/v1/chat/completions","model":"meta-llama/llama-3.3-70b-instruct:free"})
 
-#        # 🥈 DeepSeek 直連（備援）
+        # 🥈 DeepSeek 直連（備援）
         ds_key = os.getenv("DEEPSEEK_API_KEY")
         if ds_key:
-#            self.providers.append({"name":"DeepSeek","key":ds_key,"ep":"https://api.deepseek.com/v1/chat/completions","model":"deepseek-v4-pro"})
+            self.providers.append({"name":"DeepSeek","key":ds_key,"ep":"https://api.deepseek.com/v1/chat/completions","model":"deepseek-v4-pro"})
 
         # 🥉 Ollama 本機（免費備援 — 快速檢查，不卡 startup）
         ollama_model = os.getenv("OLLAMA_MODEL", "qwen2.5:7b")
