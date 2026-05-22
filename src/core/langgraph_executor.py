@@ -1335,18 +1335,7 @@ class LangGraphExecutor:
                     except Exception as e:
                         print(f"[LangGraphExecutor] 反省失敗: {e}")
         
-        # ===== 核心能力 3：自我反省（每次回覆後都執行） =====
-        if agent_result:
-            agent_result = self._self_reflect(user_msg, agent_result)
-            # 記錄反省結果到記憶
-            if self.memory_manager:
-                try:
-                    self.memory_manager.remember_fact(
-                        f"自我反省：使用者說「{user_msg[:30]}」，回覆「{agent_result[:30]}」",
-                        importance=0.7
-                    )
-                except:
-                    pass
+        # ===== 核心能力 3：自我反省（已停用，避免 LLM 重複消耗） =====
         
         # ===== 修復 5：被動觸發 - 自動 self_repair =====
         if agent_failed or not agent_result:
