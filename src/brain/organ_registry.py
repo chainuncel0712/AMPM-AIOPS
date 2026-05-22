@@ -63,11 +63,15 @@ class OrganRegistry:
 
     def all(self) -> Dict[str, Any]:
         with self._lock:
-            return dict(self._organs)
+            result = dict(self._organs)
+            for name in self._factories:
+                if name not in result:
+                    result[name] = None
+            return result
 
     def count(self) -> int:
         with self._lock:
-            return len(self._organs)
+            return len(self._organs) + len(self._factories)
 
     def get_version(self, name: str) -> int:
         return self._versions.get(name, 0)

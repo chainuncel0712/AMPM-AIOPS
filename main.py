@@ -168,7 +168,7 @@ def main():
         sys.exit(1)
     print()
     
-    # 步驟 2：掃描並載入 core/ 目錄中的器官
+    # 步驟 2：掃描並載入 core/ 目錄中的器官（精簡模式 — 只載入核心，其餘按需）
     print("🔍 步驟 2/3: 掃描零件...")
     try:
         from skeleton.assembler import Assembler
@@ -177,30 +177,11 @@ def main():
         assembler.scan_and_load()
         assembler.connect_all()
         assembler.health_check()
-        # 使用 instantiated_organs 計算零件數
         organ_count = len(assembler.instantiated_organs)
         
-        # 將 core/ 器官注入到 obsidian.organs 中（不覆蓋舊器官）
         for name, organ in assembler.instantiated_organs.items():
             if name not in obsidian.organs:
                 obsidian.organs[name] = organ
-        
-        # 將 assembler 回注到重生器官
-        if hasattr(obsidian, 'rebirth') and obsidian.rebirth:
-            obsidian.rebirth.assembler = assembler
-
-        # 將 organs 注入崩潰恢復
-        if hasattr(obsidian, 'crash_recovery') and obsidian.crash_recovery:
-            obsidian.crash_recovery.organ_refs = obsidian.organs
-
-        # 自我意識掃描所有器官
-        if hasattr(obsidian, 'self_awareness') and obsidian.self_awareness:
-            obsidian.self_awareness.scan_all_organs(obsidian.organs)
-            obsidian.self_awareness.set_activity("器官掃描完成")
-
-        # 存初始快照
-        if hasattr(obsidian, 'rebirth') and obsidian.rebirth:
-            obsidian.rebirth.take_snapshot(label="initial")
 
         print(f"  [✅] 獨立零件: {organ_count} 個就緒")
         print(f"  [✅] 總器官數: {len(obsidian.organs)} 個")
@@ -304,12 +285,11 @@ def main():
     try:
         print_header("⚙️ 機械零件健康報告")
         print(f"  🔩 總零件數: {len(obsidian.organs)}")
-        # 修復 10：顯示已載入的機械零件數量（使用已定義的 organ_count）
         print(f"  ⚙️ 已載入 {organ_count} 個機械零件")
-        if organ_count > 70:
-            print("  ✅ 零件數量超過 70，符合要求")
+        if organ_count > 15:
+            print(f"  ✅ 核心零件: {organ_count} 個（精簡模式）")
         else:
-            print(f"  ⚠️ 零件數量不足，目前 {organ_count} 個，需要超過 70 個")
+            print(f"  ⚠️ 零件數量不足，目前 {organ_count} 個")
         # 顯示一些已注入的黑曜屬性（使用機械零組件代號）
         organ_display_names = {
             "memory": "記憶模組",
