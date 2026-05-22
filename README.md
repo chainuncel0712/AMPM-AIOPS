@@ -1,26 +1,8 @@
 <div align="center">
 
-```
-  ╔══════════════════════════════════════════════════════════╗
-  ║                                                          ║
-  ║    █████╗ ██╗    ██╗     ██████╗ ███████╗               ║
-  ║   ██╔══██╗██║    ██║     ██╔══██╗██╔════╝               ║
-  ║   ███████║██║ █╗ ██║     ██████╔╝███████╗               ║
-  ║   ██╔══██║██║███╗██║     ██╔══██╗╚════██║               ║
-  ║   ██║  ██║╚███╔███╔╝     ██████╔╝███████║               ║
-  ║   ╚═╝  ╚═╝ ╚══╝╚══╝      ╚═════╝ ╚══════╝               ║
-  ║                                                          ║
-  ║       🤖  Artificial Intelligence  Body  OS             ║
-  ║                                                          ║
-  ║     機械器官 · 自我進化 · 自動修復 · 54+ 零件            ║
-  ║                                                          ║
-  ╚══════════════════════════════════════════════════════════╝
-
-</div>
+<img src="assets/ai-bos-banner.svg" width="100%" alt="AI-BOS Banner">
 
 <br>
-
-<div align="center">
 
 [![License](https://img.shields.io/badge/授權-AGPLv3%20%2B%20Custom-blue?style=flat-square)](#license)
 [![Organs](https://img.shields.io/badge/🧬_器官-54%2B-brightgreen?style=flat-square)](/#)
