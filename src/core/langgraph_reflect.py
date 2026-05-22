@@ -9,6 +9,9 @@ def self_reflect(executor, user_msg: str, reply: str, depth: int = 0) -> str:
     if depth >= 2:
         return reply
 
+    if "所有模型不可用" in reply or "模型不可用" in reply:
+        return reply
+
     try:
         llm = executor.agent.get("llm")
         if not llm:

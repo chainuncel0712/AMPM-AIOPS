@@ -7,6 +7,9 @@ import subprocess
 
 
 def self_repair(executor, user_msg: str, bad_reply: str) -> str:
+    if "所有模型不可用" in bad_reply or "模型不可用" in bad_reply:
+        return bad_reply
+
     try:
         print(f"  [🔧] 自我修復：真實執行修復指令...")
 

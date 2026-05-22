@@ -476,15 +476,15 @@ class LangGraphExecutor:
                 learn_organ = self.organs.get("self_learn")
                 if learn_organ and hasattr(learn_organ, "reflect"):
                     try:
-                        reflect_result = learn_organ.reflect(
-                            f"回覆與工具結果不一致：工具結果={tool_result_text[:100]}，回覆={agent_result[:100]}"
-                        )
-                        print(f"[LangGraphExecutor] 反省結果: {reflect_result[:200]}")
-                        if self.memory_manager:
-                            self.memory_manager.remember_fact(
-                                f"反省記錄：{reflect_result[:100]}",
-                                importance=0.8
+                            reflect_result = learn_organ.reflect(
+                                f"回覆與工具結果不一致：工具結果={tool_result_text[:100]}，回覆={agent_result[:100]}"
                             )
+                            print(f"[LangGraphExecutor] 反省結果: {reflect_result[:200]}")
+                            if self.memory_manager and "✅" in reflect_result:
+                                self.memory_manager.remember_fact(
+                                    f"反省記錄：{reflect_result[:100]}",
+                                    importance=0.8
+                                )
                     except Exception as e:
                         print(f"[LangGraphExecutor] 反省失敗: {e}")
 
@@ -514,6 +514,10 @@ class LangGraphExecutor:
                         )
             except Exception as e:
                 print(f"[LangGraphExecutor] cortex 處理失敗: {e}")
+
+        if agent_result and ("所有模型不可用" in agent_result):
+            print(f"[LangGraphExecutor] LLM 不可用，跳過修復迴圈")
+            return agent_result
 
         if agent_result and ("⚠️" in agent_result or "❌" in agent_result or "錯誤" in agent_result or "失敗" in agent_result):
             print(f"[LangGraphExecutor] 檢測到錯誤，自動觸發修復...")
@@ -558,6 +562,8 @@ class LangGraphExecutor:
 
         # ===== 連續失敗自動學習 =====
         if agent_result and ("⚠️" in agent_result or "❌" in agent_result or "錯誤" in agent_result or "失敗" in agent_result):
+            if "所有模型不可用" in agent_result:
+                return agent_result
             if not hasattr(self, '_consecutive_error_count'):
                 self._consecutive_error_count = 0
             self._consecutive_error_count += 1
