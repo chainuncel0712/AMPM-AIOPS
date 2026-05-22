@@ -43,11 +43,11 @@ class Thalamus(BaseOrgan):
         """
         target_map = {
             "vision": ["OR-Gemini", "Gemini"],
-            "chat":    ["DeepSeek", "OR-DeepSeek"],
-            "task":    ["DeepSeek", "OR-DeepSeek"],
-            "search":  ["DeepSeek", "OR-DeepSeek"],
-            "system":  ["DeepSeek", "Ollama"],
-            "translate": ["DeepSeek", "OR-DeepSeek"],
+            "chat":    ["Ollama", "DeepSeek", "OR-DeepSeek"],
+            "task":    ["Ollama", "DeepSeek", "OR-DeepSeek"],
+            "search":  ["DeepSeek", "OR-DeepSeek", "Ollama"],
+            "system":  ["Ollama", "DeepSeek"],
+            "translate": ["DeepSeek", "OR-DeepSeek", "Ollama"],
         }
         preferred_names = target_map.get(category, ["DeepSeek"])
         for name in preferred_names:

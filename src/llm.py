@@ -42,25 +42,33 @@ class LLMClient:
         self._health_lock = threading.Lock()
         self._start_health_checks()
 
-        # 🥇 OpenRouter 免費模型（優先，不燒錢）
-        or_key = os.getenv("OPENROUTER_API_KEY")
-        if or_key:
-            self.providers.append({"name":"OR-Free","key":or_key,"ep":"https://openrouter.ai/api/v1/chat/completions","model":"openrouter/auto"})
-            self.providers.append({"name":"OR-Llama","key":or_key,"ep":"https://openrouter.ai/api/v1/chat/completions","model":"openrouter/auto"})
-
-        # 🥈 DeepSeek 直連（備援）
-        ds_key = os.getenv("DEEPSEEK_API_KEY")
-        if ds_key:
-            self.providers.append({"name":"DeepSeek","key":ds_key,"ep":"https://api.deepseek.com/v1/chat/completions","model":"deepseek-v4-pro"})
-
-        # 🥉 Ollama 本機（免費備援 — 快速檢查，不卡 startup）
+        # 🥇 Ollama 本機（優先 — 免費、離線、不用等 timeout）
         ollama_model = os.getenv("OLLAMA_MODEL", "qwen2.5:7b")
         try:
             r = requests.get("http://localhost:11434/api/tags", timeout=3)
             if r.status_code == 200:
                 self.providers.append({"name":"Ollama","key":"ollama","ep":"http://localhost:11434/v1/chat/completions","model":ollama_model})
+                # 預先載入模型，避免第一次請求 timeout
+                try:
+                    requests.post("http://localhost:11434/api/generate",
+                        json={"model": ollama_model, "prompt": "hello", "keep_alive": "30m", "options": {"num_predict": 1}},
+                        timeout=60)
+                    print(f"  ✅ Ollama 模型 {ollama_model} 已預先載入")
+                except Exception as e:
+                    print(f"  ⚠️ Ollama 模型預載失敗（首次回應可能較慢）: {str(e)[:50]}")
         except Exception:
             pass
+
+        # 🥈 OpenRouter（備援 — OR-Free/OR-Llama 可能 402 沒錢）
+        or_key = os.getenv("OPENROUTER_API_KEY")
+        if or_key:
+            self.providers.append({"name":"OR-Free","key":or_key,"ep":"https://openrouter.ai/api/v1/chat/completions","model":"openrouter/auto"})
+            self.providers.append({"name":"OR-Llama","key":or_key,"ep":"https://openrouter.ai/api/v1/chat/completions","model":"openrouter/auto"})
+
+        # 🥉 DeepSeek 直連（備援）
+        ds_key = os.getenv("DEEPSEEK_API_KEY")
+        if ds_key:
+            self.providers.append({"name":"DeepSeek","key":ds_key,"ep":"https://api.deepseek.com/v1/chat/completions","model":"deepseek-v4-pro"})
 
         # 🤗 HuggingFace（已移除 — DNS 無法解析且模型不支援）
 
@@ -255,7 +263,7 @@ class LLMClient:
                     p["ep"],
                     headers={"Authorization": f"Bearer {p['key']}", "Content-Type": "application/json"},
                     json={"model": p["model"], "messages": safe, "temperature": temperature, "max_tokens": 4000},
-                    timeout=15
+                    timeout=30
                 )
                 if r.status_code == 200:
                     self._working_provider = p["name"]
@@ -280,7 +288,7 @@ class LLMClient:
                             p["ep"],
                             headers={"Authorization": f"Bearer {p['key']}", "Content-Type": "application/json"},
                             json={"model": p["model"], "messages": safe, "temperature": temperature, "max_tokens": 4000},
-                            timeout=20
+                            timeout=30
                         )
                         if r.status_code == 200:
                             self._working_provider = p["name"]
@@ -341,7 +349,7 @@ class LLMClient:
                                 p["ep"],
                                 headers={"Authorization": f"Bearer {p['key']}", "Content-Type": "application/json"},
                                 json={"model": p["model"], "messages": safe, "temperature": temperature, "max_tokens": 4000},
-                                timeout=25
+                                timeout=30
                             )
                             if r.status_code == 200:
                                 try:
