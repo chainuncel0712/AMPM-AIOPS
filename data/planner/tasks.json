@@ -42,9 +42,9 @@
       "description": "提供 2.1-2.7 章節要點與段落模板，作為後續全文撰寫的骨架；待工具就位直接落地成全文，並回報結案。風格偏好：專業、清晰、結構化。",
       "priority": 1,
       "deadline": null,
-      "status": "pending",
+      "status": "in_progress",
       "created_at": "2026-05-22T08:13:02.346245",
-      "updated_at": "2026-05-22T08:13:02.346245",
+      "updated_at": "2026-05-22T08:18:01.360382",
       "completed_at": null,
       "overdue_warned": false
     }
