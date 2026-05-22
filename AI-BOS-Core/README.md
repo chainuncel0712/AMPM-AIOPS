@@ -1,9 +1,13 @@
-# 黑曜 · Obsidian AI‑BOS Core
+# 黑曜 AI‑BOS Core
 
 **生命會自己找到出路 — AI 也是。**
 
-黑曜（Obsidian AI‑BOS）是一套以**生物器官系統**為隱喻的 AI Agent 框架。  
+黑曜是一套以**生物器官系統**為隱喻的 AI Agent 框架。  
 它不是 pipeline、不是 graph、不是 chain — 它是一個**會自己呼吸的機械生命體**。
+
+<p align="center">
+  <img src="assets/banner.svg" alt="黑曜 AI-BOS Core Banner" width="100%"/>
+</p>
 
 ```
          ┌─────────────────────────────┐
@@ -74,6 +78,10 @@ python -m ai_bos_core
 ---
 
 ## 架構總覽
+
+<p align="center">
+  <img src="assets/architecture.svg" alt="Architecture Diagram" width="90%"/>
+</p>
 
 | 層級 | 目錄 | 職責 |
 |------|------|------|
@@ -208,7 +216,7 @@ bos.registry.register("my_organ", MyOrgan())
 ## 開發者
 
 ```bash
-git clone https://github.com/chainuncel0712/Obsidian-Framework.git
+git clone https://github.com/chainuncel0712/AMPM-AI-BOS.git
 cd AI-BOS-Core
 pip install -e .
 pytest -v
@@ -240,4 +248,4 @@ pytest -v
 
 ---
 
-*黑曜 · Obsidian AI‑BOS — 生命自己會找到出路。*
+*黑曜 AI‑BOS — 生命自己會找到出路。*

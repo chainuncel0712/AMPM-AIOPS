@@ -8,7 +8,7 @@ setup(
     long_description_content_type="text/markdown",
     author="AMPM Labs",
     author_email="chainuncel0712@gmail.com",
-    url="https://github.com/chainuncel0712/AI-BOS-Core",
+    url="https://github.com/chainuncel0712/AMPM-AI-BOS",
     packages=find_packages(),
     python_requires=">=3.10",
     license="AGPL-3.0 + Additional Restrictions",
