@@ -48,12 +48,12 @@ class LLMClient:
             r = requests.get("http://localhost:11434/api/tags", timeout=3)
             if r.status_code == 200:
                 self.providers.append({"name":"Ollama","key":"ollama","ep":"http://localhost:11434/v1/chat/completions","model":ollama_model})
-                # 背景預載模型（不卡初始化）
+                # 背景輕量預載（只載一次，避免多 runner 互搶）
                 def _warmup():
                     try:
                         requests.post("http://localhost:11434/api/generate",
-                            json={"model": ollama_model, "prompt": "warmup", "keep_alive": "30m", "options": {"num_predict": 1}},
-                            timeout=120)
+                            json={"model": ollama_model, "prompt": "warmup", "keep_alive": "5m", "options": {"num_predict": 1}},
+                            timeout=30)
                     except Exception:
                         pass
                 threading.Thread(target=_warmup, daemon=True).start()
@@ -428,8 +428,8 @@ class LLMClient:
             ]
         }]
 
-        # 用 Gemini 處理視覺（透過 OpenRouter）
-        vision_providers = [p for p in self.providers if "gemini" in p["name"].lower() or "4o" in p.get("model", "").lower()]
+        # 用 Gemini / GPT-4o 或 OpenRouter auto 處理視覺
+        vision_providers = [p for p in self.providers if "gemini" in p["name"].lower() or "4o" in p.get("model", "").lower() or "or-" in p["name"].lower()]
         if not vision_providers:
             return "⚠️ 沒有視覺模型可用（需 Gemini 或 GPT-4o）"
 
