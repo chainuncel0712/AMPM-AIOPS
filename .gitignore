@@ -41,3 +41,23 @@ nuget.config
 tmp/
 temp/
 backup/
+
+# ===== KERNEL — moved to AMPM-KERNEL (private) =====
+src/brain/
+src/governance/
+src/runtime/
+src/core/
+src/compass/
+src/decisions/
+src/agents.py
+src/llm.py
+src/memory.py
+src/memory_vector.py
+src/models.py
+src/executor.py
+src/handler.py
+src/breath.py
+src/nose.py
+src/civilization_controller.py
+src/config.py
+OPS/
