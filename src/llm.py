@@ -198,16 +198,6 @@ class LLMClient:
                 healthy = r.status_code < 500  # 401/403 = endpoint 活著
             except Exception:
                 healthy = False
-                # Ollama 不健康時順便清理卡住的 runner 行程
-                if p["name"] == "Ollama":
-                    try:
-                        import subprocess
-                        subprocess.run(
-                            ["pkill", "-f", "ollama runner"],
-                            timeout=3, capture_output=True
-                        )
-                    except Exception:
-                        pass
             with self._health_lock:
                 self._provider_health[p["name"]] = healthy
 
