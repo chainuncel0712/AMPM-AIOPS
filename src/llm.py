@@ -42,20 +42,21 @@ class LLMClient:
         self._health_lock = threading.Lock()
         self._start_health_checks()
 
-        # 🥇 Ollama 本機（優先 — 免費、離線、不用等 timeout）
+        # 🥇 Ollama 本機（優先 — 免費、離線）
         ollama_model = os.getenv("OLLAMA_MODEL", "qwen2.5:7b")
         try:
             r = requests.get("http://localhost:11434/api/tags", timeout=3)
             if r.status_code == 200:
                 self.providers.append({"name":"Ollama","key":"ollama","ep":"http://localhost:11434/v1/chat/completions","model":ollama_model})
-                # 預先載入模型，避免第一次請求 timeout
-                try:
-                    requests.post("http://localhost:11434/api/generate",
-                        json={"model": ollama_model, "prompt": "hello", "keep_alive": "30m", "options": {"num_predict": 1}},
-                        timeout=60)
-                    print(f"  ✅ Ollama 模型 {ollama_model} 已預先載入")
-                except Exception as e:
-                    print(f"  ⚠️ Ollama 模型預載失敗（首次回應可能較慢）: {str(e)[:50]}")
+                # 背景預載模型（不卡初始化）
+                def _warmup():
+                    try:
+                        requests.post("http://localhost:11434/api/generate",
+                            json={"model": ollama_model, "prompt": "warmup", "keep_alive": "30m", "options": {"num_predict": 1}},
+                            timeout=120)
+                    except Exception:
+                        pass
+                threading.Thread(target=_warmup, daemon=True).start()
         except Exception:
             pass
 
