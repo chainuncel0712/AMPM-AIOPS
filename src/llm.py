@@ -342,11 +342,20 @@ class LLMClient:
                                 json={"model": p["model"], "messages": safe, "temperature": temperature, "max_tokens": 4000},
                                 timeout=30
                             )
-                            if r.status_code == 200:
-                                try:
-                                    return r.json().get("choices", [{}])[0].get("message", {}).get("content", "")
-                                except (KeyError, IndexError, TypeError, json.JSONDecodeError):
-                                    continue
+                if r.status_code == 200:
+                    try:
+                        data = r.json()
+                        choice = data.get("choices", [{}])[0]
+                        msg = choice.get("message", {})
+                        # Try content first, then reasoning, then fallback
+                        content = msg.get("content") or msg.get("reasoning") or ""
+                        if content.strip():
+                            return content
+                        # If still empty, try to get any text from the choice
+                        if "text" in choice:
+                            return choice["text"]
+                    except (KeyError, IndexError, TypeError, json.JSONDecodeError):
+                        continue
                             if r.status_code == 429:
                                 print(f"⚠️ {p['name']} 速率限製，換備援")
                                 time.sleep(1)
