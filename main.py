@@ -611,6 +611,23 @@ def main():
             except Exception as e:
                 await update.message.reply_text(f"❌ 錯誤: {e}")
 
+        async def train_cmd(update, context):
+            args = context.args
+            if len(args) < 2:
+                await update.message.reply_text(
+                    "🧠 訓練黑曜\n\n"
+                    "指令：\n"
+                    "/train <主題> <內容> — 教黑曜新知識\n"
+                    "範例：/train 安裝流程 先收錢再給SSH\n\n"
+                    "訓練後黑曜會記住，下次遇到相關問題就知道怎麼回。"
+                )
+                return
+            topic = args[0]
+            content = " ".join(args[1:])
+            uid = str(update.effective_user.id)
+            result = dispatcher.train(uid, topic, content)
+            await update.message.reply_text(f"🧠 {result}")
+
         async def customers_cmd(update, context):
             all_c = dispatcher.get_customers_summary()
             if not all_c:
@@ -626,6 +643,7 @@ def main():
         app.add_handler(CommandHandler("status", status_cmd))
         app.add_handler(CommandHandler("service", service_cmd))
         app.add_handler(CommandHandler("customers", customers_cmd))
+        app.add_handler(CommandHandler("train", train_cmd))
         app.add_handler(MessageHandler(filters.TEXT, handle))
         
         print("  [✅] Bot 已啟動")

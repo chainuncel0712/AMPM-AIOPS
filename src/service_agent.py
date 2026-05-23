@@ -284,6 +284,23 @@ class ServiceDispatcher:
         self.install = InstallAgent()
         self.after = AfterSalesAgent()
 
+    def train(self, cid, topic, content):
+        """訓練黑曜 — 記錄特定知識"""
+        c = db.get_or_create(cid)
+        if "knowledge" not in c:
+            c["knowledge"] = {}
+        c["knowledge"][topic] = {"content": content, "trained_at": datetime.now().isoformat()}
+        db.save()
+        return f"✅ 已學習：{topic}"
+
+    def get_knowledge(self, cid, topic=None):
+        c = db.get(cid)
+        if not c or "knowledge" not in c:
+            return ""
+        if topic:
+            return c["knowledge"].get(topic, {}).get("content", "")
+        return c["knowledge"]
+
     def get_context_for_obsidian(self, cid):
         """黑曜呼叫用 — 回傳客戶摘要文字"""
         c = db.get(cid)
