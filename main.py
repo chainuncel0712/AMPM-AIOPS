@@ -34,6 +34,7 @@ sys.path.insert(0, SRC_PATH)
 
 import license_manager
 import payment_verifier
+import support
 
 ERROR_CN = {
     "ModuleNotFoundError": "找不到模組",
@@ -340,9 +341,21 @@ def main():
             supervisor.heartbeat("bot")
             msg = update.message.text
             user_id = update.effective_user.id
+            chat = update.effective_chat
             import sys as _sys
             _sys.stdout.write(f"[Bot] 收到訊息: {msg[:100]}\n")
             _sys.stdout.flush()
+
+            # ── 群組客服模式 ──
+            if chat.type in ("group", "supergroup"):
+                bot_username = (await context.bot.get_me()).username
+                if bot_username not in msg and not msg.startswith("/"):
+                    return  # 沒 @Bot 或 / 就不回
+                reply = support.auto_reply(msg)
+                if reply:
+                    await update.message.reply_text(reply)
+                    return
+                # 沒匹配到 FAQ 就 fallthrough 到一般對話
 
             # ── 授權指令（不需要付費即可使用）──
             if msg.startswith("/activate"):
