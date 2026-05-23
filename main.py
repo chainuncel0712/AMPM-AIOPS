@@ -476,13 +476,13 @@ def main():
                         msg_with_ctx = f"[客戶資料: {customer_ctx}] {msg}"
                         if obsidian.langgraph and hasattr(obsidian.langgraph, 'process'):
                             _sys.stdout.write(f"[Bot] 使用 LangGraph 引擎\n")
-                            reply = obsidian.langgraph.process(msg)
+                            reply = obsidian.langgraph.process(msg_with_ctx)
                         elif hasattr(obsidian, 'cortex') and obsidian.cortex and hasattr(obsidian.cortex, 'think'):
                             _sys.stdout.write(f"[Bot] 使用 Cortex 引擎\n")
-                            reply = obsidian.cortex.think(msg)
+                            reply = obsidian.cortex.think(msg_with_ctx)
                         else:
                             reply = "🤔 思考引擎尚未初始化。"
-                    except Exception as e:
+                except Exception as e:
                         _sys.stdout.write(f"[Bot] 引擎錯誤: {e}\n")
                         reply = f"⚠️ {translate_error(e)}"
 
