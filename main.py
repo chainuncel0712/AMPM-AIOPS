@@ -356,15 +356,19 @@ def main():
                 await update.message.reply_text(result)
                 return
             if msg == "/pricing":
-                await update.message.reply_text(
-                    "💰 黑曜 AI 訂閱方案\n\n"
-                    "🔹 月費：$10/月\n"
-                    "🔹 季費：$25/季（省 $5）\n"
-                    "🔹 年費：$80/年（省 $40）\n\n"
-                    "💳 加密貨幣付款（USDT TRC20）：\n"
-                    "`你的錢包地址放這裡`\n\n"
-                    "付款後請將 TXID 傳給管理員開通授權。"
-                )
+                photo_path = Path(__file__).parent / "assets" / "100.jpg"
+                with open(photo_path, "rb") as f:
+                    await update.message.reply_photo(
+                        photo=f,
+                        caption=(
+                            "💰 黑曜 AI 訂閱方案\n\n"
+                            "🔹 月費：$10/月\n"
+                            "🔹 季費：$25/季（省 $5）\n"
+                            "🔹 年費：$80/年（省 $40）\n\n"
+                            "💳 掃上方 QRCode 付款（BNB Chain / BEP20）\n"
+                            "付款後請將 TXID 傳給管理員開通授權。"
+                        )
+                    )
                 return
 
             # ── 授權檢查 ──
