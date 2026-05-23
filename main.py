@@ -397,7 +397,7 @@ def main():
                 return
 
             # ── 授權檢查 ──
-            allowed, auth_msg = license_manager.check_access(user_id)
+            allowed, auth_msg, tier = license_manager.check_access(user_id)
             if not allowed and user_id not in AUTHORIZED:
                 await update.message.reply_text(
                     f"⛔ 無授權\n\n{auth_msg}\n\n"
@@ -410,8 +410,12 @@ def main():
             _sys.stdout.flush()
             try:
                 try:
-                    # ── 先檢查 ExecutionContext 特殊意圖（模型切換/看圖/系統指令） ──
+                    # ── 功能分級閘門 ──
                     ec = getattr(obsidian, 'execution_context', None)
+                    if tier == "basic":
+                        # 基礎版：只走基本對話，跳過 EC 特殊意圖 / 記憶 / 進化
+                        raise StopIteration("basic_fallthrough")
+                    # ── 先檢查 ExecutionContext 特殊意圖（模型切換/看圖/系統指令） ──
                     from runtime.execution_context import RequestSandbox
                     check_sandbox = RequestSandbox(user_msg=msg)
                     if ec:
