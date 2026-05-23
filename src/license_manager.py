@@ -51,10 +51,7 @@ def activate(key: str, user_id: int) -> str:
     lic["activated_at"] = datetime.utcnow().isoformat()
     _save(data)
     remaining = (expiry - datetime.utcnow()).days
-    tier_name = {"basic": "基礎版", "pro": "專業版", "business": "商務版"}.get(
-        lic.get("tier", "basic"), "基礎版"
-    )
-    return f"✅ 啟用成功！方案：{tier_name}，剩餘 {remaining} 天。"
+    return f"✅ 啟用成功！剩餘 {remaining} 天。"
 
 
 def check_access(user_id: int) -> tuple:
@@ -66,8 +63,7 @@ def check_access(user_id: int) -> tuple:
             if expiry > datetime.utcnow():
                 remaining = (expiry - datetime.utcnow()).days
                 tier = lic.get("tier", "basic")
-                tier_name = {"basic": "基礎版", "pro": "專業版", "business": "商務版"}.get(tier, "基礎版")
-                return True, f"{tier_name}，剩餘 {remaining} 天", tier
+                return True, f"剩餘 {remaining} 天", tier
             else:
                 lic["active"] = False
                 _save(data)
@@ -92,12 +88,9 @@ def status(user_id: int) -> str:
             expiry = datetime.fromisoformat(lic["expires"])
             remaining = (expiry - datetime.utcnow()).days
             active = lic.get("active", True) and remaining > 0
-            tier = lic.get("tier", "basic")
-            tier_name = {"basic": "基礎版", "pro": "專業版", "business": "商務版"}.get(tier, "基礎版")
             status_text = "✅ 啟用中" if active else "❌ 已過期"
             return (
                 f"📋 訂閱狀態\n"
-                f"方案：{tier_name}\n"
                 f"狀態：{status_text}\n"
                 f"到期：{expiry.strftime('%Y-%m-%d')}\n"
                 f"剩餘：{max(0, remaining)} 天"
