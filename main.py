@@ -649,6 +649,11 @@ def main():
         print("  [✅] Bot 已啟動")
         supervisor.register("bot", hb_interval=30, hb_timeout=120,
                             is_restartable=False, is_critical=True)
+        try:
+            from heartbeat import start as start_heartbeat
+            start_heartbeat()
+        except:
+            pass
         print()
         print_header("🎉 黑曜啟動完成，所有系統就緒")
         
