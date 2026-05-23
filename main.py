@@ -399,10 +399,15 @@ def main():
                     await update.message.reply_photo(
                         photo=f,
                         caption=(
-                            "💰 黑曜 AI 方案（付錢全解鎖）\n\n"
+                            "💰 黑曜 AI 方案\n\n"
+                            "📦 自託管（自備 VPS）\n"
                             "🔹 $15/月 — 30 天\n"
                             "🔹 $39/季 — 90 天\n"
-                            "🔹 $120/年 — 365 天 (省 $60)\n\n"
+                            "🔹 $120/年 — 365 天\n\n"
+                            "☁️ 雲端版（我們代管）\n"
+                            "🔹 $30/月 — 30 天\n"
+                            "🔹 $80/季 — 90 天\n"
+                            "🔹 $240/年 — 365 天\n\n"
                             "💳 掃上方 QRCode 付款（BNB Chain / BEP20）\n"
                             "付款後將 TXID 複製，輸入 /activate <TXID> 自動開通。"
                         )
