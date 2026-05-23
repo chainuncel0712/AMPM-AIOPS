@@ -59,6 +59,7 @@ footer::before{content:'[system] AMPM-AIOPS v4.0 — all rights reserved';displa
 section[data-lang]{display:none}
 section[data-lang].active{display:block}
 .lang-group{display:block}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
 @media(max-width:600px){header h1{font-size:2rem}.pricing-grid{grid-template-columns:1fr}}
 </style>
 </head>
@@ -404,6 +405,62 @@ section[data-lang].active{display:block}
   </div>
 </section>
 
+<section class="lang-zh">
+  <div class="container">
+    <h2>聯絡客服</h2>
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="background:#030a0f;border-bottom:1px solid #004466;padding:10px 16px;display:flex;align-items:center;gap:10px">
+        <div style="width:10px;height:10px;border-radius:50%;background:#00e6ff;box-shadow:0 0 8px rgba(0,230,255,0.5);animation:pulse 2s infinite"></div>
+        <span style="color:#00e6ff;font-size:0.9rem;letter-spacing:1px">> 線上客服 ONLiNE_ <span style="color:#0088aa;font-size:0.7rem">[status: active]</span></span>
+      </div>
+      <div style="padding:0;max-height:400px;overflow-y:auto" id="chat-box">
+        <div style="padding:12px 16px;border-bottom:1px solid #003355">
+          <div style="color:#00e6ff;font-size:0.75rem;margin-bottom:4px">> 系統 · 自動回覆</div>
+          <div style="color:#0088aa;font-size:0.85rem">您好，我是黑曜 AI 客服。請問有什麼需要協助的？您可以輸入文字或點擊下方快速提問。</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;padding:8px 12px;border-top:1px solid #003355;background:#020408">
+        <button onclick="quickAsk('方案與價格')" style="background:transparent;border:1px solid #004466;color:#0088aa;padding:4px 10px;font-size:0.75rem;cursor:pointer;font-family:inherit;border-radius:0">方案與價格</button>
+        <button onclick="quickAsk('如何付款開通')" style="background:transparent;border:1px solid #004466;color:#0088aa;padding:4px 10px;font-size:0.75rem;cursor:pointer;font-family:inherit;border-radius:0">如何付款開通</button>
+        <button onclick="quickAsk('技術支援')" style="background:transparent;border:1px solid #004466;color:#0088aa;padding:4px 10px;font-size:0.75rem;cursor:pointer;font-family:inherit;border-radius:0">技術支援</button>
+        <button onclick="quickAsk('客製化服務')" style="background:transparent;border:1px solid #004466;color:#0088aa;padding:4px 10px;font-size:0.75rem;cursor:pointer;font-family:inherit;border-radius:0">客製化服務</button>
+      </div>
+      <div style="display:flex;border-top:1px solid #004466">
+        <input type="text" id="chat-input" placeholder="輸入訊息..." style="flex:1;background:#020408;border:none;color:#00e6ff;padding:12px 16px;font-family:inherit;font-size:0.85rem;outline:none" onkeydown="if(event.key==='Enter') sendMsg()">
+        <button onclick="sendMsg()" style="background:transparent;border:none;border-left:1px solid #004466;color:#00e6ff;padding:0 20px;cursor:pointer;font-family:inherit;font-size:0.85rem;letter-spacing:1px">發送</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="lang-en" style="display:none">
+  <div class="container">
+    <h2>Contact Support</h2>
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="background:#030a0f;border-bottom:1px solid #004466;padding:10px 16px;display:flex;align-items:center;gap:10px">
+        <div style="width:10px;height:10px;border-radius:50%;background:#00e6ff;box-shadow:0 0 8px rgba(0,230,255,0.5);animation:pulse 2s infinite"></div>
+        <span style="color:#00e6ff;font-size:0.9rem;letter-spacing:1px">> LiVE SUPPORT ONLiNE_ <span style="color:#0088aa;font-size:0.7rem">[status: active]</span></span>
+      </div>
+      <div style="padding:0;max-height:400px;overflow-y:auto" id="chat-box-en">
+        <div style="padding:12px 16px;border-bottom:1px solid #003355">
+          <div style="color:#00e6ff;font-size:0.75rem;margin-bottom:4px">> System · Auto Reply</div>
+          <div style="color:#0088aa;font-size:0.85rem">Hello, I'm Obsidian AI Support. How can I help you? Type your question or click a quick option below.</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;padding:8px 12px;border-top:1px solid #003355;background:#020408">
+        <button onclick="quickAskEn('Pricing')" style="background:transparent;border:1px solid #004466;color:#0088aa;padding:4px 10px;font-size:0.75rem;cursor:pointer;font-family:inherit;border-radius:0">Pricing</button>
+        <button onclick="quickAskEn('How to activate')" style="background:transparent;border:1px solid #004466;color:#0088aa;padding:4px 10px;font-size:0.75rem;cursor:pointer;font-family:inherit;border-radius:0">How to Activate</button>
+        <button onclick="quickAskEn('Tech Support')" style="background:transparent;border:1px solid #004466;color:#0088aa;padding:4px 10px;font-size:0.75rem;cursor:pointer;font-family:inherit;border-radius:0">Tech Support</button>
+        <button onclick="quickAskEn('Custom Service')" style="background:transparent;border:1px solid #004466;color:#0088aa;padding:4px 10px;font-size:0.75rem;cursor:pointer;font-family:inherit;border-radius:0">Custom Service</button>
+      </div>
+      <div style="display:flex;border-top:1px solid #004466">
+        <input type="text" id="chat-input-en" placeholder="Type a message..." style="flex:1;background:#020408;border:none;color:#00e6ff;padding:12px 16px;font-family:inherit;font-size:0.85rem;outline:none" onkeydown="if(event.key==='Enter') sendMsgEn()">
+        <button onclick="sendMsgEn()" style="background:transparent;border:none;border-left:1px solid #004466;color:#00e6ff;padding:0 20px;cursor:pointer;font-family:inherit;font-size:0.85rem;letter-spacing:1px">Send</button>
+      </div>
+    </div>
+  </div>
+</section>
+
 <footer>
   <div class="container">
     <p>AMPM-AIOPS © 2026 — 黑曜 AI Lifeform</p>
@@ -439,6 +496,81 @@ if (navLang && navLang.startsWith('en')) switchLang('en');
 <script>
 function openTgChat() {
   window.open('https://t.me/AMPM_Service_bot?start=website', '_blank', 'width=480,height=720');
+}
+
+// Chat logic
+function sendMsg() {
+  var input = document.getElementById('chat-input');
+  var msg = input.value.trim();
+  if (!msg) return;
+  addChatMsg('您', msg, '#00e6ff');
+  input.value = '';
+  setTimeout(function() {
+    var reply = getAutoReply(msg);
+    addChatMsg('> 黑曜客服', reply, '#0088aa');
+  }, 500);
+}
+
+function sendMsgEn() {
+  var input = document.getElementById('chat-input-en');
+  var msg = input.value.trim();
+  if (!msg) return;
+  addChatMsg('You', msg, '#00e6ff', 'chat-box-en');
+  input.value = '';
+  setTimeout(function() {
+    var reply = getAutoReplyEn(msg);
+    addChatMsg('> Obsidian Support', reply, '#0088aa', 'chat-box-en');
+  }, 500);
+}
+
+function quickAsk(q) {
+  addChatMsg('您', q, '#00e6ff');
+  setTimeout(function() {
+    addChatMsg('> 黑曜客服', getAutoReply(q), '#0088aa');
+  }, 500);
+}
+
+function quickAskEn(q) {
+  addChatMsg('You', q, '#00e6ff', 'chat-box-en');
+  setTimeout(function() {
+    addChatMsg('> Obsidian Support', getAutoReplyEn(q), '#0088aa', 'chat-box-en');
+  }, 500);
+}
+
+function addChatMsg(who, text, color, boxId) {
+  boxId = boxId || 'chat-box';
+  var box = document.getElementById(boxId);
+  var d = document.createElement('div');
+  d.style.cssText = 'padding:12px 16px;border-bottom:1px solid #003355';
+  d.innerHTML = '<div style="color:'+color+';font-size:0.75rem;margin-bottom:4px">'+who+' <span style="color:#004466;font-size:0.65rem">'+new Date().toLocaleTimeString()+'</span></div><div style="color:#0088aa;font-size:0.85rem">'+text+'</div>';
+  box.appendChild(d);
+  box.scrollTop = box.scrollHeight;
+}
+
+function getAutoReply(msg) {
+  var m = msg.toLowerCase();
+  if (m.indexOf('價格')>=0 || m.indexOf('方案')>=0 || m.indexOf('多少錢')>=0 || m.indexOf('價')>=0)
+    return '月方案 $15/30天，季方案 $39/90天，年方案 $120/365天。付費即解鎖全部功能，不分級。需要詳細介紹嗎？';
+  if (m.indexOf('付款')>=0 || m.indexOf('開通')>=0 || m.indexOf('activate')>=0 || m.indexOf('txid')>=0)
+    return '支援 USDT BEP20 自動開通：付款後將 TXID 傳給黑曜 Bot，輸入 /activate [TXID] 即可秒開通。也支援 PayPal（私訊管理員）。';
+  if (m.indexOf('技術')>=0 || m.indexOf('安裝')>=0 || m.indexOf('setup')>=0 || m.indexOf('問題')>=0)
+    return '技術支援請加入我們的 Telegram 支援群組，由黑曜 AI 與技術人員協助排除。私訊 @AMPM_Service_bot 即可聯繫。';
+  if (m.indexOf('客製')>=0 || m.indexOf('自訂')>=0 || m.indexOf('custom')>=0)
+    return '客製化功能開發另外報價。請描述您的需求，我們會評估後提供報價與時程。';
+  return '感謝您的提問。如需進一步協助，請加入 Telegram 支援群組 @AMPM_Service_bot，會有專人為您服務。';
+}
+
+function getAutoReplyEn(msg) {
+  var m = msg.toLowerCase();
+  if (m.indexOf('price')>=0 || m.indexOf('pricing')>=0 || m.indexOf('cost')>=0 || m.indexOf('plan')>=0)
+    return 'Monthly $15/30 days, Quarterly $39/90 days, Yearly $120/365 days. Pay once, unlock everything. Need more details?';
+  if (m.indexOf('pay')>=0 || m.indexOf('activate')>=0 || m.indexOf('txid')>=0)
+    return 'We accept USDT BEP20 (auto-activation). Send TXID to Obsidian Bot with /activate [TXID]. PayPal also available — contact admin.';
+  if (m.indexOf('tech')>=0 || m.indexOf('support')>=0 || m.indexOf('issue')>=0 || m.indexOf('help')>=0)
+    return 'Join our Telegram support group for technical assistance. Message @AMPM_Service_bot to get started.';
+  if (m.indexOf('custom')>=0)
+    return 'Custom development is available. Describe your requirements and we will provide a quote.';
+  return 'Thank you for your inquiry. For further assistance, please join our Telegram support group @AMPM_Service_bot.';
 }
 </script>
 
