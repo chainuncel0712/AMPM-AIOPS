@@ -30,6 +30,7 @@ section:last-child{border-bottom:none}
 h2{font-size:1.6rem;color:#00e6ff;margin-bottom:24px;text-align:center;letter-spacing:4px;text-shadow:0 0 15px rgba(0,230,255,0.4),0 0 40px rgba(0,230,255,0.1);font-weight:400;text-transform:uppercase;position:relative;display:inline-block;left:50%;transform:translateX(-50%);padding:0 20px}
 h2::before{content:'< ';color:rgba(0,230,255,0.3)}
 h2::after{content:' >';color:rgba(0,230,255,0.3)}
+table{font-family:'Courier New',monospace}
 .card{background:#030a0f;border:2px solid #004466;padding:32px;margin-bottom:16px;position:relative;overflow:hidden}
 .card::before{content:'// ── ';position:absolute;top:4px;left:10px;color:#006688;font-size:0.7rem;font-family:monospace;opacity:0.5}
 .card::after{content:'▣';position:absolute;bottom:6px;right:10px;color:rgba(0,230,255,0.1);font-size:0.9rem}
@@ -96,10 +97,69 @@ section[data-lang].active{display:block}
 <!-- ZH content -->
 <section class="lang-zh">
   <div class="container">
-    <h2>什麼是黑曜？</h2>
+    <h2>黑曜不是一般的 AI 聊天機器人</h2>
     <div class="card">
-      <p>黑曜是一個部署在 Telegram 上的 AI 生命體。具備記憶、分析、任務執行、多代理協作與自我進化能力。你只需要一台 VPS，就能擁有自己的 AI 夥伴。</p>
-      <p style="margin-top:12px;color:#888">🔒 用戶自備主機，資料不外洩<br>🤖 多模型支援（Ollama / DeepSeek / OpenAI）</p>
+      <p style="color:#00e6ff;font-size:1.1rem;margin-bottom:16px;letter-spacing:1px">一般的 AI 只會回答問題。黑曜會幫你把事情做完。</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px">
+        <div style="background:#020408;border:1px solid #003355;padding:16px">
+          <div style="color:#006688;font-size:0.75rem;margin-bottom:4px">>> 一般 AI</div>
+          <div style="color:#005566;font-size:0.85rem">你問一句它答一句<br>不會記得你講過什麼<br>沒有行動能力<br>只能被動等指令</div>
+        </div>
+        <div style="background:#030a0f;border:1px solid #00e6ff;padding:16px">
+          <div style="color:#00e6ff;font-size:0.75rem;margin-bottom:4px">>> 黑曜 AI 生命體</div>
+          <div style="color:#0088aa;font-size:0.85rem">你交代一次它就記住<br>會主動執行任務定時回報<br>可以指派子代理分工合作<br>會自己上網、寫書、盯銷售</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="lang-zh">
+  <div class="container">
+    <h2>一般 AI vs 黑曜 — 差在哪？</h2>
+    <div class="card" style="padding:0">
+      <table style="width:100%;border-collapse:collapse;font-size:0.85rem">
+        <tr style="border-bottom:2px solid #003355">
+          <th style="padding:14px 16px;text-align:left;color:#006688;font-weight:400;width:30%"></th>
+          <th style="padding:14px 16px;text-align:center;color:#006688;font-weight:400;width:35%">一般 AI  chatbot</th>
+          <th style="padding:14px 16px;text-align:center;color:#00e6ff;font-weight:400;width:35%">⚫ 黑曜</th>
+        </tr>
+        <tr style="border-bottom:1px solid #002244">
+          <td style="padding:12px 16px;color:#0088aa">記憶能力</td>
+          <td style="padding:12px 16px;text-align:center;color:#005566">關掉對話就忘記</td>
+          <td style="padding:12px 16px;text-align:center;color:#00e6ff">長期記憶，說過就記住</td>
+        </tr>
+        <tr style="border-bottom:1px solid #002244">
+          <td style="padding:12px 16px;color:#0088aa">執行任務</td>
+          <td style="padding:12px 16px;text-align:center;color:#005566">只能回答問題</td>
+          <td style="padding:12px 16px;text-align:center;color:#00e6ff">自動執行、定時回報、不需你盯</td>
+        </tr>
+        <tr style="border-bottom:1px solid #002244">
+          <td style="padding:12px 16px;color:#0088aa">分工協作</td>
+          <td style="padding:12px 16px;text-align:center;color:#005566">單一對話</td>
+          <td style="padding:12px 16px;text-align:center;color:#00e6ff">多子代理同時跑不同任務</td>
+        </tr>
+        <tr style="border-bottom:1px solid #002244">
+          <td style="padding:12px 16px;color:#0088aa">網路能力</td>
+          <td style="padding:12px 16px;text-align:center;color:#005566">只有訓練過的知識</td>
+          <td style="padding:12px 16px;text-align:center;color:#00e6ff">可上網搜尋、爬資料、分析對手</td>
+        </tr>
+        <tr style="border-bottom:1px solid #002244">
+          <td style="padding:12px 16px;color:#0088aa">檔案處理</td>
+          <td style="padding:12px 16px;text-align:center;color:#005566">不能讀檔案</td>
+          <td style="padding:12px 16px;text-align:center;color:#00e6ff">能讀 PDF、Word、Excel、程式碼</td>
+        </tr>
+        <tr style="border-bottom:1px solid #002244">
+          <td style="padding:12px 16px;color:#0088aa">自我成長</td>
+          <td style="padding:12px 16px;text-align:center;color:#005566">永遠一樣笨</td>
+          <td style="padding:12px 16px;text-align:center;color:#00e6ff">越用越聰明，自動整理重要記憶</td>
+        </tr>
+        <tr>
+          <td style="padding:12px 16px;color:#0088aa">商業自動化</td>
+          <td style="padding:12px 16px;text-align:center;color:#005566">無法幫你賺錢</td>
+          <td style="padding:12px 16px;text-align:center;color:#00e6ff">可自動寫書上架、盯銷售、找變現點子</td>
+        </tr>
+      </table>
     </div>
   </div>
 </section>
@@ -285,10 +345,69 @@ section[data-lang].active{display:block}
 <!-- EN content -->
 <section class="lang-en" style="display:none">
   <div class="container">
-    <h2>What is Obsidian?</h2>
+    <h2>Obsidian is not just another AI chatbot</h2>
     <div class="card">
-      <p>Obsidian is an AI lifeform deployed on Telegram. It has memory, analysis, task execution, multi-agent collaboration, and self-evolution capabilities. All you need is a VPS to run your own AI partner.</p>
-      <p style="margin-top:12px;color:#888">🔒 Self-hosted — your data stays yours<br>🤖 Multi-model support (Ollama / DeepSeek / OpenAI-compatible)</p>
+      <p style="color:#00e6ff;font-size:1.1rem;margin-bottom:16px;letter-spacing:1px">Most AI only answers questions. Obsidian gets things done.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px">
+        <div style="background:#020408;border:1px solid #003355;padding:16px">
+          <div style="color:#006688;font-size:0.75rem;margin-bottom:4px">>> Typical AI</div>
+          <div style="color:#005566;font-size:0.85rem">Answers one question at a time<br>Forgets everything after chat<br>No ability to take action<br>Waits passively for commands</div>
+        </div>
+        <div style="background:#030a0f;border:1px solid #00e6ff;padding:16px">
+          <div style="color:#00e6ff;font-size:0.75rem;margin-bottom:4px">>> Obsidian AI Lifeform</div>
+          <div style="color:#0088aa;font-size:0.85rem">Remembers everything you say<br>Executes tasks on schedule<br>Delegates to sub-agents<br>Researches, writes, monitors sales</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="lang-en" style="display:none">
+  <div class="container">
+    <h2>Typical AI vs Obsidian</h2>
+    <div class="card" style="padding:0">
+      <table style="width:100%;border-collapse:collapse;font-size:0.85rem">
+        <tr style="border-bottom:2px solid #003355">
+          <th style="padding:14px 16px;text-align:left;color:#006688;font-weight:400;width:30%"></th>
+          <th style="padding:14px 16px;text-align:center;color:#006688;font-weight:400;width:35%">Typical AI Chatbot</th>
+          <th style="padding:14px 16px;text-align:center;color:#00e6ff;font-weight:400;width:35%">⚫ Obsidian</th>
+        </tr>
+        <tr style="border-bottom:1px solid #002244">
+          <td style="padding:12px 16px;color:#0088aa">Memory</td>
+          <td style="padding:12px 16px;text-align:center;color:#005566">Forgets after session</td>
+          <td style="padding:12px 16px;text-align:center;color:#00e6ff">Long-term memory, remembers everything</td>
+        </tr>
+        <tr style="border-bottom:1px solid #002244">
+          <td style="padding:12px 16px;color:#0088aa">Task Execution</td>
+          <td style="padding:12px 16px;text-align:center;color:#005566">Can only answer questions</td>
+          <td style="padding:12px 16px;text-align:center;color:#00e6ff">Auto-executes, reports back, no babysitting</td>
+        </tr>
+        <tr style="border-bottom:1px solid #002244">
+          <td style="padding:12px 16px;color:#0088aa">Multi-Agent</td>
+          <td style="padding:12px 16px;text-align:center;color:#005566">Single conversation</td>
+          <td style="padding:12px 16px;text-align:center;color:#00e6ff">Multiple sub-agents working in parallel</td>
+        </tr>
+        <tr style="border-bottom:1px solid #002244">
+          <td style="padding:12px 16px;color:#0088aa">Web Access</td>
+          <td style="padding:12px 16px;text-align:center;color:#005566">Only trained knowledge</td>
+          <td style="padding:12px 16px;text-align:center;color:#00e6ff">Searches web, scrapes data, analyzes competitors</td>
+        </tr>
+        <tr style="border-bottom:1px solid #002244">
+          <td style="padding:12px 16px;color:#0088aa">File Handling</td>
+          <td style="padding:12px 16px;text-align:center;color:#005566">Cannot read files</td>
+          <td style="padding:12px 16px;text-align:center;color:#00e6ff">Reads PDF, Word, Excel, code</td>
+        </tr>
+        <tr style="border-bottom:1px solid #002244">
+          <td style="padding:12px 16px;color:#0088aa">Self-Evolution</td>
+          <td style="padding:12px 16px;text-align:center;color:#005566">Never improves</td>
+          <td style="padding:12px 16px;text-align:center;color:#00e6ff">Gets smarter over time, auto-organizes memory</td>
+        </tr>
+        <tr>
+          <td style="padding:12px 16px;color:#0088aa">Business Automation</td>
+          <td style="padding:12px 16px;text-align:center;color:#005566">Can't help you earn</td>
+          <td style="padding:12px 16px;text-align:center;color:#00e6ff">Auto-writes books, tracks sales, finds monetization ideas</td>
+        </tr>
+      </table>
     </div>
   </div>
 </section>
