@@ -407,6 +407,7 @@ def main():
                             "🔹 $80/季 — 90 天\n"
                             "🔹 $240/年 — 365 天\n\n"
                             "💳 掃上方 QRCode 付款（BNB Chain / BEP20）\n"
+                            "或 PayPal 支付：請私訊管理員索取付款連結\n"
                             "付款後將 TXID 複製，輸入 /activate <TXID> 自動開通。"
                         )
                     )
