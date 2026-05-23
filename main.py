@@ -389,7 +389,8 @@ def main():
                             "💰 黑曜 AI 訂閱方案\n\n"
                             "🔹 基礎版 $10/月 — 個人開發者\n"
                             "🔹 專業版 $25/季 — 重度使用者\n"
-                            "🔹 企業版 $300/年 — 公司/工作室（全部解鎖）\n\n"
+                            "🔹 商務版 $150/年 — 公司行號\n"
+                            "🔹 客製化版 另議 — 專屬功能開發\n\n"
                             "💳 掃上方 QRCode 付款（BNB Chain / BEP20）\n"
                             "付款後將 TXID 複製，輸入 /activate <TXID> 自動開通。"
                         )
@@ -412,8 +413,8 @@ def main():
                 try:
                     # ── 功能分級閘門 ──
                     ec = getattr(obsidian, 'execution_context', None)
-                    if tier == "basic":
-                        # 基礎版：只走基本對話，跳過 EC 特殊意圖 / 記憶 / 進化
+                    if tier in ("basic", "pro"):
+                        # 基礎/專業版：不開放 EC 特殊意圖
                         raise StopIteration("basic_fallthrough")
                     # ── 先檢查 ExecutionContext 特殊意圖（模型切換/看圖/系統指令） ──
                     from runtime.execution_context import RequestSandbox

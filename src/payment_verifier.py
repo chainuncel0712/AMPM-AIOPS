@@ -14,7 +14,7 @@ USDT_CONTRACT = "0x55d398326f99059fF775485246999027B3197955"  # USDT BEP20
 CLAIMED_FILE = Path(__file__).parent.parent / "data" / "claimed_txids.json"
 
 AMOUNT_PLANS = [
-    (300, 365, "enterprise", "企業版（$300/年）"),
+    (150, 365, "business",  "商務版（$150/年）"),
     (25,  90,  "pro",       "專業版（$25/季）"),
     (10,  30,  "basic",     "基礎版（$10/月）"),
 ]
