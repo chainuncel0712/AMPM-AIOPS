@@ -70,5 +70,4 @@ src/handler.py
 src/breath.py
 src/nose.py
 src/civilization_controller.py
-src/config.py
 OPS

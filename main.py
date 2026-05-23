@@ -424,6 +424,7 @@ def main():
             try:
                 try:
                     # ── 先檢查 ExecutionContext 特殊意圖（模型切換/看圖/系統指令） ──
+                    ec = getattr(obsidian, 'execution_context', None)
                     from runtime.execution_context import RequestSandbox
                     check_sandbox = RequestSandbox(user_msg=msg)
                     if ec:
@@ -499,7 +500,7 @@ def main():
         app = Application.builder().token(TOKEN).build()
         app.add_handler(CommandHandler("start", start_cmd))
         app.add_handler(CommandHandler("status", status_cmd))
-        app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle))
+        app.add_handler(MessageHandler(filters.TEXT, handle))
         
         print("  [✅] Bot 已啟動")
         supervisor.register("bot", hb_interval=30, hb_timeout=120,

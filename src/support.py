@@ -29,8 +29,4 @@ def find_answer(text: str) -> str | None:
 
 def auto_reply(text: str) -> str | None:
     """Group support auto-reply. Returns reply or None if no match."""
-    # Check for help keywords
-    help_triggers = ["help", "幫助", "怎麼", "如何", "問題", "請問", "客服", "support"]
-    if not any(t in text.lower() for t in help_triggers):
-        return None
     return find_answer(text)
