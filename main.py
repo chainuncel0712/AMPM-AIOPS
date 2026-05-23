@@ -221,22 +221,19 @@ def main():
     
     # 步驟 2.5：建立 LangGraph 引擎並注入
     print("🔗 步驟 2.5/3: 初始化 LangGraph 引擎...")
-    if getattr(obsidian, 'mode', 'stable') != 'stable':
-        try:
-            from core.langgraph_executor import LangGraphExecutor
-            
-            langgraph = LangGraphExecutor(brain=obsidian)
-            obsidian.langgraph = langgraph
-            if hasattr(obsidian, 'cortex'):
-                obsidian.cortex.langgraph = langgraph
-            print("  [✅] LangGraph 引擎就緒")
-        except Exception as e:
-            print(f"  [❌] LangGraph 引擎初始化失敗: {translate_error(e)}")
-            obsidian.langgraph = None
-            if hasattr(obsidian, 'cortex'):
-                obsidian.cortex.langgraph = None
-    else:
-        print("  [⏸️] LangGraph 引擎已停用（stable 模式）")
+    try:
+        from core.langgraph_executor import LangGraphExecutor
+        
+        langgraph = LangGraphExecutor(brain=obsidian)
+        obsidian.langgraph = langgraph
+        if hasattr(obsidian, 'cortex'):
+            obsidian.cortex.langgraph = langgraph
+        print("  [✅] LangGraph 引擎就緒")
+    except Exception as e:
+        print(f"  [❌] LangGraph 引擎初始化失敗: {translate_error(e)}")
+        obsidian.langgraph = None
+        if hasattr(obsidian, 'cortex'):
+            obsidian.cortex.langgraph = None
     print()
     
     # 步驟 2.6：啟動健康循環系統（每 5 分鐘檢查器官心跳）
