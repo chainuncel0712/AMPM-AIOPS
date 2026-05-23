@@ -172,25 +172,23 @@ def main():
         sys.exit(1)
     print()
     
-    # 步驟 2：掃描並載入 core/ 目錄中的器官（精簡模式 — 只載入核心，其餘按需）
-    print("🔍 步驟 2/3: 掃描零件...")
+    # 步驟 2：掃描並載入器官（精簡模式 — 只載入核心，其餘按需）
+    print("🔍 步驟 2/3: 掃描零件（精簡模式）...")
+    organ_count = 0
     try:
-        from skeleton.assembler import Assembler
-        assembler = Assembler()
-        assembler.load_link_map()
-        assembler.scan_and_load()
-        assembler.connect_all()
-        assembler.health_check()
-        organ_count = len(assembler.instantiated_organs)
-        
-        for name, organ in assembler.instantiated_organs.items():
-            if name not in obsidian.organs:
-                obsidian.organs[name] = organ
-
-        print(f"  [✅] 獨立零件: {organ_count} 個就緒")
-        print(f"  [✅] 總器官數: {len(obsidian.organs)} 個")
+        # 只載入少量核心器官，避免吃完記憶體
+        for name in ['memory', 'tools', 'compass', 'nose', 'breath']:
+            try:
+                mod = __import__(name, fromlist=[''])
+                organ = getattr(mod, name.capitalize(), None) or getattr(mod, 'get_instance', lambda: None)()
+                if organ:
+                    obsidian.organs[name] = organ
+                    organ_count += 1
+            except Exception:
+                pass
+        print(f"  [✅] 已載入 {organ_count} 個核心零件（按需載入，其餘閒置）")
     except Exception as e:
-        print(f"  [❌] 零件掃描異常: {translate_error(e)}")
+        print(f"  [⚠️] 零件載入: {e}")
         organ_count = 0
     print()
     
