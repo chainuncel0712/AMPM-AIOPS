@@ -26,6 +26,7 @@ import time
 import threading
 import traceback
 from pathlib import Path
+import license_manager
 
 SRC_PATH = str(Path(__file__).parent / "src")
 if SRC_PATH in sys.path:
@@ -336,11 +337,44 @@ def main():
         async def handle(update, context):
             supervisor.heartbeat("bot")
             msg = update.message.text
+            user_id = update.effective_user.id
             import sys as _sys
             _sys.stdout.write(f"[Bot] 收到訊息: {msg[:100]}\n")
             _sys.stdout.flush()
-            if update.effective_user.id not in AUTHORIZED:
-                await update.message.reply_text("⛔ 無權限")
+
+            # ── 授權指令（不需要付費即可使用）──
+            if msg.startswith("/activate"):
+                parts = msg.split()
+                if len(parts) < 2:
+                    await update.message.reply_text("用法：/activate <授權碼>\n授權碼請向管理員購買。")
+                    return
+                result = license_manager.activate(parts[1], user_id)
+                await update.message.reply_text(result)
+                return
+            if msg == "/status":
+                result = license_manager.status(user_id)
+                await update.message.reply_text(result)
+                return
+            if msg == "/pricing":
+                await update.message.reply_text(
+                    "💰 黑曜 AI 訂閱方案\n\n"
+                    "🔹 月費：$10/月\n"
+                    "🔹 季費：$25/季（省 $5）\n"
+                    "🔹 年費：$80/年（省 $40）\n\n"
+                    "💳 加密貨幣付款（USDT TRC20）：\n"
+                    "`你的錢包地址放這裡`\n\n"
+                    "付款後請將 TXID 傳給管理員開通授權。"
+                )
+                return
+
+            # ── 授權檢查 ──
+            allowed, auth_msg = license_manager.check_access(user_id)
+            if not allowed and user_id not in AUTHORIZED:
+                await update.message.reply_text(
+                    f"⛔ 無授權\n\n{auth_msg}\n\n"
+                    "輸入 /pricing 查看方案\n"
+                    "輸入 /activate <授權碼> 啟用"
+                )
                 return
             msg = update.message.text
             _sys.stdout.write(f"[Bot] 除錯: langgraph={obsidian.langgraph is not None}, cortex={obsidian.cortex is not None}, llm={obsidian.llm is not None}\n")
