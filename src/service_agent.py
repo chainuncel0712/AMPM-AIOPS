@@ -131,7 +131,7 @@ class ServiceAgent:
         if customer.get("trial") and customer.get("trial_expires"):
             remaining = (datetime.fromisoformat(customer["trial_expires"]) - datetime.now()).total_seconds()
             if remaining > 0:
-                return f"您已在試用期內，還剩下 {int(remaining/86400)} 天。"
+                return f"您已在試用期內，還剩下 {int(remaining/86400)} 天。\n\n試用版包含：\n✅ AI 對話（無限制）\n✅ 長期記憶\n✅ 任務執行\n✅ 檔案分析\n\n馬上體驗黑曜的強大能力吧！"
         customer["trial"] = True
         customer["trial_expires"] = (datetime.now().replace(microsecond=0) + timedelta(days=days)).isoformat()
         customer["status"] = "trial"
@@ -140,7 +140,26 @@ class ServiceAgent:
         customer["license_key"] = license_key
         self._save()
         self._log(cid, "trial_started", f"{days} 天試用")
-        return f"✅ 您已啟用 {days} 天試用版（功能全開）！\n授權碼: {license_key}\n到期日: {customer['trial_expires']}\n試用期滿後如需繼續使用，請選擇方案付款。\n\n👉 前往 ampm-aiops.com 查看方案"
+        return (
+            f"🚀 試用版已啟用！\n\n"
+            f"⏱ 時效：{days} 天（到期 {customer['trial_expires']}）\n"
+            f"🔑 授權碼：{license_key}\n\n"
+            f"試用版包含：\n"
+            f"  ✅ AI 對話 — 用聊天的就像跟真人說話\n"
+            f"  ✅ 長期記憶 — 它會記住你，不用重複交代\n"
+            f"  ✅ 任務執行 — 叫它做事，它自己會搞定\n"
+            f"  ✅ 檔案分析 — PDF、Word、Excel 丟給它讀\n"
+            f"  ✅ 網路搜尋 — 上網幫你找資料\n\n"
+            f"試用期滿後選擇方案付款即可繼續使用。\n"
+            f"👉 前往 ampm-aiops.com 查看完整方案"
+        )
+
+    def is_trial(self, customer_id):
+        cid = self._cid(customer_id)
+        customer = self.get(cid)
+        if not customer:
+            return False
+        return customer.get("trial", False) and customer.get("status") in ("trial",)
 
     def check_trial(self, customer_id):
         cid = self._cid(customer_id)
