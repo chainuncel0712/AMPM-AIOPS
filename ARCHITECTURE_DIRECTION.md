@@ -1,5 +1,9 @@
 <p align="center"><img src="assets/300.png" width="180"></p>
 
+<p align="center">
+  <img src="assets/0066.png" alt="AMPM Architecture Diagram" width="720">
+</p>
+
 <h1 align="center" style="color:#e94560; border-bottom:1px solid #30363d; padding-bottom:8px;">
 AMPM AI Operating System<br>
 <span style="color:#58a6ff; font-size:0.6em;">Architecture Direction & Repository Refactor</span>
