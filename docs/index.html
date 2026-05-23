@@ -317,18 +317,38 @@ section[data-lang].active{display:block}
     <div class="card" style="text-align:center">
       <p style="color:#0088aa;margin-bottom:20px;font-size:1rem">選一種方式，付款後立即開通</p>
       <div style="display:flex;flex-wrap:wrap;gap:20px;justify-content:center">
-        <div style="flex:1;min-width:220px;background:#020408;border:2px solid #004466;padding:20px">
+        <div style="flex:1;min-width:280px;background:#020408;border:2px solid #004466;padding:20px">
           <div style="color:#00e6ff;font-size:0.9rem;margin-bottom:12px;letter-spacing:2px">> USDT BEP20</div>
           <img src="qr-usdt.png" alt="USDT QR Code" style="width:180px;height:180px;display:block;margin:0 auto 12px;border:1px solid #004466">
           <div style="background:#020408;border:1px solid #004466;padding:8px;font-family:monospace;font-size:0.75rem;color:#00e6ff;word-break:break-all;cursor:pointer" onclick="copyAddr(this)">0x7f3110c1314bD68Fdf8E32cD921E646912108587</div>
           <div style="color:#006688;font-size:0.75rem;margin-top:6px">點擊複製錢包地址</div>
           <div style="color:#0088aa;font-size:0.8rem;margin-top:12px">付款後傳 TXID 給黑曜 Bot<br>輸入 <span style="color:#00e6ff">/activate [TXID]</span> 秒開通</div>
         </div>
-        <div style="flex:1;min-width:220px;background:#020408;border:2px solid #004466;padding:20px;display:flex;flex-direction:column;align-items:center;justify-content:center">
-          <div style="color:#00e6ff;font-size:0.9rem;margin-bottom:12px;letter-spacing:2px">> PayPal</div>
-          <div style="font-size:3rem;margin-bottom:8px;filter:drop-shadow(0 0 10px rgba(0,230,255,0.2))">💳</div>
-          <p style="color:#0088aa;font-size:0.85rem;margin-bottom:16px">信用卡 / PayPal 餘額</p>
-          <a href="https://www.paypal.com/ncp/payment/4Z28JNY7HUKN2" target="_blank" class="cta" style="padding:10px 24px;font-size:0.8rem;margin:0">前往付款</a>
+        <div style="flex:1;min-width:280px;background:#020408;border:2px solid #004466;padding:20px">
+          <div style="color:#00e6ff;font-size:0.9rem;margin-bottom:12px;letter-spacing:2px">> PayPal 信用卡</div>
+          <div id="paypal-container-G4P6R65EYXV7G" style="min-height:100px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="lang-en" style="display:none">
+  <div class="container">
+    <h2>Payment</h2>
+    <div class="card" style="text-align:center">
+      <p style="color:#0088aa;margin-bottom:20px;font-size:1rem">Choose a method and get activated instantly</p>
+      <div style="display:flex;flex-wrap:wrap;gap:20px;justify-content:center">
+        <div style="flex:1;min-width:280px;background:#020408;border:2px solid #004466;padding:20px">
+          <div style="color:#00e6ff;font-size:0.9rem;margin-bottom:12px;letter-spacing:2px">> USDT BEP20</div>
+          <img src="qr-usdt.png" alt="USDT QR Code" style="width:180px;height:180px;display:block;margin:0 auto 12px;border:1px solid #004466">
+          <div style="background:#020408;border:1px solid #004466;padding:8px;font-family:monospace;font-size:0.75rem;color:#00e6ff;word-break:break-all;cursor:pointer" onclick="copyAddrEn(this)">0x7f3110c1314bD68Fdf8E32cD921E646912108587</div>
+          <div style="color:#006688;font-size:0.75rem;margin-top:6px">Click to copy address</div>
+          <div style="color:#0088aa;font-size:0.8rem;margin-top:12px">After payment, send TXID to Obsidian Bot<br>Type <span style="color:#00e6ff">/activate [TXID]</span> for instant activation</div>
+        </div>
+        <div style="flex:1;min-width:280px;background:#020408;border:2px solid #004466;padding:20px">
+          <div style="color:#00e6ff;font-size:0.9rem;margin-bottom:12px;letter-spacing:2px">> PayPal / Credit Card</div>
+          <div id="paypal-container-G4P6R65EYXV7G-en" style="min-height:100px"></div>
         </div>
       </div>
     </div>
@@ -703,6 +723,8 @@ if (navLang && navLang.startsWith('en')) switchLang('en');
 </script>
 
 <!-- Telegram Widget -->
+<script src="https://www.paypal.com/sdk/js?client-id=BAAzma8YPRiApfIzN3eXW1U0TNZ44wtZ6k1vRoIrxwDtWGeTN7Goi-GQxrdkiN5VcapVwcRcHHEHYwNE4o&components=hosted-buttons&disable-funding=venmo&currency=USD">
+</script>
 <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram="AMPM_Service_bot" data-widget="14" data-width="100%" data-height="400" data-color="E94560" data-dark="1" data-chat="@AMPM_Service_bot" data-text="💬 線上客服"></script>
 
 <!-- Floating Telegram Button -->
@@ -732,6 +754,12 @@ function copyAddr(el) {
   el.innerHTML = '✅ 已複製！';
   setTimeout(function(){ el.innerHTML = '0x7f3110c1314bD68Fdf8E32cD921E646912108587'; }, 2000);
 }
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof paypal !== 'undefined') {
+    paypal.HostedButtons({ hostedButtonId: 'G4P6R65EYXV7G' }).render('#paypal-container-G4P6R65EYXV7G');
+    paypal.HostedButtons({ hostedButtonId: 'G4P6R65EYXV7G' }).render('#paypal-container-G4P6R65EYXV7G-en');
+  }
+});
 function openTgChat() {
   window.open('https://t.me/AMPM_Service_bot?start=website', '_blank', 'width=480,height=720');
 }
