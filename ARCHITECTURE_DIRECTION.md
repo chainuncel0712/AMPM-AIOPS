@@ -219,7 +219,7 @@ It must not contain the actual AI brain.
 
 <h3 align="center" style="color:#e94560;">Repository · 倉庫</h3>
 <p align="center" style="color:#c9d1d9; font-size:1.1em;">
-<code style="background:#1a1a2e; color:#e94560; padding:4px 16px; border-radius:4px;">AMPM-KEL</code>
+<code style="background:#1a1a2e; color:#e94560; padding:4px 16px; border-radius:4px;">AMPM-KERNEL</code>
 </p>
 
 <h3 align="center" style="color:#2ea043;">Purpose · 目的</h3>
@@ -464,7 +464,7 @@ Plugins must never possess authority.
 | Repository · 倉庫 | Role · 角色 |
 |:---|---:|
 | <strong style="color:#2ea043;">AMPM-AIOPS</strong> | Public ecosystem framework · 公開生態框架 |
-| <strong style="color:#e94560;">AMPM-KEL</strong> | Private orchestration kernel · 私有協調核心 |
+| <strong style="color:#e94560;">AMPM-KERNEL</strong> | Private orchestration kernel · 私有協調核心 |
 
 </p>
 
