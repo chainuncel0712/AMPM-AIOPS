@@ -27,6 +27,7 @@ import threading
 import traceback
 from pathlib import Path
 import license_manager
+import payment_verifier
 
 SRC_PATH = str(Path(__file__).parent / "src")
 if SRC_PATH in sys.path:
@@ -346,9 +347,31 @@ def main():
             if msg.startswith("/activate"):
                 parts = msg.split()
                 if len(parts) < 2:
-                    await update.message.reply_text("用法：/activate <授權碼>\n授權碼請向管理員購買。")
+                    await update.message.reply_text(
+                        "用法：\n"
+                        "  /activate <授權碼>  — 輸入管理員給的授權碼\n"
+                        "  /activate <TXID>    — 付款後貼上 TXID 自動開通"
+                    )
                     return
-                result = license_manager.activate(parts[1], user_id)
+                code = parts[1]
+                # TXID 自動開通
+                if code.startswith("0x"):
+                    await update.message.reply_text("🔍 正在查詢 BscScan 驗證交易...")
+                    result = payment_verifier.verify_tx(code)
+                    if result["success"]:
+                        days = result["days"]
+                        key = license_manager.generate_key(user_id, days)
+                        act = license_manager.activate(key, user_id)
+                        await update.message.reply_text(
+                            f"{result['message']}\n"
+                            f"{act}\n"
+                            f"授權碼：`{key}`"
+                        )
+                    else:
+                        await update.message.reply_text(result["message"])
+                    return
+                # 傳統授權碼
+                result = license_manager.activate(code, user_id)
                 await update.message.reply_text(result)
                 return
             if msg == "/status":
@@ -366,7 +389,7 @@ def main():
                             "🔹 季費：$25/季（省 $5）\n"
                             "🔹 年費：$80/年（省 $40）\n\n"
                             "💳 掃上方 QRCode 付款（BNB Chain / BEP20）\n"
-                            "付款後請將 TXID 傳給管理員開通授權。"
+                            "付款後將 TXID 複製，輸入 /activate <TXID> 自動開通。"
                         )
                     )
                 return
