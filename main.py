@@ -35,6 +35,7 @@ sys.path.insert(0, SRC_PATH)
 import license_manager
 import payment_verifier
 import support
+from service_agent import service_agent
 
 ERROR_CN = {
     "ModuleNotFoundError": "找不到模組",
@@ -519,10 +520,73 @@ def main():
             if hasattr(obsidian, 'rebirth') and obsidian.rebirth:
                 lines.append(f"  🔄 rebirth: {obsidian.rebirth.rebirth_count} restores")
             await update.message.reply_text("\n".join(lines))
+
+        async def service_cmd(update, context):
+            uid = update.effective_user.id
+            args = context.args
+            if not args:
+                await update.message.reply_text(
+                    "🧑‍💼 客服系統\n\n"
+                    "指令：\n"
+                    "/service new <姓名> <方案> — 新增客戶\n"
+                    "/service pay <客戶ID> <方式> <金額> — 確認付款\n"
+                    "/service vps <客戶ID> <IP> <使用者> — 記錄主機\n"
+                    "/service install <客戶ID> — 產生安裝腳本\n"
+                    "/service done <客戶ID> — 標記安裝完成\n"
+                    "/service note <客戶ID> <備註> — 加備註\n"
+                    "/service summary <客戶ID> — 查看客戶摘要\n"
+                    "/customers — 所有客戶列表"
+                )
+                return
+            cmd = args[0]
+            try:
+                if cmd == "new" and len(args) >= 3:
+                    cid = abs(hash(args[1])) % 1000000
+                    service_agent.get_or_create(cid, name=args[1])
+                    plan = args[2] if len(args) > 2 else "monthly"
+                    service_agent.set_plan(cid, plan)
+                    await update.message.reply_text(f"✅ 客戶已建立\nID: {cid}\n姓名: {args[1]}\n方案: {plan}")
+                elif cmd == "pay" and len(args) >= 3:
+                    reply = service_agent.confirm_payment(args[1], args[2], args[3] if len(args) > 3 else "0")
+                    await update.message.reply_text(reply)
+                elif cmd == "vps" and len(args) >= 4:
+                    reply = service_agent.set_vps(args[1], args[2], args[3])
+                    await update.message.reply_text(reply)
+                elif cmd == "install" and len(args) >= 2:
+                    path = service_agent.generate_script(args[1])
+                    if path:
+                        await update.message.reply_text(f"✅ 安裝腳本已產生: {path}")
+                    else:
+                        await update.message.reply_text("❌ 產生失敗，請先設定主機資訊")
+                elif cmd == "done" and len(args) >= 2:
+                    service_agent.mark_installed(args[1])
+                    await update.message.reply_text("✅ 已標記安裝完成")
+                elif cmd == "note" and len(args) >= 3:
+                    service_agent.add_note(args[1], " ".join(args[2:]))
+                    await update.message.reply_text("✅ 備註已新增")
+                elif cmd == "summary" and len(args) >= 2:
+                    summary = service_agent.get_customer_summary(args[1])
+                    await update.message.reply_text(f"📋 客戶資料：\n{summary}")
+                else:
+                    await update.message.reply_text("❌ 指令格式錯誤，請檢查參數")
+            except Exception as e:
+                await update.message.reply_text(f"❌ 錯誤: {e}")
+
+        async def customers_cmd(update, context):
+            all_c = service_agent.get_all_customers()
+            if not all_c:
+                await update.message.reply_text("目前沒有客戶資料")
+                return
+            lines = ["📋 所有客戶:"]
+            for cid, info in all_c.items():
+                lines.append(f"  {cid}: {info.get('name','?')} — {info.get('plan','?')} — {info.get('status','?')}")
+            await update.message.reply_text("\n".join(lines[-20:]))
         
         app = Application.builder().token(TOKEN).build()
         app.add_handler(CommandHandler("start", start_cmd))
         app.add_handler(CommandHandler("status", status_cmd))
+        app.add_handler(CommandHandler("service", service_cmd))
+        app.add_handler(CommandHandler("customers", customers_cmd))
         app.add_handler(MessageHandler(filters.TEXT, handle))
         
         print("  [✅] Bot 已啟動")
