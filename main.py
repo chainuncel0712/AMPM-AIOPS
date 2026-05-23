@@ -108,42 +108,61 @@ def main():
             # 如果 brain/__init__.py 不存在，嘗試從 brain/cortex.py 導入
             from brain.cortex import Cortex
             
-            # 嘗試使用 LLM 客戶端（支援 Ollama 和 DeepSeek）
+            # 嘗試使用 LLM 客戶端（多供應商：NVIDIA → OpenRouter → Ollama）
             llm_client = None
             try:
                 from openai import OpenAI
                 
-                # 檢查是否設定了 DeepSeek API Key
-                DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
-                if DEEPSEEK_API_KEY:
-                    # 使用 DeepSeek API
-                    DEEPSEEK_MODEL = os.getenv("DEEPSEEK_MODEL", "deepseek-v4-pro")
+                # 1. NVIDIA NIM（首選）
+                NVIDIA_KEY = os.getenv("NVIDIA_API_KEY", "")
+                if NVIDIA_KEY:
+                    NVIDIA_MODEL = os.getenv("NVIDIA_MODEL", "meta/llama-3.1-8b-instruct")
                     llm_client = OpenAI(
-                        base_url="https://api.deepseek.com/v1",
-                        api_key=DEEPSEEK_API_KEY
+                        base_url="https://integrate.api.nvidia.com/v1",
+                        api_key=NVIDIA_KEY
                     )
-                    llm_client.model = DEEPSEEK_MODEL
-                    print(f"  [✅] 已連接到 DeepSeek API")
-                    print(f"  [🤖] 使用模型: {DEEPSEEK_MODEL}")
+                    llm_client.model = NVIDIA_MODEL
+                    print(f"  [✅] 已連接到 NVIDIA NIM")
+                    print(f"  [🤖] 使用模型: {NVIDIA_MODEL}")
                 else:
-                    # 檢查 Ollama 是否在運行
-                    import socket
-                    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    result = sock.connect_ex(('127.0.0.1', 11434))
-                    sock.close()
-                    if result == 0:
-                        # 設定要使用的模型名稱（可自行修改）
-                        OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2:1b")
+                    # 2. OpenRouter（備援）
+                    OR_KEY = os.getenv("OPENROUTER_API_KEY", "")
+                    if OR_KEY:
                         llm_client = OpenAI(
-                            base_url="http://localhost:11434/v1",
-                            api_key="ollama"
+                            base_url="https://openrouter.ai/api/v1",
+                            api_key=OR_KEY
                         )
-                        # 設定模型名稱
-                        llm_client.model = OLLAMA_MODEL
-                        print(f"  [✅] 已連接到 Ollama (http://localhost:11434)")
-                        print(f"  [🤖] 使用模型: {OLLAMA_MODEL}")
+                        llm_client.model = "openai/gpt-4o-mini"
+                        print(f"  [✅] 已連接到 OpenRouter")
+                        print(f"  [🤖] 使用模型: gpt-4o-mini")
                     else:
-                        print("  [⚠️] Ollama 未運行，將使用規則引擎")
+                        # 3. Together AI
+                        TG_KEY = os.getenv("TOGETHER_API_KEY", "")
+                        if TG_KEY:
+                            llm_client = OpenAI(
+                                base_url="https://api.together.xyz/v1",
+                                api_key=TG_KEY
+                            )
+                            llm_client.model = "mistralai/Mixtral-8x7B-Instruct-v0.1"
+                            print(f"  [✅] 已連接到 Together AI")
+                            print(f"  [🤖] 使用模型: Mixtral-8x7B")
+                        else:
+                            # 4. Ollama 本機（最後手段）
+                            import socket
+                            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                            result = sock.connect_ex(('127.0.0.1', 11434))
+                            sock.close()
+                            if result == 0:
+                                OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen2.5:7b")
+                                llm_client = OpenAI(
+                                    base_url="http://localhost:11434/v1",
+                                    api_key="ollama"
+                                )
+                                llm_client.model = OLLAMA_MODEL
+                                print(f"  [✅] 已連接到 Ollama")
+                                print(f"  [🤖] 使用模型: {OLLAMA_MODEL}")
+                            else:
+                                print("  [⚠️] 無可用 LLM 供應商")
             except ImportError:
                 print("  [⚠️] 未安裝 openai 套件，將使用規則引擎")
             except Exception as e:
