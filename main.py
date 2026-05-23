@@ -26,13 +26,14 @@ import time
 import threading
 import traceback
 from pathlib import Path
-import license_manager
-import payment_verifier
 
 SRC_PATH = str(Path(__file__).parent / "src")
 if SRC_PATH in sys.path:
     sys.path.remove(SRC_PATH)
 sys.path.insert(0, SRC_PATH)
+
+import license_manager
+import payment_verifier
 
 ERROR_CN = {
     "ModuleNotFoundError": "找不到模組",
