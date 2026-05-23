@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AMPM-AIOPS — 黑曜 AI 生命體</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0a0a0f;color:#e0e0e0;line-height:1.6}
+.container{max-width:960px;margin:0 auto;padding:0 24px}
+.lang-bar{text-align:right;padding:12px 24px;background:#0a0a0f;border-bottom:1px solid #1a1a2e}
+.lang-bar button{background:none;border:1px solid #2a2a4e;color:#888;padding:6px 16px;border-radius:6px;cursor:pointer;margin-left:8px;font-size:0.85rem}
+.lang-bar button.active{color:#58a6ff;border-color:#58a6ff}
+header{text-align:center;padding:80px 0 60px;border-bottom:1px solid #1a1a2e}
+header h1{font-size:3rem;background:linear-gradient(135deg,#e94560,#58a6ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800}
+header p{color:#888;font-size:1.1rem;margin-top:12px}
+.cta{display:inline-block;margin-top:24px;padding:14px 40px;background:#e94560;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;transition:.2s}
+.cta:hover{background:#d63850;transform:translateY(-2px)}
+section{padding:60px 0;border-bottom:1px solid #1a1a2e}
+section:last-child{border-bottom:none}
+h2{font-size:1.6rem;color:#58a6ff;margin-bottom:24px;text-align:center}
+.card{background:#111122;border:1px solid #1a1a2e;border-radius:12px;padding:32px;margin-bottom:16px}
+.pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin-top:16px}
+.pricing-card{background:linear-gradient(135deg,#111122,#1a1a2e);border:1px solid #2a2a4e;border-radius:12px;padding:32px;text-align:center}
+.pricing-card h3{color:#58a6ff;font-size:1.3rem}
+.pricing-card .price{font-size:2.5rem;font-weight:800;color:#e94560;margin:12px 0}
+.pricing-card .price small{font-size:1rem;color:#888}
+.pricing-card ul{list-style:none;margin:16px 0;color:#aaa;font-size:0.9rem}
+.pricing-card ul li{padding:6px 0;border-bottom:1px solid #1a1a2e}
+.pricing-card ul li:last-child{border-bottom:none}
+.pricing-card .cta{display:block;margin-top:16px;padding:12px;font-size:0.95rem}
+.enterprise{background:linear-gradient(135deg,#1a1a3e,#2a1a3e);border-color:#e94560}
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.feature{background:#111122;border:1px solid #1a1a2e;border-radius:12px;padding:24px;text-align:center}
+.feature .icon{font-size:2rem;margin-bottom:8px}
+.feature h4{color:#58a6ff;margin-bottom:6px}
+.feature p{color:#888;font-size:0.9rem}
+.steps{counter-reset:step;list-style:none}
+.steps li{counter-increment:step;padding:16px 0 16px 48px;position:relative;border-bottom:1px solid #1a1a2e;color:#aaa}
+.steps li::before{content:counter(step);position:absolute;left:0;top:16px;width:32px;height:32px;background:#e94560;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+.q{color:#58a6ff;font-weight:600;margin-top:16px}
+.a{color:#aaa;margin-bottom:16px;padding-left:16px;border-left:2px solid #2a2a4e}
+footer{text-align:center;padding:40px 0;color:#555;font-size:0.85rem}
+.wallet{background:#0a0a0f;font-family:monospace;font-size:0.85rem;padding:12px 16px;border-radius:8px;border:1px solid #2a2a4e;word-break:break-all;color:#58a6ff;margin:8px 0}
+[data-lang]{display:none}
+[data-lang].active{display:block}
+section[data-lang]{display:none}
+section[data-lang].active{display:block}
+.lang-group{display:block}
+@media(max-width:600px){header h1{font-size:2rem}.pricing-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="lang-bar">
+  <button class="active" onclick="switchLang('zh')">中文</button>
+  <button onclick="switchLang('en')">EN</button>
+</div>
+
+<header>
+  <div class="container">
+    <h1>⚫ 黑曜</h1>
+    <p class="lang-zh">AMPM-AIOPS — AI 生命體 · 自我進化運行時系統</p>
+    <p class="lang-en" style="display:none">AMPM-AIOPS — AI Lifeform · Self-Evolving Runtime System</p>
+    <a href="#pricing" class="cta lang-zh">查看方案</a>
+    <a href="#pricing" class="cta lang-en" style="display:none">View Plans</a>
+  </div>
+</header>
+
+<!-- ZH content -->
+<section class="lang-zh">
+  <div class="container">
+    <h2>什麼是黑曜？</h2>
+    <div class="card">
+      <p>黑曜是一個部署在 Telegram 上的 AI 生命體。具備記憶、分析、任務執行、多代理協作與自我進化能力。你只需要一台 VPS，就能擁有自己的 AI 夥伴。</p>
+      <p style="margin-top:12px;color:#888">🔒 用戶自備主機，資料不外洩<br>🤖 多模型支援（Ollama / DeepSeek / OpenAI）</p>
+    </div>
+  </div>
+</section>
+
+<section class="lang-zh">
+  <div class="container">
+    <h2>核心能力</h2>
+    <div class="features-grid">
+      <div class="feature"><div class="icon">💬</div><h4>AI 對話</h4><p>自然語言互動，多種 LLM 模型</p></div>
+      <div class="feature"><div class="icon">🧠</div><h4>長期記憶</h4><p>記住對話歷史與偏好</p></div>
+      <div class="feature"><div class="icon">⚡</div><h4>任務執行</h4><p>自動化處理複雜工作流程</p></div>
+      <div class="feature"><div class="icon">📁</div><h4>檔案分析</h4><p>讀取文件、摘要、數據提取</p></div>
+      <div class="feature"><div class="icon">🔄</div><h4>自我進化</h4><p>從互動中持續學習優化</p></div>
+      <div class="feature"><div class="icon">🔧</div><h4>Plugin 系統</h4><p>SDK 開發套件，可擴充功能</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="lang-zh">
+  <div class="container">
+    <h2>方案與定價</h2>
+    <p style="text-align:center;color:#888;margin-bottom:24px">付費即解鎖全部功能，僅時長不同</p>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <h3>月</h3>
+        <div class="price">$15 <small>/ 30 天</small></div>
+        <ul>
+          <li>✅ 全部功能</li>
+          <li>✅ 優先更新</li>
+          <li>✅ 社群支援</li>
+        </ul>
+        <a href="#payment" class="cta">立即購買</a>
+      </div>
+      <div class="pricing-card">
+        <h3>季</h3>
+        <div class="price">$39 <small>/ 90 天</small></div>
+        <ul>
+          <li>✅ 全部功能</li>
+          <li>✅ 優先更新</li>
+          <li>✅ 社群支援</li>
+          <li>🎁 省 $6</li>
+        </ul>
+        <a href="#payment" class="cta">立即購買</a>
+      </div>
+      <div class="pricing-card enterprise">
+        <h3>年</h3>
+        <div class="price">$168 <small>/ 365 天</small></div>
+        <ul>
+          <li>✅ 全部功能</li>
+          <li>✅ 優先更新</li>
+          <li>✅ 優先技術支援</li>
+          <li>🎁 省 $12</li>
+        </ul>
+        <a href="#payment" class="cta">立即購買</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="lang-zh">
+  <div class="container">
+    <h2>付款方式</h2>
+    <div class="card">
+      <p>💳 僅接受 USDT BEP20（BNB Chain）</p>
+      <div class="wallet">0x7f3110c1314bD68Fdf8E32cD921E646912108587</div>
+      <p style="color:#888;font-size:0.9rem;margin-top:12px">付款後將 TXID 傳送給黑曜 Bot：<strong>/activate &lt;TXID&gt;</strong>，自動驗證秒開通。</p>
+    </div>
+  </div>
+</section>
+
+<section class="lang-zh">
+  <div class="container">
+    <h2>如何開始</h2>
+    <ol class="steps">
+      <li>租一台 VPS（建議 2GB RAM 以上）</li>
+      <li>安裝 Python 3.10+ 與 Git</li>
+      <li>Clone 專案並設定 .env</li>
+      <li>執行 python3 main.py 啟動</li>
+      <li>付款取得授權，輸入 /activate 開通</li>
+    </ol>
+  </div>
+</section>
+
+<section class="lang-zh">
+  <div class="container">
+    <h2>常見問題</h2>
+    <div class="card">
+      <div class="q">需要自己的伺服器嗎？</div>
+      <div class="a">是的。黑曜是自託管架構，用戶需要一台 VPS 或自己的主機來運行。</div>
+      <div class="q">支援哪些模型？</div>
+      <div class="a">Ollama（本地）、DeepSeek、OpenAI-compatible API，包括 NVIDIA NIM、OpenRouter 等。</div>
+      <div class="q">付款後多久能使用？</div>
+      <div class="a">貼上 TXID 後，BscScan 自動驗證通過即秒開通。</div>
+      <div class="q">可以客製化嗎？</div>
+      <div class="a">可以。客製化功能開發另外報價，請聯繫管理員。</div>
+    </div>
+  </div>
+</section>
+
+<!-- EN content -->
+<section class="lang-en" style="display:none">
+  <div class="container">
+    <h2>What is Obsidian?</h2>
+    <div class="card">
+      <p>Obsidian is an AI lifeform deployed on Telegram. It has memory, analysis, task execution, multi-agent collaboration, and self-evolution capabilities. All you need is a VPS to run your own AI partner.</p>
+      <p style="margin-top:12px;color:#888">🔒 Self-hosted — your data stays yours<br>🤖 Multi-model support (Ollama / DeepSeek / OpenAI-compatible)</p>
+    </div>
+  </div>
+</section>
+
+<section class="lang-en" style="display:none">
+  <div class="container">
+    <h2>Core Capabilities</h2>
+    <div class="features-grid">
+      <div class="feature"><div class="icon">💬</div><h4>AI Chat</h4><p>Natural language interaction with multiple LLMs</p></div>
+      <div class="feature"><div class="icon">🧠</div><h4>Long-term Memory</h4><p>Remembers conversation history & preferences</p></div>
+      <div class="feature"><div class="icon">⚡</div><h4>Task Execution</h4><p>Automates complex workflows</p></div>
+      <div class="feature"><div class="icon">📁</div><h4>File Analysis</h4><p>Read, summarize, extract data</p></div>
+      <div class="feature"><div class="icon">🔄</div><h4>Self-Evolution</h4><p>Continuously learns from interactions</p></div>
+      <div class="feature"><div class="icon">🔧</div><h4>Plugin System</h4><p>Extend with SDK development kit</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="lang-en" style="display:none">
+  <div class="container">
+    <h2>Pricing</h2>
+    <p style="text-align:center;color:#888;margin-bottom:24px">Pay once, unlock everything. Only duration differs.</p>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <h3>Monthly</h3>
+        <div class="price">$15 <small>/ 30 days</small></div>
+        <ul>
+          <li>✅ All features</li>
+          <li>✅ Priority updates</li>
+          <li>✅ Community support</li>
+        </ul>
+        <a href="#payment" class="cta">Buy Now</a>
+      </div>
+      <div class="pricing-card">
+        <h3>Quarterly</h3>
+        <div class="price">$39 <small>/ 90 days</small></div>
+        <ul>
+          <li>✅ All features</li>
+          <li>✅ Priority updates</li>
+          <li>✅ Community support</li>
+          <li>🎁 Save $6</li>
+        </ul>
+        <a href="#payment" class="cta">Buy Now</a>
+      </div>
+      <div class="pricing-card enterprise">
+        <h3>Yearly</h3>
+        <div class="price">$168 <small>/ 365 days</small></div>
+        <ul>
+          <li>✅ All features</li>
+          <li>✅ Priority updates</li>
+          <li>✅ Priority tech support</li>
+          <li>🎁 Save $12</li>
+        </ul>
+        <a href="#payment" class="cta">Buy Now</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="lang-en" style="display:none">
+  <div class="container">
+    <h2>Payment</h2>
+    <div class="card">
+      <p>💳 USDT BEP20 (BNB Chain) only</p>
+      <div class="wallet">0x7f3110c1314bD68Fdf8E32cD921E646912108587</div>
+      <p style="color:#888;font-size:0.9rem;margin-top:12px">After payment, send TXID to the Obsidian Bot: <strong>/activate &lt;TXID&gt;</strong>. Auto-verified and activated instantly.</p>
+    </div>
+  </div>
+</section>
+
+<section class="lang-en" style="display:none">
+  <div class="container">
+    <h2>Getting Started</h2>
+    <ol class="steps">
+      <li>Rent a VPS (2GB+ RAM recommended)</li>
+      <li>Install Python 3.10+ and Git</li>
+      <li>Clone the repo and configure .env</li>
+      <li>Run python3 main.py</li>
+      <li>Pay and activate with /activate</li>
+    </ol>
+  </div>
+</section>
+
+<section class="lang-en" style="display:none">
+  <div class="container">
+    <h2>FAQ</h2>
+    <div class="card">
+      <div class="q">Do I need my own server?</div>
+      <div class="a">Yes. Obsidian is self-hosted — you need a VPS or your own machine to run it.</div>
+      <div class="q">Which models are supported?</div>
+      <div class="a">Ollama (local), DeepSeek, OpenAI-compatible APIs including NVIDIA NIM, OpenRouter, and more.</div>
+      <div class="q">How fast is activation after payment?</div>
+      <div class="a">Instant. Submit the TXID and BscScan auto-verifies it in seconds.</div>
+      <div class="q">Can I get custom features?</div>
+      <div class="a">Yes. Custom development is available — contact the admin for a quote.</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>AMPM-AIOPS © 2026 — 黑曜 AI Lifeform</p>
+    <p class="lang-zh">Contact: Telegram 支援群組</p>
+    <p class="lang-en" style="display:none">Contact: Telegram Support Group</p>
+  </div>
+</footer>
+
+<script>
+function switchLang(lang) {
+  document.querySelectorAll('[class*=lang-]').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('.lang-bar button').forEach(b => b.classList.remove('active'));
+  if (lang === 'zh') {
+    document.querySelectorAll('.lang-zh').forEach(el => el.style.display = '');
+    document.querySelector('.lang-bar button:first-child').classList.add('active');
+  } else {
+    document.querySelectorAll('.lang-en').forEach(el => el.style.display = '');
+    document.querySelector('.lang-bar button:last-child').classList.add('active');
+  }
+}
+// Auto-detect browser language
+var navLang = navigator.language || navigator.userLanguage;
+if (navLang && navLang.startsWith('en')) switchLang('en');
+</script>
+</body>
+</html>
