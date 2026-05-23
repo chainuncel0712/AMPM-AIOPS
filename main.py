@@ -361,7 +361,8 @@ def main():
                     result = payment_verifier.verify_tx(code)
                     if result["success"]:
                         days = result["days"]
-                        key = license_manager.generate_key(user_id, days)
+                        tier = result["tier"]
+                        key = license_manager.generate_key(user_id, days, tier)
                         act = license_manager.activate(key, user_id)
                         await update.message.reply_text(
                             f"{result['message']}\n"
@@ -386,9 +387,9 @@ def main():
                         photo=f,
                         caption=(
                             "💰 黑曜 AI 訂閱方案\n\n"
-                            "🔹 月費：$10/月\n"
-                            "🔹 季費：$25/季（省 $5）\n"
-                            "🔹 年費：$80/年（省 $40）\n\n"
+                            "🔹 基礎版 $10/月 — 基本對話 + 任務執行\n"
+                            "🔹 專業版 $25/季 — 基礎 + 記憶分析 + 檔案處理\n"
+                            "🔹 企業版 $80/年 — 全部解鎖（高階模型 + 進化引擎）\n\n"
                             "💳 掃上方 QRCode 付款（BNB Chain / BEP20）\n"
                             "付款後將 TXID 複製，輸入 /activate <TXID> 自動開通。"
                         )

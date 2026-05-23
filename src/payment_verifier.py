@@ -14,9 +14,9 @@ USDT_CONTRACT = "0x55d398326f99059fF775485246999027B3197955"  # USDT BEP20
 CLAIMED_FILE = Path(__file__).parent.parent / "data" / "claimed_txids.json"
 
 AMOUNT_PLANS = [
-    (80, 365, "年費方案（$80/年）"),
-    (25, 90,  "季費方案（$25/季）"),
-    (10, 30,  "月費方案（$10/月）"),
+    (80, 365, "enterprise", "企業版（$80/年）"),
+    (25, 90,  "pro",       "專業版（$25/季）"),
+    (10, 30,  "basic",     "基礎版（$10/月）"),
 ]
 
 
@@ -91,7 +91,7 @@ def verify_tx(txid: str) -> dict:
             tx_date = datetime.utcfromtimestamp(timestamp).isoformat() if timestamp else "unknown"
 
             # Find matching plan
-            for min_amount, days, plan in sorted(AMOUNT_PLANS, reverse=True):
+            for min_amount, days, tier, plan in sorted(AMOUNT_PLANS, reverse=True):
                 if amount >= min_amount:
                     # Mark claimed
                     claimed.add(txid)
@@ -101,6 +101,7 @@ def verify_tx(txid: str) -> dict:
                         "amount": amount,
                         "from_address": from_addr,
                         "plan": plan,
+                        "tier": tier,
                         "days": days,
                         "tx_date": tx_date,
                         "message": f"✅ 收到 {amount:.2f} USDT，符合{plan}（{days} 天）。"

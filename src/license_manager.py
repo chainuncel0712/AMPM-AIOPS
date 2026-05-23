@@ -1,5 +1,3 @@
-# [public] License Manager — subscription & access control for AMPM bot
-
 import json
 import os
 from datetime import datetime, timedelta
@@ -22,19 +20,22 @@ def _save(data: dict):
     DATA_FILE.write_text(json.dumps(data, indent=2, ensure_ascii=False))
 
 
-def generate_key(user_id: int, days: int = 30) -> str:
-    """Generate a license key for a user. Returns the key string."""
+def generate_key(user_id: int, days: int = 30, tier: str = "basic") -> str:
     import secrets
     key = "AMPM-" + secrets.token_hex(8).upper()
     expiry = (datetime.utcnow() + timedelta(days=days)).isoformat()
     data = _load()
-    data[key] = {"user_id": user_id, "expires": expiry, "active": True}
+    data[key] = {
+        "user_id": user_id,
+        "expires": expiry,
+        "active": True,
+        "tier": tier,
+    }
     _save(data)
     return key
 
 
 def activate(key: str, user_id: int) -> str:
-    """Activate a license key for a user. Returns status message."""
     data = _load()
     if key not in data:
         return "❌ 授權碼無效。"
@@ -50,38 +51,55 @@ def activate(key: str, user_id: int) -> str:
     lic["activated_at"] = datetime.utcnow().isoformat()
     _save(data)
     remaining = (expiry - datetime.utcnow()).days
-    return f"✅ 啟用成功！剩餘 {remaining} 天。"
+    tier_name = {"basic": "基礎版", "pro": "專業版", "enterprise": "企業版"}.get(
+        lic.get("tier", "basic"), "基礎版"
+    )
+    return f"✅ 啟用成功！方案：{tier_name}，剩餘 {remaining} 天。"
 
 
 def check_access(user_id: int) -> tuple:
-    """Check if user has active access. Returns (allowed: bool, message: str)."""
+    """Returns (allowed: bool, message: str, tier: str)"""
     data = _load()
     for key, lic in data.items():
         if lic.get("user_id") == user_id and lic.get("active", True):
             expiry = datetime.fromisoformat(lic["expires"])
             if expiry > datetime.utcnow():
                 remaining = (expiry - datetime.utcnow()).days
-                return True, f"剩餘 {remaining} 天"
+                tier = lic.get("tier", "basic")
+                tier_name = {"basic": "基礎版", "pro": "專業版", "enterprise": "企業版"}.get(tier, "基礎版")
+                return True, f"{tier_name}，剩餘 {remaining} 天", tier
             else:
                 lic["active"] = False
                 _save(data)
-                return False, "❌ 授權已過期。請聯繫管理員續期。"
-    return False, "⛔ 無有效授權。請輸入 /activate <授權碼>"
+                return False, "❌ 授權已過期。請續費。", "none"
+    return False, "⛔ 無有效授權。請輸入 /activate <授權碼>", "none"
+
+
+def get_user_tier(user_id: int) -> str:
+    data = _load()
+    for key, lic in data.items():
+        if lic.get("user_id") == user_id and lic.get("active", True):
+            expiry = datetime.fromisoformat(lic["expires"])
+            if expiry > datetime.utcnow():
+                return lic.get("tier", "basic")
+    return "none"
 
 
 def status(user_id: int) -> str:
-    """Get subscription status for a user."""
     data = _load()
     for key, lic in data.items():
         if lic.get("user_id") == user_id:
             expiry = datetime.fromisoformat(lic["expires"])
             remaining = (expiry - datetime.utcnow()).days
             active = lic.get("active", True) and remaining > 0
+            tier = lic.get("tier", "basic")
+            tier_name = {"basic": "基礎版", "pro": "專業版", "enterprise": "企業版"}.get(tier, "基礎版")
             status_text = "✅ 啟用中" if active else "❌ 已過期"
             return (
                 f"📋 訂閱狀態\n"
+                f"方案：{tier_name}\n"
                 f"狀態：{status_text}\n"
                 f"到期：{expiry.strftime('%Y-%m-%d')}\n"
                 f"剩餘：{max(0, remaining)} 天"
             )
-    return "📋 尚無授權記錄。請輸入 /activate <授權碼>"
+    return "📋 尚無授權記錄。"
