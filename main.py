@@ -528,6 +528,7 @@ def main():
                 await update.message.reply_text(
                     "🧑‍💼 客服系統\n\n"
                     "指令：\n"
+                    "/service trial <姓名> — 啟用 3 天試用\n"
                     "/service new <姓名> <方案> — 新增客戶\n"
                     "/service pay <客戶ID> <方式> <金額> — 確認付款\n"
                     "/service vps <客戶ID> <IP> <使用者> — 記錄主機\n"
@@ -540,7 +541,12 @@ def main():
                 return
             cmd = args[0]
             try:
-                if cmd == "new" and len(args) >= 3:
+                if cmd == "trial" and len(args) >= 2:
+                    cid = abs(hash(args[1])) % 1000000
+                    service_agent.get_or_create(cid, name=args[1])
+                    reply = service_agent.start_trial(cid)
+                    await update.message.reply_text(reply)
+                elif cmd == "new" and len(args) >= 3:
                     cid = abs(hash(args[1])) % 1000000
                     service_agent.get_or_create(cid, name=args[1])
                     plan = args[2] if len(args) > 2 else "monthly"

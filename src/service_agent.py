@@ -4,7 +4,7 @@
 """
 import json, os, threading, time, re
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
 
 BASE = Path(__file__).resolve().parent.parent
 DATA = BASE / "data"
@@ -60,6 +60,8 @@ class ServiceAgent:
                     "contact": contact or "",
                     "plan": None,
                     "status": "new",
+                    "trial": False,
+                    "trial_expires": None,
                     "conversation": [],
                     "payment": {},
                     "vps": {},
@@ -122,6 +124,39 @@ class ServiceAgent:
         self._save()
         self._log(cid, "payment_confirmed", f"{method} {amount}")
         return f"付款確認完成，接下來請提供您的主機 IP 和 SSH 登入資訊，我來幫您部署。"
+
+    def start_trial(self, customer_id, days=3):
+        cid = self._cid(customer_id)
+        customer = self.get_or_create(cid)
+        if customer.get("trial") and customer.get("trial_expires"):
+            remaining = (datetime.fromisoformat(customer["trial_expires"]) - datetime.now()).total_seconds()
+            if remaining > 0:
+                return f"您已在試用期內，還剩下 {int(remaining/86400)} 天。"
+        customer["trial"] = True
+        customer["trial_expires"] = (datetime.now().replace(microsecond=0) + timedelta(days=days)).isoformat()
+        customer["status"] = "trial"
+        customer["plan"] = "trial"
+        license_key = self._generate_license(cid)
+        customer["license_key"] = license_key
+        self._save()
+        self._log(cid, "trial_started", f"{days} 天試用")
+        return f"✅ 您已啟用 {days} 天試用版（功能全開）！\n授權碼: {license_key}\n到期日: {customer['trial_expires']}\n試用期滿後如需繼續使用，請選擇方案付款。\n\n👉 前往 ampm-aiops.com 查看方案"
+
+    def check_trial(self, customer_id):
+        cid = self._cid(customer_id)
+        customer = self.get(cid)
+        if not customer or not customer.get("trial"):
+            return False, "無試用記錄"
+        expires = customer.get("trial_expires")
+        if not expires:
+            return False, "無到期日"
+        remaining = (datetime.fromisoformat(expires) - datetime.now()).total_seconds()
+        if remaining <= 0:
+            customer["trial"] = False
+            customer["status"] = "trial_expired"
+            self._save()
+            return False, "試用已到期，請選擇方案付款續用"
+        return True, f"試用中，剩餘 {int(remaining/86400)} 天 {int((remaining%86400)/3600)} 小時"
 
     def set_vps(self, customer_id, ip, user, port=22):
         cid = self._cid(customer_id)
