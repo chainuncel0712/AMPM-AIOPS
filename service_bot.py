@@ -58,11 +58,17 @@ async def handle(update: Update, context):
 
 
 def main():
-    app = Application.builder().token(TOKEN).build()
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle))
-    logging.info("Service Bot started, polling...")
-    app.run_polling()
+    while True:
+        try:
+            app = Application.builder().token(TOKEN).build()
+            app.add_handler(CommandHandler("start", start))
+            app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle))
+            logging.info("Service Bot started, polling...")
+            app.run_polling(drop_pending_updates=True)
+        except Exception as e:
+            logging.error(f"Bot crashed: {e}, restarting in 10s...")
+            import time
+            time.sleep(10)
 
 
 if __name__ == "__main__":
