@@ -1,488 +1,373 @@
 """
-客服 / 安裝 / 售後 一條龍 AI 代理
+業務 / 客服 / 安裝 / 售後 四個 AI 代理 + 調度器
 有記憶、懂客戶、自動推進流程
 """
-import json, os, threading, time, re
+import json, os, threading, time, re, hashlib, random
 from pathlib import Path
 from datetime import datetime, timedelta
 
 BASE = Path(__file__).resolve().parent.parent
 DATA = BASE / "data"
 
-class ServiceAgent:
+class CustomerDB:
     def __init__(self):
-        self.customers_file = DATA / "customers.json"
-        self.log_file = DATA / "service_agent_log.json"
-        self.customers_file.parent.mkdir(parents=True, exist_ok=True)
+        self.file = DATA / "customers.json"
+        self.file.parent.mkdir(parents=True, exist_ok=True)
         self._lock = threading.RLock()
         self._load()
 
     def _load(self):
         with self._lock:
-            if self.customers_file.exists():
+            if self.file.exists():
                 try:
-                    self.customers = json.loads(self.customers_file.read_text())
+                    self.data = json.loads(self.file.read_text())
                 except:
-                    self.customers = {}
+                    self.data = {}
             else:
-                self.customers = {}
-            if self.log_file.exists():
-                try:
-                    self.log = json.loads(self.log_file.read_text())
-                except:
-                    self.log = []
-            else:
-                self.log = []
+                self.data = {}
 
     def _save(self):
         with self._lock:
-            self.customers_file.write_text(json.dumps(self.customers, ensure_ascii=False, indent=2))
-            self.log_file.write_text(json.dumps(self.log, ensure_ascii=False, indent=2))
-
-    def _log(self, customer_id, action, detail):
-        self.log.append({
-            "customer_id": customer_id,
-            "action": action,
-            "detail": detail,
-            "time": datetime.now().isoformat()
-        })
-        self._save()
+            self.file.write_text(json.dumps(self.data, ensure_ascii=False, indent=2))
 
     def _cid(self, cid):
         return str(cid).strip()
 
-    def get_or_create(self, customer_id, name=None, contact=None):
-        cid = self._cid(customer_id)
+    def get(self, cid):
+        return self.data.get(self._cid(cid))
+
+    def get_or_create(self, cid):
+        cid = self._cid(cid)
         with self._lock:
-            if cid not in self.customers:
-                self.customers[cid] = {
-                    "name": name or f"客戶_{cid}",
-                    "contact": contact or "",
-                    "plan": None,
-                    "status": "new",
-                    "trial": False,
-                    "trial_expires": None,
-                    "conversation": [],
-                    "payment": {},
-                    "vps": {},
-                    "license_key": None,
-                    "notes": [],
-                    "preferences": {
-                        "language": "zh",
-                        "contact_time": "",
-                        "preferred_model": "",
-                        "notes": ""
-                    },
-                    "usage": {
-                        "login_count": 0,
-                        "last_active": None,
-                        "features_used": [],
-                        "reports_requested": 0,
-                        "uptime_percentage": 100.0
-                    },
-                    "tickets": [],
-                    "created_at": datetime.now().isoformat(),
-                    "installed_at": None
+            if cid not in self.data:
+                self.data[cid] = {
+                    "name": f"客戶_{cid}", "contact": "", "plan": None, "status": "new",
+                    "trial": False, "trial_expires": None, "license_key": None,
+                    "payment": {}, "vps": {}, "conversation": [], "tickets": [],
+                    "preferences": {"language": "zh", "contact_time": "", "notes": ""},
+                    "usage": {"login_count": 0, "last_active": None, "features_used": [], "uptime": 100.0},
+                    "created_at": datetime.now().isoformat(), "installed_at": None,
+                    "assigned_agent": None
                 }
                 self._save()
-                self._log(cid, "new_customer", f"新客戶建立: {self.customers[cid]['name']}")
-            return self.customers[cid]
+            return self.data[cid]
 
-    def get(self, customer_id):
-        cid = self._cid(customer_id)
-        return self.customers.get(cid)
-
-    def set_name(self, customer_id, name):
-        cid = self._cid(customer_id)
-        self.get_or_create(cid)
-        self.customers[cid]["name"] = name
+    def save(self):
         self._save()
-        self._log(cid, "set_name", name)
 
-    def set_contact(self, customer_id, contact):
-        cid = self._cid(customer_id)
-        self.get_or_create(cid)
-        self.customers[cid]["contact"] = contact
-        self._save()
-        self._log(cid, "set_contact", contact)
+db = CustomerDB()
 
-    def set_plan(self, customer_id, plan):
-        cid = self._cid(customer_id)
-        self.get_or_create(cid)
-        self.customers[cid]["plan"] = plan
-        self.customers[cid]["status"] = "plan_selected"
-        self._save()
-        self._log(cid, "plan_selected", plan)
+class SalesAgent:
+    """業務代理 — 介紹方案、報價、成交"""
+    def handle(self, cid, msg):
+        c = db.get_or_create(cid)
+        m = msg.lower()
+        if any(k in m for k in ["方案", "價格", "多少錢", "月", "季", "年", "plan", "price", "pricing"]):
+            return (
+                "📋 黑曜有四種方案：\n\n"
+                "自託管（自備 VPS）：\n"
+                "  $15  / 30 天\n"
+                "  $39  / 90 天（省 $6）\n"
+                "  $120 / 365 天（省 $60）\n\n"
+                "雲端版（我們代管，無需 VPS）：\n"
+                "  $30  / 30 天\n"
+                "  $80  / 90 天（省 $10）\n"
+                "  $240 / 365 天（省 $120）\n\n"
+                "全部方案功能全開，沒有分級。\n"
+                "也有 3 天免費試用，歡迎體驗！\n"
+                "👉 ampm-aiops.com"
+            )
+        if any(k in m for k in ["試用", "trial", "免費", "free"]):
+            return "我們提供 3 天免費試用，功能全開。點擊網站上的「開始試用」按鈕，或告訴我您的名稱，我幫您啟用。"
+        if any(k in m for k in ["特色", "功能", "能做", "feature", "capability"]):
+            return (
+                "黑曜不是一般的 AI 聊天機器人，它會：\n\n"
+                "  ✅ AI 對話 — 自然聊天\n"
+                "  ✅ 長期記憶 — 說過就記住\n"
+                "  ✅ 自動跑任務 — 定時執行、回報\n"
+                "  ✅ 讀檔案 — PDF、Word、Excel\n"
+                "  ✅ 上網查資料 — 爬蟲、分析\n"
+                "  ✅ 多子代理 — 同時處理多件事\n"
+                "  ✅ AI 客服 + 安裝 — 幫客戶部署\n\n"
+                "想像力，就是你的超能力。"
+            )
+        if c.get("status") == "new":
+            c["name"] = msg.split()[0] if msg.split() else msg[:20]
+            c["status"] = "chatting"
+            db.save()
+            return f"您好 {c['name']}，我是黑曜業務代表。\n\n您想先了解方案價格，還是直接體驗 3 天試用？"
+        return (
+            "我是黑曜業務代表，我可以為您介紹：\n"
+            "  • 方案與價格\n"
+            "  • 功能特色\n"
+            "  • 免費試用\n\n"
+            "您想了解哪個？"
+        )
 
-    def confirm_payment(self, customer_id, method, amount, txid=""):
-        cid = self._cid(customer_id)
-        customer = self.get(cid)
-        if not customer:
-            return "找不到這個客戶，請先建立基本資料。"
-        customer["payment"] = {"method": method, "amount": amount, "txid": txid, "paid_at": datetime.now().isoformat()}
-        customer["status"] = "paid"
-        self._save()
-        self._log(cid, "payment_confirmed", f"{method} {amount}")
-        return f"付款確認完成，接下來請提供您的主機 IP 和 SSH 登入資訊，我來幫您部署。"
+class SupportAgent:
+    """客服代理 — 回答問題、處理客訴、引導流程"""
+    def handle(self, cid, msg):
+        c = db.get_or_create(cid)
+        m = msg.lower()
+        if any(k in m for k in ["付款", "怎麼買", "購買", "pay", "usdt", "paypal"]):
+            return (
+                "💳 付款方式：\n\n"
+                "1. USDT BEP20 — 掃 QR Code 或複製錢包地址轉帳\n"
+                "2. PayPal / 信用卡 — 點擊網站上的 PayPal 按鈕\n\n"
+                "付款後請告知，客服會立即確認。"
+            )
+        if any(k in m for k in ["安裝", "部署", "怎麼裝", "主機", "vps"]):
+            return (
+                "🔧 安裝流程：\n\n"
+                "1. 付款完成後告訴我\n"
+                "2. 提供您的主機 IP 和 SSH 帳號\n"
+                "3. 黑曜 AI 安裝代理人會自動遠端部署\n"
+                "4. 約 30 分鐘內完成\n\n"
+                "您不用懂技術，我們幫您處理。"
+            )
+        if any(k in m for k in ["售後", "問題", "故障", "錯誤", "不能", "壞", "error"]):
+            return (
+                "🛠️ 請描述您遇到的問題，我會幫您診斷。\n\n"
+                "常見問題：\n"
+                "  • Bot 無回應 → 檢查 tmux session\n"
+                "  • 記憶不見了 → 檢查 memory/ 目錄\n"
+                "  • 模型載入失敗 → 確認 Ollama 狀態\n\n"
+                "如果急需處理，也可以開工單，會有技術人員跟進。"
+            )
+        if "工單" in m or "ticket" in m or "報修" in m:
+            ticket = {"id": len(c.get("tickets", [])) + 1, "subject": "客戶回報", "description": msg,
+                      "status": "open", "created_at": datetime.now().isoformat(), "resolved_at": None}
+            c.setdefault("tickets", []).append(ticket)
+            db.save()
+            return f"✅ 已建立工單 #{ticket['id']}，技術人員會儘快處理。"
+        if "摘要" in m or "summary" in m or "我的資料" in m:
+            return f"📋 您的資料：\n{self._summary(cid)}"
+        if c.get("status") == "new":
+            c["name"] = msg.split()[0] if msg.split() else msg[:20]
+            c["status"] = "chatting"
+            db.save()
+            return f"您好 {c['name']}，我是黑曜客服。有什麼可以幫您的？"
+        return "您好，我是黑曜客服。有什麼可以幫您的？"
 
-    def start_trial(self, customer_id, days=3):
-        cid = self._cid(customer_id)
-        customer = self.get_or_create(cid)
-        if customer.get("trial") and customer.get("trial_expires"):
-            remaining = (datetime.fromisoformat(customer["trial_expires"]) - datetime.now()).total_seconds()
+    def _summary(self, cid):
+        c = db.get(cid)
+        if not c:
+            return "找不到資料"
+        return (
+            f"  姓名: {c.get('name','?')}\n"
+            f"  方案: {c.get('plan','未選擇')}\n"
+            f"  狀態: {c.get('status','new')}\n"
+            f"  主機: {c.get('vps',{}).get('ip','未部署')}\n"
+            f"  使用次數: {c['usage']['login_count']} 次"
+        )
+
+class InstallAgent:
+    """安裝代理 — 收集主機資訊、產生部署腳本"""
+    def handle(self, cid, msg):
+        c = db.get_or_create(cid)
+        m = msg.lower()
+
+        ip_pattern = r'\b(?:\d{1,3}\.){3}\d{1,3}\b'
+        ips = re.findall(ip_pattern, m)
+
+        if ips:
+            ip = ips[0]
+            user = "root"
+            if "@" in m:
+                parts = m.split("@")
+                user = parts[0].strip()
+            port = 22
+            port_match = re.search(r'port\s*[:：]?\s*(\d+)', m, re.IGNORECASE)
+            if port_match:
+                port = int(port_match.group(1))
+            c["vps"] = {"ip": ip, "user": user, "port": port, "collected_at": datetime.now().isoformat()}
+            c["status"] = "ready_for_install"
+            db.save()
+            return f"收到！主機 {ip}:{port}，使用者 {user}。正在準備安裝腳本，請稍候……"
+
+        if c.get("vps", {}).get("ip"):
+            if any(k in m for k in ["裝", "開始", "go", "deploy", "run"]):
+                return self._generate(cid)
+            return (
+                f"已記錄您的主機 {c['vps']['ip']}。\n"
+                "要現在開始安裝嗎？回覆「開始安裝」即可。"
+            )
+
+        return (
+            "🔧 要為您部署黑曜，請提供以下資訊：\n\n"
+            "  • 主機 IP 地址\n"
+            "  • SSH 使用者名稱（預設 root）\n"
+            "  • SSH 連接埠（預設 22）\n\n"
+            "範例：root@192.168.1.1 port 22\n\n"
+            "收到後我會自動產生安裝腳本。"
+        )
+
+    def _generate(self, cid):
+        c = db.get(cid)
+        if not c or not c.get("vps", {}).get("ip"):
+            return "請先提供主機資訊。"
+        vps = c["vps"]
+        key = hashlib.md5(f"AMPM-{cid}-{random.randint(10000,99999)}-{int(time.time())}".encode()).hexdigest()[:16].upper()
+        c["license_key"] = key
+        c["status"] = "script_ready"
+        db.save()
+        return (
+            f"✅ 安裝腳本已產生！\n\n"
+            f"  目標主機：{vps['ip']}:{vps['port']}\n"
+            f"  使用者：{vps['user']}\n"
+            f"  授權碼：{key}\n\n"
+            f"請在目標主機上執行以下命令：\n\n"
+            f"  ssh {vps['user']}@{vps['ip']} -p {vps['port']} \\\n"
+            f"    'curl -s https://raw.githubusercontent.com/chainuncel0712/AMPM-AIOPS/main/scripts/deploy.sh | bash'\n\n"
+            f"部署完成後黑曜會自動啟動。"
+        )
+
+class AfterSalesAgent:
+    """售後代理 — 診斷問題、自動修復、開工單"""
+    def handle(self, cid, msg):
+        c = db.get_or_create(cid)
+        m = msg.lower()
+
+        if not c.get("vps", {}).get("ip"):
+            return "您目前還沒有安裝黑曜。要先購買或試用嗎？"
+
+        if any(k in m for k in ["ping", "活著", "在嗎", "status", "狀態"]):
+            return "✅ 系統運行中。如需詳細狀態，請輸入 /status。"
+
+        if any(k in m for k in ["重啟", "restart", "reboot"]):
+            return "🔄 正在嘗試重新啟動黑曜服務……\n請稍候，約 30 秒後會恢復。"
+
+        if any(k in m for k in ["慢", "lag", "卡", "頓"]):
+            return (
+                "⚡ 效能診斷：\n\n"
+                "可能原因：\n"
+                "  1. CPU 使用率過高 — 檢查有無其他程式佔用\n"
+                "  2. 記憶體不足 — 建議關閉不必要的服務\n"
+                "  3. 模型回應慢 — 試用較小的模型如 qwen2.5:7b\n\n"
+                "需要我幫您進一步檢查嗎？"
+            )
+
+        if any(k in m for k in ["更新", "update", "upgrade"]):
+            return (
+                "🔄 正在檢查更新……\n\n"
+                "可執行的更新：\n"
+                "  • 黑曜核心 — git pull 即可更新\n"
+                "  • Ollama 模型 — ollama pull qwen2.5:14b\n\n"
+                "要現在更新嗎？"
+            )
+
+        if any(k in m for k in ["資料", "記憶", "memory", "不見", "丟"]):
+            return (
+                "🧠 記憶系統檢查：\n\n"
+                "1. 檢查 ~/.ampm_brain/memory/ 目錄\n"
+                "2. 確認 semantic.json / working.json 存在\n"
+                "3. 重啟黑曜記憶會自動恢復\n\n"
+                "如果還是找不到，我可以幫您復原。"
+            )
+
+        return (
+            "我是黑曜售後技術支援。\n\n"
+            "我可以幫您：\n"
+            "  • 檢查系統狀態\n"
+            "  • 診斷效能問題\n"
+            "  • 重啟服務\n"
+            "  • 檢查更新\n"
+            "  • 記憶恢復\n\n"
+            "請描述您遇到的問題。"
+        )
+
+class ServiceDispatcher:
+    """調度器 — 根據客戶狀態和訊息分派到對應代理"""
+    def __init__(self):
+        self.sales = SalesAgent()
+        self.support = SupportAgent()
+        self.install = InstallAgent()
+        self.after = AfterSalesAgent()
+
+    def route(self, cid, msg):
+        c = db.get_or_create(cid)
+        m = msg.lower()
+
+        c["usage"]["login_count"] += 1
+        c["usage"]["last_active"] = datetime.now().isoformat()
+        db.save()
+
+        if c.get("status") in ("ready_for_install", "script_ready"):
+            return self.install.handle(cid, msg)
+
+        if c.get("status") == "installed":
+            return self.after.handle(cid, msg)
+
+        if any(k in m for k in ["方案", "價格", "多少錢", "特色", "功能", "能做", "trial", "試用", "免費"]):
+            return self.sales.handle(cid, msg)
+
+        if any(k in m for k in ["付款", "怎麼買", "購買", "pay", "usdt", "paypal", "主機", "vps", "安裝", "部署"]):
+            return self.support.handle(cid, msg)
+
+        if any(k in m for k in ["售後", "問題", "故障", "錯誤", "壞", "重啟", "慢", "更新", "記憶"]):
+            return self.after.handle(cid, msg)
+
+        if c.get("status") in ("new", "chatting"):
+            return self.sales.handle(cid, msg)
+
+        return self.support.handle(cid, msg)
+
+    def start_trial(self, cid, days=3):
+        c = db.get_or_create(cid)
+        if c.get("trial") and c.get("trial_expires"):
+            remaining = (datetime.fromisoformat(c["trial_expires"]) - datetime.now()).total_seconds()
             if remaining > 0:
-                return f"您已在試用期內，還剩下 {int(remaining/86400)} 天。\n\n試用版包含：\n✅ AI 對話（無限制）\n✅ 長期記憶\n✅ 任務執行\n✅ 檔案分析\n\n馬上體驗黑曜的強大能力吧！"
-        customer["trial"] = True
-        customer["trial_expires"] = (datetime.now().replace(microsecond=0) + timedelta(days=days)).isoformat()
-        customer["status"] = "trial"
-        customer["plan"] = "trial"
-        license_key = self._generate_license(cid)
-        customer["license_key"] = license_key
-        self._save()
-        self._log(cid, "trial_started", f"{days} 天試用")
+                return f"您已在試用期內，還剩 {int(remaining/86400)} 天。"
+        expires = (datetime.now().replace(microsecond=0) + timedelta(days=days)).isoformat()
+        key = hashlib.md5(f"TRIAL-{cid}-{int(time.time())}".encode()).hexdigest()[:16].upper()
+        c["trial"] = True
+        c["trial_expires"] = expires
+        c["status"] = "trial"
+        c["plan"] = "trial"
+        c["license_key"] = key
+        db.save()
         return (
             f"🚀 試用版已啟用！\n\n"
-            f"⏱ 時效：{days} 天（到期 {customer['trial_expires']}）\n"
-            f"🔑 授權碼：{license_key}\n\n"
-            f"試用版包含：\n"
-            f"  ✅ AI 對話 — 用聊天的就像跟真人說話\n"
-            f"  ✅ 長期記憶 — 它會記住你，不用重複交代\n"
-            f"  ✅ 任務執行 — 叫它做事，它自己會搞定\n"
-            f"  ✅ 檔案分析 — PDF、Word、Excel 丟給它讀\n"
-            f"  ✅ 網路搜尋 — 上網幫你找資料\n\n"
-            f"完整版額外功能（試用版未含）：\n"
-            f"  ⭐ 多子代理分工 — 同時跑多個任務\n"
-            f"  ⭐ 自動排程 — 定時執行、自動回報\n"
-            f"  ⭐ 銷售追蹤 — 串接平台盯銷售數據\n"
-            f"  ⭐ AI 客服 + 安裝代理人 — 幫客戶部署\n"
-            f"  ⭐ 商業變現提案 — 每天找賺錢點子\n\n"
+            f"⏱ 時效：{days} 天（到期 {expires}）\n"
+            f"🔑 授權碼：{key}\n\n"
+            f"✅ 試用版包含：\n"
+            f"  • AI 對話（無限制）\n"
+            f"  • 長期記憶\n"
+            f"  • 任務執行\n"
+            f"  • 檔案分析\n"
+            f"  • 網路搜尋\n\n"
+            f"⭐ 完整版額外功能（試用版未含）：\n"
+            f"  • 多子代理分工\n"
+            f"  • 自動排程定時回報\n"
+            f"  • 銷售追蹤\n"
+            f"  • AI 安裝代理人\n"
+            f"  • 商業變現提案\n\n"
             f"試用期滿後選擇方案付款即可解鎖全部功能。\n"
-            f"👉 前往 ampm-aiops.com 查看完整方案"
+            f"👉 ampm-aiops.com"
         )
 
-    def is_trial(self, customer_id):
-        cid = self._cid(customer_id)
-        customer = self.get(cid)
-        if not customer:
-            return False
-        return customer.get("trial", False) and customer.get("status") in ("trial",)
+    def get_customers_summary(self):
+        return {k: {"name": v.get("name"), "plan": v.get("plan"), "status": v.get("status")}
+                for k, v in db.data.items()}
 
-    def check_trial(self, customer_id):
-        cid = self._cid(customer_id)
-        customer = self.get(cid)
-        if not customer or not customer.get("trial"):
-            return False, "無試用記錄"
-        expires = customer.get("trial_expires")
-        if not expires:
-            return False, "無到期日"
-        remaining = (datetime.fromisoformat(expires) - datetime.now()).total_seconds()
-        if remaining <= 0:
-            customer["trial"] = False
-            customer["status"] = "trial_expired"
-            self._save()
-            return False, "試用已到期，請選擇方案付款續用"
-        return True, f"試用中，剩餘 {int(remaining/86400)} 天 {int((remaining%86400)/3600)} 小時"
-
-    def set_vps(self, customer_id, ip, user, port=22):
-        cid = self._cid(customer_id)
-        customer = self.get(cid)
-        if not customer:
-            return "找不到這個客戶。"
-        customer["vps"] = {"ip": ip, "user": user, "port": port, "collected_at": datetime.now().isoformat()}
-        customer["status"] = "ready_for_install"
-        self._save()
-        self._log(cid, "vps_collected", f"{ip}:{port}")
-        return f"收到，目標主機 {ip}:{port}，使用者 {user}。正在準備安裝腳本……"
-
-    def generate_script(self, customer_id):
-        cid = self._cid(customer_id)
-        customer = self.get(cid)
-        if not customer:
-            return None
-        vps = customer.get("vps", {})
-        if not vps.get("ip"):
-            return None
-        license_key = self._generate_license(cid)
-        script_path = DATA / f"deploy_{cid}.sh"
-        script = self._build_script(customer.get("name", "客戶"), vps["ip"], vps["user"], vps.get("port", 22), license_key)
-        script_path.write_text(script)
-        script_path.chmod(0o755)
-        customer["license_key"] = license_key
-        customer["status"] = "script_ready"
-        self._save()
-        self._log(cid, "script_generated", license_key)
-        return str(script_path)
-
-    def _build_script(self, name, ip, user, port, key):
-        return f"""#!/bin/bash
-# AMPM-AIOPS 自動部署 — {name} ({ip})
-set -e
-echo ">>> 開始部署黑曜到 {name} 的主機 {ip}"
-ssh -o StrictHostKeyChecking=no -p {port} {user}@{ip} bash -s << 'SSHEOF'
-  cd /opt
-  git clone https://github.com/chainuncel0712/AMPM-AIOPS.git 2>/dev/null || (cd AMPM-AIOPS && git pull)
-  cd AMPM-AIOPS
-  python3 -m venv venv 2>/dev/null || true
-  source venv/bin/activate
-  pip install -q -r requirements.txt
-  echo "{key}" > data/license.key
-  tmux new-session -d -s obsidian 'python3 main.py' 2>/dev/null || screen -dmS obsidian python3 main.py
-  echo "黑曜已啟動，授權碼: {key}"
-SSHEOF
-echo ">>> 部署完成！"
-"""
-
-    def _generate_license(self, cid):
-        import hashlib, random
-        raw = f"AMPM-{cid}-{random.randint(10000,99999)}-{int(time.time())}"
-        return hashlib.md5(raw.encode()).hexdigest()[:16].upper()
-
-    def mark_installed(self, customer_id):
-        cid = self._cid(customer_id)
-        customer = self.get(cid)
-        if not customer:
-            return
-        customer["status"] = "installed"
-        customer["installed_at"] = datetime.now().isoformat()
-        self._save()
-        self._log(cid, "installed", "部署完成")
-
-    def set_preference(self, customer_id, key, value):
-        allowed = ["language", "contact_time", "preferred_model", "notes"]
-        if key not in allowed:
-            return
-        cid = self._cid(customer_id)
-        customer = self.get_or_create(cid)
-        customer["preferences"][key] = value
-        self._save()
-        self._log(cid, "preference_set", f"{key}={value}")
-
-    def log_usage(self, customer_id, feature=None):
-        cid = self._cid(customer_id)
-        customer = self.get_or_create(cid)
-        customer["usage"]["login_count"] += 1
-        customer["usage"]["last_active"] = datetime.now().isoformat()
-        if feature and feature not in customer["usage"]["features_used"]:
-            customer["usage"]["features_used"].append(feature)
-        self._save()
-
-    def add_ticket(self, customer_id, subject, description):
-        cid = self._cid(customer_id)
-        customer = self.get_or_create(cid)
-        ticket = {
-            "id": len(customer["tickets"]) + 1,
-            "subject": subject,
-            "description": description,
-            "status": "open",
-            "created_at": datetime.now().isoformat(),
-            "resolved_at": None
-        }
-        customer["tickets"].append(ticket)
-        self._save()
-        self._log(cid, "ticket_created", f"#{ticket['id']} {subject}")
-        return ticket
-
-    def resolve_ticket(self, customer_id, ticket_id):
-        cid = self._cid(customer_id)
-        customer = self.get(cid)
-        if not customer:
-            return
-        for t in customer["tickets"]:
-            if t["id"] == ticket_id:
-                t["status"] = "resolved"
-                t["resolved_at"] = datetime.now().isoformat()
-                break
-        self._save()
-        self._log(cid, "ticket_resolved", f"#{ticket_id}")
-
-    def get_customer_summary(self, customer_id):
-        cid = self._cid(customer_id)
-        customer = self.get(cid)
-        if not customer:
+    def get_customer_detail(self, cid):
+        c = db.get(cid)
+        if not c:
             return "找不到客戶"
-        c = customer
-        lines = [
-            f"姓名: {c.get('name', '未知')}",
-            f"聯絡: {c.get('contact', '無')}",
-            f"方案: {c.get('plan', '未選擇')}",
-            f"狀態: {c.get('status', 'new')}",
-            f"付款: {c.get('payment', {}).get('method', '未付款')} {c.get('payment', {}).get('amount', '')}",
-            f"主機: {c.get('vps', {}).get('ip', '未部署')}",
-            f"授權: {c.get('license_key', '無')}",
-            f"使用次數: {c['usage']['login_count']} 次",
-            f"最後上線: {c['usage']['last_active'] or '從未'}",
-            f"使用功能: {', '.join(c['usage']['features_used']) if c['usage']['features_used'] else '無'}",
-            f"工單: {len([t for t in c['tickets'] if t['status']=='open'])} 張開啟",
-            f"偏好語言: {c['preferences'].get('language', 'zh')}",
-            f"偏好模型: {c['preferences'].get('preferred_model', '未設定')}",
-            f"備註: {c['preferences'].get('notes', '無')}",
-        ]
-        return "\n".join(lines)
-
-    def add_note(self, customer_id, note):
-        cid = self._cid(customer_id)
-        customer = self.get_or_create(cid)
-        customer["notes"].append({"note": note, "time": datetime.now().isoformat()})
-        self._save()
-        self._log(cid, "note_added", note[:100])
-
-    def add_conversation(self, customer_id, role, text):
-        cid = self._cid(customer_id)
-        customer = self.get_or_create(cid)
-        customer["conversation"].append({
-            "role": role,
-            "text": text,
-            "time": datetime.now().isoformat()
-        })
-        if len(customer["conversation"]) > 2000:
-            customer["conversation"] = customer["conversation"][-2000:]
-        self._save()
-
-    def get_context(self, customer_id):
-        cid = self._cid(customer_id)
-        customer = self.get(cid)
-        if not customer:
-            return ""
-        ctx = [
-            f"客戶: {customer.get('name', '未知')}",
-            f"狀態: {customer.get('status', 'new')}",
-            f"方案: {customer.get('plan', '未選擇')}",
-            f"付款: {customer.get('payment', {}).get('method', '未付款')}",
-            f"主機: {customer.get('vps', {}).get('ip', '未提供')}",
-            f"授權: {customer.get('license_key', '無')}",
-        ]
-        convs = customer.get("conversation", [])[-6:]
-        for c in convs:
-            who = "客戶" if c["role"] == "user" else "客服"
-            ctx.append(f"{who}: {c['text'][:100]}")
-        return "\n".join(ctx)
-
-    def handle_chat(self, customer_id, message, llm_call=None):
-        cid = self._cid(customer_id)
-        customer = self.get_or_create(cid)
-        self.add_conversation(cid, "user", message)
-        self.log_usage(cid)
-
-        m = message.lower()
-        if "偏好" in m or "語言" in m or "習慣" in m:
-            if "英文" in m or "en" in m:
-                self.set_preference(cid, "language", "en")
-                return "已記錄您的語言偏好：英文。"
-            if "中文" in m or "zh" in m:
-                self.set_preference(cid, "language", "zh")
-                return "已記錄您的語言偏好：中文。"
-            if "模型" in m:
-                for model in ["ollama", "deepseek", "openai", "qwen", "llama", "gpt"]:
-                    if model in m:
-                        self.set_preference(cid, "preferred_model", model)
-                        return f"已記錄您的偏好模型：{model}"
-            return "您可以告訴我您的偏好，例如「我习惯用英文」或「偏好 deepseek 模型」"
-
-        if "工單" in m or "ticket" in m or "報修" in m or "問題回報" in m:
-            subject = "客戶回報問題"
-            desc = message
-            ticket = self.add_ticket(cid, subject, desc)
-            return f"已建立工單 #{ticket['id']}，我們會盡快處理。工單狀態：{ticket['status']}"
-
-        if "摘要" in m or "summary" in m or "我的資料" in m or "查看" in m:
-            return f"📋 您的客戶資料：\n\n{self.get_customer_summary(cid)}"
-
-        if llm_call:
-            context = self.get_context(cid)
-            prompt = f"""你是黑曜的客服 AI 代理，負責銷售、安裝部署與售後支援。
-語氣自然、不強迫推銷，像朋友一樣協助客戶。
-
-當前客戶狀態：
-{context}
-
-客戶最新訊息: {message}
-
-根據客戶狀態和對話歷史回應。不要主動推銷，客戶問什麼就答什麼。
-如果是新客戶，簡單介紹即可，不要一直催。
-如果是已付費客戶，引導提供主機資訊。
-如果是已安裝客戶，提供售後支援。
-"""
-            reply = llm_call(prompt)
-            self.add_conversation(cid, "assistant", reply)
-            return reply
-
-        m = message.lower()
-        status = customer.get("status", "new")
-
-        if status == "new":
-            self.customers[cid]["name"] = message.split()[0] if message.split() else message[:10]
-            self.customers[cid]["status"] = "chatting"
-            self._save()
-            return (
-                f"您好 {customer.get('name','')}，我是黑曜的 AI 客服。\n\n"
-                "我可以幫您：\n"
-                "1. 了解方案與價格\n"
-                "2. 完成付款\n"
-                "3. 安排安裝部署\n"
-                "4. 售後技術支援\n\n"
-                "請問您想了解什麼？"
-            )
-
-        if any(k in m for k in ["方案", "價格", "多少錢", "月", "季", "年", "plan", "price"]):
-            return (
-                "📋 我們有三種方案：\n\n"
-                "▸ 月方案  $15／30 天\n"
-                "▸ 季方案  $39／90 天（省 $6）\n"
-                "▸ 年方案  $120／365 天（省 $60）\n\n"
-                "全部方案都解鎖完整功能，沒有分級。\n"
-                "您想選擇哪個方案？"
-            )
-
-        if any(k in m for k in ["月", "季", "年", "15", "39", "120", "選"]):
-            plan_map = {"月": "monthly", "15": "monthly", "季": "quarterly", "39": "quarterly", "年": "yearly", "120": "yearly"}
-            for k, v in plan_map.items():
-                if k in m:
-                    self.set_plan(cid, v)
-                    break
-            return (
-                f"好的，已為您選擇 {customer.get('plan','')} 方案。\n\n"
-                "付款方式：\n"
-                "1. USDT BEP20 — 掃 QR Code 轉帳\n"
-                "2. PayPal — 點擊網站上的按鈕\n\n"
-                "付款完成後請告知，我會立即為您安排安裝。"
-            )
-
-        if any(k in m for k in ["付", "pay", "usdt", "txid", "轉帳", "匯款"]):
-            return (
-                "付款完成後，請提供：\n"
-                "1. 付款方式（USDT / PayPal）\n"
-                "2. 金額\n"
-                "3. TXID 或交易截圖\n\n"
-                "我會確認後立刻為您安排安裝。"
-            )
-
-        if status in ("paid", "plan_selected") or any(k in m for k in ["主機", "ip", "ssh", "vps", "安裝", "部署", "裝"]):
-            if status in ("paid", "plan_selected") and not customer.get("vps", {}).get("ip"):
-                return (
-                    "要為您部署黑曜，請提供以下主機資訊：\n\n"
-                    "• IP 地址\n"
-                    "• SSH 使用者名稱（通常是 root）\n"
-                    "• SSH 連接埠（預設 22）\n\n"
-                    "收到後我會自動產生安裝腳本並部署。"
-                )
-
-        if any(k in m for k in ["問題", "故障", "錯誤", "不能", "壞", "error", "bug", "當機", "連不上"]):
-            return (
-                "請描述您遇到的問題，我會嘗試遠端診斷。\n\n"
-                "常見問題：\n"
-                "• Bot 無回應 → 檢查是否在運行\n"
-                "• 記憶不見了 → 檢查 memory/ 目錄\n"
-                "• 模型無法載入 → 確認 Ollama 狀態\n\n"
-                "詳細描述後我會給您具體解法。"
-            )
-
-        reply = (
-            f"了解。我已經記錄您的訊息。\n\n"
-            f"目前您的狀態：方案 {customer.get('plan','未選擇')}，"
-            f"付款 {customer.get('payment',{}).get('method','未付款')}。\n\n"
-            "請問還有什麼需要幫助的嗎？"
+        return (
+            f"  姓名: {c.get('name','?')}\n"
+            f"  聯絡: {c.get('contact','無')}\n"
+            f"  方案: {c.get('plan','無')}\n"
+            f"  狀態: {c.get('status','new')}\n"
+            f"  試用: {'是' if c.get('trial') else '否'}\n"
+            f"  到期: {c.get('trial_expires','無')}\n"
+            f"  付款: {c.get('payment',{}).get('method','無')}\n"
+            f"  主機: {c.get('vps',{}).get('ip','無')}\n"
+            f"  授權: {c.get('license_key','無')}\n"
+            f"  登入: {c['usage']['login_count']} 次\n"
+            f"  最後: {c['usage']['last_active'] or '從未'}\n"
+            f"  功能: {', '.join(c['usage']['features_used']) if c['usage']['features_used'] else '無'}\n"
+            f"  工單: {len([t for t in c.get('tickets',[]) if t['status']=='open'])} 張開啟"
         )
-        self.add_conversation(cid, "assistant", reply)
-        return reply
 
-service_agent = ServiceAgent()
+dispatcher = ServiceDispatcher()
