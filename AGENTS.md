@@ -92,3 +92,16 @@ print(f'授權碼: {key}')
 - 用戶自備 VPS，你收授權費
 - 核心競爭力：持續更新 + 技術支援
 - 防盜版靠服務，不靠技術鎖
+
+## Session Memory（自動更新）
+- **最後 session**: 2026-05-23 — 系統體檢 + 網站討論
+- **網站狀態**: `docs/index.html` (ampm-aiops.com) 定價正確含中英雙語; `dashboard/pricing.html` 是舊版 ($29/$99/$199) 需處理
+- **系統體檢結果 (2026-05-23)**:
+  - ✅ 主 Bot 運行中 (PID 1364470)，48/48 器官正常
+  - ✅ 5 筆有效授權在 licenses.json
+  - ✅ .env 有 TELEGRAM_TOKEN_OBSIDIAN、BSCSCAN_API_KEY、AUTHORIZED_USER_IDS
+  - ✅ License manager / payment_verifier / support 功能正常
+  - ⚠️ Ollama 本機未啟動（11434 timeout，但有 NVIDIA 備援）
+  - ⚠️ BSCSCAN_API_KEY 仍是佔位符
+  - ⚠️ Service bot 曾啟動但短暫後停止（非 InvalidToken）
+- **待確認**: `dashboard/pricing.html` 舊版處理; service bot 問題排查
