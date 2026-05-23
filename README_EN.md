@@ -1,3 +1,5 @@
+<p align="center"><img src="assets/300.png" width="180"></p>
+
 <p align="center">
   <img src="https://img.shields.io/badge/status-active-00b4d8?style=for-the-badge" />
   <img src="https://img.shields.io/badge/license-MIT-green?style=for-the-badge" />
@@ -13,11 +15,11 @@
 
 <br />
 
-<h1 align="center">
+<h1 align="center" style="color:#e94560;">
   ⚫ Obsidian &nbsp;·&nbsp; 黑曜
 </h1>
 
-<p align="center">
+<p align="center" style="color:#c9d1d9;">
   <b><i>An AI system that finds its own work, executes it, fixes itself, and evolves.</i></b>
   <br />
   <i>Not a chatbot. An autonomous AI Operating System.</i>
@@ -26,23 +28,27 @@
 <br />
 <br />
 
----
+<hr style="border:1px solid #30363d;">
 
 <br />
 
-## In One Line
+<h2 align="center" style="color:#58a6ff;">In One Line</h2>
 
+<p style="color:#c9d1d9;">
 Every AI agent waits for your command.
+</p>
 
-**Obsidian doesn't.** It scans tasks, dispatches agents, writes files, fixes errors, and plans the next move — all on its own.
+<p align="center" style="color:#e94560; font-weight:bold;">
+Obsidian doesn't. It scans tasks, dispatches agents, writes files, fixes errors, and plans the next move — all on its own.
+</p>
 
 <br />
 
----
+<hr style="border:1px solid #30363d;">
 
 <br />
 
-## How Is It Different?
+<h2 align="center" style="color:#58a6ff;">How Is It Different?</h2>
 
 | | Typical AI Agent | ⚫ Obsidian |
 |---|---|---|
@@ -58,11 +64,11 @@ Every AI agent waits for your command.
 
 <br />
 
----
+<hr style="border:1px solid #30363d;">
 
 <br />
 
-## Architecture
+<h2 align="center" style="color:#58a6ff;">Architecture</h2>
 
 ```
 ╔═══════════════════════════════════════════════╗
@@ -103,11 +109,11 @@ Every AI agent waits for your command.
 
 <br />
 
----
+<hr style="border:1px solid #30363d;">
 
 <br />
 
-## How It Works
+<h2 align="center" style="color:#58a6ff;">How It Works</h2>
 
 ```
                  Obsidian Autonomy Loop
@@ -152,13 +158,15 @@ Every AI agent waits for your command.
 
 <br />
 
----
+<hr style="border:1px solid #30363d;">
 
 <br />
 
-## Real Outputs
+<h2 align="center" style="color:#58a6ff;">Real Outputs</h2>
 
-Obsidian doesn't just talk. **It writes real files:**
+<p style="color:#c9d1d9;">
+Obsidian doesn't just talk. <strong>It writes real files:</strong>
+</p>
 
 ```
 📂 outputs/
@@ -178,15 +186,17 @@ Obsidian doesn't just talk. **It writes real files:**
     └── ...  service flow docs
 ```
 
-Every file is written to disk by a sub-agent via the `write_file` tool. Real bytes, real paragraphs, real output.
+<p style="color:#c9d1d9;">
+Every file is written to disk by a sub-agent via the <code>write_file</code> tool. Real bytes, real paragraphs, real output.
+</p>
 
 <br />
 
----
+<hr style="border:1px solid #30363d;">
 
 <br />
 
-## Quick Start
+<h2 align="center" style="color:#58a6ff;">Quick Start</h2>
 
 ```bash
 # 1. Install
@@ -199,20 +209,25 @@ cp .env.example .env
 OBSIDIAN_MODE=full nohup python3 main.py > /tmp/heiyao.log 2>&1 &
 ```
 
-Send `/status` to the Telegram bot to check system health. Obsidian will automatically scan tasks, dispatch agents, and produce files.
+<p style="color:#c9d1d9;">
+Send <code>/status</code> to the Telegram bot to check system health. Obsidian will automatically scan tasks, dispatch agents, and produce files.
+</p>
 
+<p style="color:#c9d1d9;">
 To stop:
+</p>
+
 ```bash
 pkill -f "python3 main.py"
 ```
 
 <br />
 
----
+<hr style="border:1px solid #30363d;">
 
 <br />
 
-## Tech Stack
+<h2 align="center" style="color:#58a6ff;">Tech Stack</h2>
 
 | Category | Technology |
 |----------|-----------|
@@ -226,26 +241,33 @@ pkill -f "python3 main.py"
 
 <br />
 
----
+<hr style="border:1px solid #30363d;">
 
 <br />
 
-## The Story
+<h2 align="center" style="color:#58a6ff;">The Story</h2>
 
+<p align="center" style="color:#c9d1d9;">
 His name is Hao. No engineering background. Doesn't understand syntax. In debt. Won't give up.
+</p>
 
+<p align="center" style="color:#c9d1d9;">
 He built Obsidian piece by piece with AI — because he couldn't find a single AI agent that would truly grow, reflect, and evolve with him.
+</p>
 
-> [📖 Full Story](STORY_EN.md)
-> [📖 完整故事 · 中文](STORY.md)
+<p align="center">
+  <a href="STORY_EN.md">📖 Full Story</a>
+  &nbsp;·&nbsp;
+  <a href="STORY.md">📖 完整故事 · 中文</a>
+</p>
 
 <br />
 
----
+<hr style="border:1px solid #30363d;">
 
 <br />
 
-## License
+<h2 align="center" style="color:#58a6ff;">License</h2>
 
 | Component | License | Note |
 |-----------|---------|------|
@@ -254,7 +276,7 @@ He built Obsidian piece by piece with AI — because he couldn't find a single A
 
 <br />
 
----
+<hr style="border:1px solid #30363d;">
 
 <br />
 
@@ -264,7 +286,7 @@ He built Obsidian piece by piece with AI — because he couldn't find a single A
   </a>
 </p>
 
-<p align="center">
+<p align="center" style="color:#8b949e;">
   <sub>
     3 AM. The glow of the screen. He's seen this hundreds of times.<br />
     Now Obsidian executes tasks on its own.<br />
@@ -272,4 +294,10 @@ He built Obsidian piece by piece with AI — because he couldn't find a single A
   </sub>
   <br /><br />
   <sub>With nothing, but always moving forward.</sub>
+</p>
+
+<br>
+<hr style="border:1px solid #30363d;">
+<p align="center" style="color:#8b949e; font-size:0.85em;">
+  <sub>AMPM-AIOPS — AI OS Public Framework</sub>
 </p>

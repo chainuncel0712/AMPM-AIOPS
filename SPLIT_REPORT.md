@@ -1,14 +1,19 @@
-# AMPM Repo Split Report
+<p align="center"><img src="assets/300.png" width="180"></p>
 
-## Summary
+<h1 align="center" style="color:#e94560; border-bottom:1px solid #30363d; padding-bottom:8px;">AMPM Repo Split Report</h1>
 
+<h2 align="center" style="color:#58a6ff;">Summary</h2>
+
+<p align="center" style="color:#c9d1d9;">
 The original AMPM-AIOPS monorepo has been split into:
+</p>
+
 - **AMPM-AIOPS** (public) — AI OS Public Framework
 - **AMPM-KERNEL** (private) — True AI Brain
 
-## Moved to AMPM-KERNEL
+<h2 align="center" style="color:#58a6ff;">Moved to AMPM-KERNEL</h2>
 
-### Source Code
+<h3 style="color:#e94560;">Source Code</h3>
 
 | Path | Reason |
 |------|--------|
@@ -31,7 +36,7 @@ The original AMPM-AIOPS monorepo has been split into:
 | `src/evolution_module.py` | Growth/optimization logic |
 | `src/config.py` (private parts) | Provider priorities, routing config, fallback config |
 
-### Kernel-Only Directories (entirely private)
+<h3 style="color:#e94560;">Kernel-Only Directories (entirely private)</h3>
 
 ```
 src/brain/
@@ -42,9 +47,9 @@ src/evolution/
 src/decisions/
 ```
 
-## Retained in AMPM-AIOPS
+<h2 align="center" style="color:#58a6ff;">Retained in AMPM-AIOPS</h2>
 
-### Public Framework
+<h3 style="color:#2ea043;">Public Framework</h3>
 
 | Path | Purpose |
 |------|---------|
@@ -60,9 +65,11 @@ src/decisions/
 | `*.md` | Public documentation |
 | `bot.py` | Bot interface (public) |
 
-## Forbidden in Public Repo
+<h2 align="center" style="color:#58a6ff;">Forbidden in Public Repo</h2>
 
-The following must **never** be added to AMPM-AIOPS:
+<p style="color:#c9d1d9;">
+The following must <strong>never</strong> be added to AMPM-AIOPS:
+</p>
 
 - ❌ Routing logic
 - ❌ Context ranking/weighting
@@ -73,9 +80,12 @@ The following must **never** be added to AMPM-AIOPS:
 - ❌ Provider strategy
 - ❌ Decision authority
 
-## Plugin Restrictions
+<h2 align="center" style="color:#58a6ff;">Plugin Restrictions</h2>
 
+<p style="color:#c9d1d9;">
 All plugins loaded into AMPM-AIOPS are permanently forbidden from:
+</p>
+
 - Modifying routing
 - Modifying governance
 - Modifying context policy
@@ -83,11 +93,15 @@ All plugins loaded into AMPM-AIOPS are permanently forbidden from:
 - Modifying permissions
 - Modifying runtime authority
 
+<p style="color:#c9d1d9;">
 Plugins may only: provide capabilities, return results, provide context candidates (no authority).
+</p>
 
-## API Contract
+<h2 align="center" style="color:#58a6ff;">API Contract</h2>
 
+<p style="color:#c9d1d9;">
 AMPM-AIOPS ↔ AMPM-KERNEL communication is limited to:
+</p>
 
 ```
 Plugin Interface  →  register / execute / get_capabilities
@@ -96,8 +110,18 @@ Event Bus         →  publish / subscribe / unsubscribe
 Lifecycle         →  start / stop / health_check
 ```
 
+<p align="center" style="color:#e94560; font-weight:bold;">
 Direct internal imports are strictly prohibited.
+</p>
 
-## Date
+<h2 align="center" style="color:#58a6ff;">Date</h2>
 
+<p align="center" style="color:#c9d1d9;">
 Split executed: 2026-05-23
+</p>
+
+<br>
+<hr style="border:1px solid #30363d;">
+<p align="center" style="color:#8b949e; font-size:0.85em;">
+  <sub>AMPM-AIOPS — AI OS Public Framework</sub>
+</p>

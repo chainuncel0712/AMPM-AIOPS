@@ -1,10 +1,14 @@
-# Plugin Security Policy
+<p align="center"><img src="assets/300.png" width="180"></p>
 
-## Core Rule
+<h1 align="center" style="color:#e94560; border-bottom:1px solid #30363d; padding-bottom:8px;">Plugin Security Policy</h1>
 
-Plugins **must never** hold decision authority over the AI Brain.
+<h2 align="center" style="color:#58a6ff;">Core Rule</h2>
 
-## Permanently Forbidden Operations
+<p align="center" style="color:#c9d1d9;">
+Plugins <strong>must never</strong> hold decision authority over the AI Brain.
+</p>
+
+<h2 align="center" style="color:#58a6ff;">Permanently Forbidden Operations</h2>
 
 | Operation | Reason |
 |-----------|--------|
@@ -17,7 +21,7 @@ Plugins **must never** hold decision authority over the AI Brain.
 | Access Kernel Directories | Only through Public API |
 | Execute Unauthorized Tools | Only registered capabilities allowed |
 
-## Allowed Operations
+<h2 align="center" style="color:#58a6ff;">Allowed Operations</h2>
 
 - ✅ Register capabilities
 - ✅ Return execution results
@@ -25,14 +29,14 @@ Plugins **must never** hold decision authority over the AI Brain.
 - ✅ Subscribe to public events
 - ✅ Use SDK public methods
 
-## Enforcement
+<h2 align="center" style="color:#58a6ff;">Enforcement</h2>
 
 1. Plugin manifest **must declare** all capabilities upfront.
 2. Runtime **rejects** any plugin attempting forbidden operations.
 3. Plugins run in a **sandboxed execution context**.
 4. Violation = automatic plugin disable + security log entry.
 
-## Violation Severity
+<h2 align="center" style="color:#58a6ff;">Violation Severity</h2>
 
 | Level | Action |
 |-------|--------|
@@ -40,7 +44,16 @@ Plugins **must never** hold decision authority over the AI Brain.
 | **Error** | Repeated violations within 1 hour |
 | **Critical** | Attempt to modify governance/routing/permissions |
 
+<p style="color:#c9d1d9;">
 Critical violations trigger:
+</p>
+
 - Immediate plugin disable
 - Security alert notification
 - Permanent block after 3 critical violations
+
+<br>
+<hr style="border:1px solid #30363d;">
+<p align="center" style="color:#8b949e; font-size:0.85em;">
+  <sub>AMPM-AIOPS — AI OS Public Framework</sub>
+</p>

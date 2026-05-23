@@ -1,6 +1,8 @@
-# 黑曜商業版設定指南
+<p align="center"><img src="assets/300.png" width="180"></p>
 
-## 1. 設定環境變數
+<h1 align="center" style="color:#e94560; border-bottom:1px solid #30363d; padding-bottom:8px;">黑曜商業版設定指南</h1>
+
+<h2 align="center" style="color:#58a6ff;">1. 設定環境變數</h2>
 
 ```bash
 # 必要：金鑰 HMAC 密鑰（一定要換）
@@ -14,7 +16,7 @@ export LEMON_SQUEEZY_API_KEY="your-api-key"
 export STRIPE_SECRET_KEY="sk_xxxxx"
 ```
 
-## 2. 產生授權金鑰
+<h2 align="center" style="color:#58a6ff;">2. 產生授權金鑰</h2>
 
 ```bash
 # 產生專業版金鑰（365 天）
@@ -33,7 +35,7 @@ python scripts/manage_license.py validate AMPM-PRO-xxxx-xxxx
 python scripts/manage_license.py list
 ```
 
-## 3. 上架商品 (Lemon Squeezy)
+<h2 align="center" style="color:#58a6ff;">3. 上架商品 (Lemon Squeezy)</h2>
 
 1. 註冊 [Lemon Squeezy](https://lemonsqueezy.com)
 2. 建立商品 → 建立兩個 variant：
@@ -44,7 +46,7 @@ python scripts/manage_license.py list
    - Events: `order_created`, `subscription_created`
 4. 把 variant ID 填入 `src/commerce/lemon.py` 的 `VARIANT_TIERS` 對照表
 
-## 4. 版本比較
+<h2 align="center" style="color:#58a6ff;">4. 版本比較</h2>
 
 | 功能 | 社群版 🆓 | 專業版 💎 | 企業版 🏢 |
 |------|:--------:|:--------:|:--------:|
@@ -61,9 +63,11 @@ python scripts/manage_license.py list
 | SLA 保障 | - | - | ✅ |
 | **價格** | **免費** | **$29/月** | **$99/月** |
 
-## 5. 買家如何使用
+<h2 align="center" style="color:#58a6ff;">5. 買家如何使用</h2>
 
+<p style="color:#c9d1d9;">
 買家收到金鑰後：
+</p>
 
 ```bash
 # 方式一：環境變數（推薦）
@@ -74,4 +78,12 @@ python main.py
 echo '{"tier": "pro", "key": "AMPM-PRO-xxxx-xxxx"}' > data/license.json
 ```
 
+<p style="color:#c9d1d9;">
 系統啟動時會自動驗證金鑰並解鎖對應功能。
+</p>
+
+<br>
+<hr style="border:1px solid #30363d;">
+<p align="center" style="color:#8b949e; font-size:0.85em;">
+  <sub>AMPM-AIOPS — AI OS Public Framework</sub>
+</p>

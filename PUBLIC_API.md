@@ -1,14 +1,20 @@
-# AMPM-AIOPS Public API Contract
+<p align="center"><img src="assets/300.png" width="180"></p>
 
-## Principle
+<h1 align="center" style="color:#e94560; border-bottom:1px solid #30363d; padding-bottom:8px;">AMPM-AIOPS Public API Contract</h1>
 
-AMPM-AIOPS is the **public framework layer**. It may **only** interact with AMPM-KERNEL through defined interfaces.
+<h2 align="center" style="color:#58a6ff;">Principle</h2>
 
-**Direct internal import of AMPM-KERNEL is strictly prohibited.**
+<p align="center" style="color:#c9d1d9;">
+AMPM-AIOPS is the <strong>public framework layer</strong>. It may <strong>only</strong> interact with AMPM-KERNEL through defined interfaces.
+</p>
 
-## Allowed Interfaces
+<p align="center" style="color:#e94560; font-weight:bold;">
+Direct internal import of AMPM-KERNEL is strictly prohibited.
+</p>
 
-### Plugin Interface
+<h2 align="center" style="color:#58a6ff;">Allowed Interfaces</h2>
+
+<h3 style="color:#e94560;">Plugin Interface</h3>
 
 ```python
 class PluginInterface:
@@ -17,7 +23,7 @@ class PluginInterface:
     def get_capabilities()
 ```
 
-### SDK Interface
+<h3 style="color:#e94560;">SDK Interface</h3>
 
 ```python
 class SDKInterface:
@@ -26,7 +32,7 @@ class SDKInterface:
     def subscribe(self, event, handler)
 ```
 
-### Event Bus
+<h3 style="color:#e94560;">Event Bus</h3>
 
 ```python
 class EventBus:
@@ -35,7 +41,7 @@ class EventBus:
     def unsubscribe(self, event, handler)
 ```
 
-### Lifecycle Interface
+<h3 style="color:#e94560;">Lifecycle Interface</h3>
 
 ```python
 class LifecycleInterface:
@@ -45,15 +51,21 @@ class LifecycleInterface:
     def status()
 ```
 
-## Forbidden Patterns
+<h2 align="center" style="color:#58a6ff;">Forbidden Patterns</h2>
 
 ❌ `from kernel.brain import Cortex` — direct import
 ❌ `from governance import gatekeeper` — bypassing interface
 ❌ `import runtime.context` — internal context access
 ❌ Any `sys.path` manipulation to import Kernel modules
 
-## Enforcement
+<h2 align="center" style="color:#58a6ff;">Enforcement</h2>
 
 - CI pipeline **must reject** any PR containing direct imports of Kernel modules.
 - Code review **must check** for hidden routing, governance, or context logic.
 - All cross-repo communication **must** go through the defined interfaces above.
+
+<br>
+<hr style="border:1px solid #30363d;">
+<p align="center" style="color:#8b949e; font-size:0.85em;">
+  <sub>AMPM-AIOPS — AI OS Public Framework</sub>
+</p>

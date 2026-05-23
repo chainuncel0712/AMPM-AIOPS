@@ -1,18 +1,28 @@
-# AMPM-AIOPS 黑曜 — 目前規劃狀況與公司架構
+<p align="center"><img src="assets/300.png" width="180"></p>
 
-## 一、公司概述
+<h1 align="center" style="color:#e94560; border-bottom:1px solid #30363d; padding-bottom:8px;">AMPM-AIOPS 黑曜 — 目前規劃狀況與公司架構</h1>
 
-**公司名稱：** AMPM-AIOPS 黑曜（AMPM AIOps｜AI 代理指揮中心）
+<h2 align="center" style="color:#58a6ff;">一、公司概述</h2>
 
-**核心定位：** 以 AI 代理（Agent）協作指揮為核心的 AIOps 解決方案公司。透過多代理架構實現 IT 維運自動化、事件智能管理、內容生產自動化與知識管理。
+<p style="color:#c9d1d9;">
+<strong>公司名稱：</strong>AMPM-AIOPS 黑曜（AMPM AIOps｜AI 代理指揮中心）
+</p>
 
-**願景：** 成為亞太地區最懂 Agentic AI 與 AIOps 落地場景的技術團隊。
+<p style="color:#c9d1d9;">
+<strong>核心定位：</strong>以 AI 代理（Agent）協作指揮為核心的 AIOps 解決方案公司。透過多代理架構實現 IT 維運自動化、事件智能管理、內容生產自動化與知識管理。
+</p>
 
----
+<p style="color:#c9d1d9;">
+<strong>願景：</strong>成為亞太地區最懂 Agentic AI 與 AIOps 落地場景的技術團隊。
+</p>
 
-## 二、目前規劃狀況
+<br>
+<hr style="border:1px solid #30363d;">
 
-### 階段一：基礎建設與代理框架建立（已完成）
+<h2 align="center" style="color:#58a6ff;">二、目前規劃狀況</h2>
+
+<h3 style="color:#2ea043;">階段一：基礎建設與代理框架建立（已完成）</h3>
+
 | 項目 | 狀態 | 說明 |
 |------|------|------|
 | 多代理通訊協定設計 | ✅ 完成 | 定義 Master Agent → Sub-Agent 的任務分派與回報機制 |
@@ -20,7 +30,8 @@
 | 工具調用基礎設施 | ✅ 完成 | web_search, write_file, read_file, generate_image 等核心工具已整合 |
 | 子代理角色與能力定義 | ✅ 完成 | 每個子代理有明確的職掌與輸出規範 |
 
-### 階段二：內容生產鏈建立（進行中）
+<h3 style="color:#d29922;">階段二：內容生產鏈建立（進行中）</h3>
+
 | 項目 | 狀態 | 說明 |
 |------|------|------|
 | content_dept_1（黑曜研究與輸出代理） | ✅ 運作中 | 負責所有對外內容的搜尋、研究、產出與歸檔 |
@@ -28,7 +39,8 @@
 | 圖像生成整合 | 🔄 測試中 | generate_image 工具已上線，可產出插畫與封面 |
 | 內容品質檢查機制 | 📋 待建立 | 需引入複審與校對代理 |
 
-### 階段三：AI 代理指揮中心產品化（2025 H2 目標）
+<h3 style="color:#e94560;">階段三：AI 代理指揮中心產品化（2025 H2 目標）</h3>
+
 | 項目 | 狀態 | 說明 |
 |------|------|------|
 | Agent Marketplace | 📋 規劃中 | 可讓使用者下載/自訂不同職能的子代理 |
@@ -36,11 +48,12 @@
 | 記憶庫（Vector DB）整合 | 📋 規劃中 | 長期記憶與知識庫的向量化儲存與檢索 |
 | 對外 SaaS 服務 | 📋 規劃中 | 預計 2026 Q1 推出 MVP |
 
----
+<br>
+<hr style="border:1px solid #30363d;">
 
-## 三、公司組織架構
+<h2 align="center" style="color:#58a6ff;">三、公司組織架構</h2>
 
-### 3.1 層級架構
+<h3 style="color:#58a6ff;">3.1 層級架構</h3>
 
 ```
 黑曜（Master Agent / AI 代理指揮中心）
@@ -66,7 +79,7 @@
     └── ops_dept_3（資料分析與報表代理）
 ```
 
-### 3.2 代理職責說明
+<h3 style="color:#58a6ff;">3.2 代理職責說明</h3>
 
 | 部門 | 代理代號 | 主要職責 |
 |------|----------|----------|
@@ -83,11 +96,12 @@
 | **ops_dept** | ops_dept_2 | 對外溝通、社群管理、官網發布 |
 | **ops_dept** | ops_dept_3 | 效能分析、數據儀表板、報表產出 |
 
----
+<br>
+<hr style="border:1px solid #30363d;">
 
-## 四、決策與溝通流程
+<h2 align="center" style="color:#58a6ff;">四、決策與溝通流程</h2>
 
-### 4.1 任務流
+<h3 style="color:#58a6ff;">4.1 任務流</h3>
 
 ```
 使用者（Hao）
@@ -108,14 +122,16 @@
 黑曜 → 格式化輸出給使用者
 ```
 
-### 4.2 記憶與知識共享
+<h3 style="color:#58a6ff;">4.2 記憶與知識共享</h3>
+
 - **短期記憶：** 當前任務上下文（各代理獨立）
 - **長期記憶：** 已完成任務的摘要與關鍵產出（共用記憶庫，規劃用 Vector DB）
 - **計畫記憶：** 任務路線圖與階段目標（黑曜統一維護）
 
----
+<br>
+<hr style="border:1px solid #30363d;">
 
-## 五、工具與技術棧
+<h2 align="center" style="color:#58a6ff;">五、工具與技術棧</h2>
 
 | 類別 | 工具/技術 | 用途 |
 |------|-----------|------|
@@ -125,9 +141,10 @@
 | 命令執行 | run_command | 系統操作、腳本執行 |
 | 目錄管理 | list_dir | 檔案系統瀏覽與組織 |
 
----
+<br>
+<hr style="border:1px solid #30363d;">
 
-## 六、目前可交付成果
+<h2 align="center" style="color:#58a6ff;">六、目前可交付成果</h2>
 
 1. ✅ 代理層級架構已定義並實作
 2. ✅ content_dept_1 已上線運作中
@@ -135,8 +152,17 @@
 4. 🔄 跨代理協作流程測試中
 5. 📋 產品化路線圖規劃中
 
----
+<br>
+<hr style="border:1px solid #30363d;">
 
-> 文件建立者：content_dept_1（黑曜研究與輸出代理）
-> 建立時間：依據系統任務指令即時產出
-> 狀態：✅ 完整呈現目前規劃狀況與公司架構
+<blockquote style="color:#8b949e; border-left:3px solid #30363d; padding-left:12px;">
+  文件建立者：content_dept_1（黑曜研究與輸出代理）<br>
+  建立時間：依據系統任務指令即時產出<br>
+  狀態：✅ 完整呈現目前規劃狀況與公司架構
+</blockquote>
+
+<br>
+<hr style="border:1px solid #30363d;">
+<p align="center" style="color:#8b949e; font-size:0.85em;">
+  <sub>AMPM-AIOPS — AI OS Public Framework</sub>
+</p>

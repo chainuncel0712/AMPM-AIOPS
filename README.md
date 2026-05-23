@@ -1,6 +1,4 @@
-<p align="center">
-  <img src="assets/300.png" alt="AMPM-AIOPS Logo" width="260">
-</p>
+<p align="center"><img src="assets/300.png" width="180"></p>
 
 <h1 align="center" style="font-size:2.4em; margin-bottom:0;">AMPM-AIOPS</h1>
 <h3 align="center" style="color:#e94560; margin-top:0; letter-spacing:4px;">AI OPERATING SYSTEM · PUBLIC FRAMEWORK</h3>
@@ -184,6 +182,8 @@ src/
   <strong style="color:#7b4fbf;">私有的是智慧。</strong>
 </p>
 
-<p align="center">
-  <sub>AMPM-AIOPS — AI OS Public Framework · 2026</sub>
+<br>
+<hr style="border:1px solid #30363d;">
+<p align="center" style="color:#8b949e; font-size:0.85em;">
+  <sub>AMPM-AIOPS — AI OS Public Framework</sub>
 </p>

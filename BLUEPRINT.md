@@ -1,11 +1,18 @@
-# 黑曜機械人 (HeiYao) — 器官藍圖
+<p align="center"><img src="assets/300.png" width="180"></p>
 
-## 專案定位
+<h1 align="center" style="color:#e94560; border-bottom:1px solid #30363d; padding-bottom:8px;">黑曜機械人 (HeiYao) — 器官藍圖</h1>
+
+<h2 align="center" style="color:#58a6ff;">專案定位</h2>
+
+<p align="center" style="color:#c9d1d9;">
 AI Agent 仿生架構 — 每個目錄/檔案對應生物器官，實現自我進化、自我修復。
+</p>
 
----
+<br>
+<hr style="border:1px solid #30363d;">
 
-## 目錄總覽（95 器官）
+<h2 align="center" style="color:#58a6ff;">目錄總覽（95 器官）</h2>
+
 ```
 src/
 ├── brain/     (5)  中樞神經 — 核心決策
@@ -31,228 +38,282 @@ src/
 └── data/      (7)  狀態持久化
 ```
 
----
+<br>
+<hr style="border:1px solid #30363d;">
 
-## 一、中樞神經系統（src/brain/）
+<h2 align="center" style="color:#58a6ff;">一、中樞神經系統（src/brain/）</h2>
 
-### 1.1 cortex.py — 大腦皮層（核心已實作，需重構路徑引用）
+<h3 style="color:#e94560;">1.1 cortex.py — 大腦皮層（核心已實作，需重構路徑引用）</h3>
+
 - **職責**: 高級認知，接收輸入 → 防火牆檢查 → LLM 推理 → 工具執行 → 自我反思 → 回覆
 - **依賴**: llm, memory, compass, decisions, tasks, executor, registry, persona, firewall, breaker, eye, self_review, self_repair
 - **輸入**: user_msg: str
 - **輸出**: str (回覆)
 - **狀態**: ✅ 完整（325行），需更新 import 路徑
 
-### 1.2 thalamus.py — 丘腦（已實作，需確認）
+<h3 style="color:#e94560;">1.2 thalamus.py — 丘腦（已實作，需確認）</h3>
+
 - **職責**: 訊息中繼，接收 Telegram/webhook 訊息，路由到 cortex
 - **依賴**: cortex, handler
 - **狀態**: ⚠️ 需檢查內容
 
-### 1.3 hypothalamus.py — 下丘腦（合併，只留 src/brain/）
+<h3 style="color:#e94560;">1.3 hypothalamus.py — 下丘腦（合併，只留 src/brain/）</h3>
+
 - **職責**: 定時任務排程 — 每30分鐘 sniff、每6小時清理記憶、每24小時成長報告
 - **狀態**: ⚠️ 有兩份（brain + core），需合併到 brain/，刪除 core/
 
-### 1.4 self_repair.py — 自我修復（已實作）
+<h3 style="color:#e94560;">1.4 self_repair.py — 自我修復（已實作）</h3>
+
 - **職責**: 檢查死掉的器官，嘗試重新初始化
 - **依賴**: skeleton.assembler
 - **狀態**: ✅ 完整
 
-### 1.5 self_review.py — 自我反思（已實作）
+<h3 style="color:#e94560;">1.5 self_review.py — 自我反思（已實作）</h3>
+
 - **職責**: 每次回覆後自我評估，寫入記憶
 - **依賴**: llm, contradiction
 - **狀態**: ✅ 完整
 
----
+<br>
+<hr style="border:1px solid #30363d;">
 
-## 二、感知系統（src/nerve/）
+<h2 align="center" style="color:#58a6ff;">二、感知系統（src/nerve/）</h2>
 
-### 2.1 eye.py — 視覺
+<h3 style="color:#e94560;">2.1 eye.py — 視覺</h3>
+
 - **職責**: 文字搜尋（web_search），解析搜尋結果
 - **狀態**: ⚠️ 需檢查
 
-### 2.2 eye_vision.py — 電腦視覺
+<h3 style="color:#e94560;">2.2 eye_vision.py — 電腦視覺</h3>
+
 - **職責**: 圖片/影片輸入處理
 - **狀態**: ⚠️ 需檢查
 
-### 2.3 ear.py — 聽覺
+<h3 style="color:#e94560;">2.3 ear.py — 聽覺</h3>
+
 - **職責**: 語音輸入轉文字
 - **狀態**: ⚠️ 需檢查
 
-### 2.4 ear_voice.py — 語音輸出
+<h3 style="color:#e94560;">2.4 ear_voice.py — 語音輸出</h3>
+
 - **職責**: 文字轉語音輸出
 - **狀態**: ⚠️ 需檢查
 
----
+<br>
+<hr style="border:1px solid #30363d;">
 
-## 三、循環系統（src/blood/）
+<h2 align="center" style="color:#58a6ff;">三、循環系統（src/blood/）</h2>
 
-### 3.1 event_bus.py — 事件匯流排
+<h3 style="color:#e94560;">3.1 event_bus.py — 事件匯流排</h3>
+
 - **職責**: pub/sub 模式事件分發，器官間解耦通訊
 - **API**: subscribe(event, callback), publish(event, data)
 - **狀態**: ⚠️ 需檢查
 
-### 3.2 scheduler.py — 排程器
+<h3 style="color:#e94560;">3.2 scheduler.py — 排程器</h3>
+
 - **職責**: 定時任務管理（cron-like）
 - **API**: add_job(interval, func), remove_job(id), list_jobs()
 - **狀態**: ⚠️ 需檢查
 
-### 3.3 monitor.py — 監控器
+<h3 style="color:#e94560;">3.3 monitor.py — 監控器</h3>
+
 - **職責**: 器官心跳監控，每5分鐘檢查一輪
 - **狀態**: ⚠️ 需檢查
 
----
+<br>
+<hr style="border:1px solid #30363d;">
 
-## 四、肌肉系統（src/muscle/）
+<h2 align="center" style="color:#58a6ff;">四、肌肉系統（src/muscle/）</h2>
 
-### 4.1 executor.py — 執行器
+<h3 style="color:#e94560;">4.1 executor.py — 執行器</h3>
+
 - **職責**: 執行 LLM 選擇的工具呼叫，捕捉例外
 - **狀態**: ⚠️ 需檢查
 
-### 4.2 tool_creator.py — 工具生成器
+<h3 style="color:#e94560;">4.2 tool_creator.py — 工具生成器</h3>
+
 - **職責**: 從範本動態生成新工具代碼
 - **狀態**: ⚠️ 需檢查
 
-### 4.3 tool_registry.py — 工具註冊中心
+<h3 style="color:#e94560;">4.3 tool_registry.py — 工具註冊中心</h3>
+
 - **職責**: 註冊/查詢/列出所有可用工具
 - **狀態**: ⚠️ 需檢查
 
----
+<br>
+<hr style="border:1px solid #30363d;">
 
-## 五、免疫系統（src/immune/）
+<h2 align="center" style="color:#58a6ff;">五、免疫系統（src/immune/）</h2>
 
-### 5.1 firewall.py — 防火牆
+<h3 style="color:#e94560;">5.1 firewall.py — 防火牆</h3>
+
 - **職責**: 輸入過濾（惡意prompt、SQL注入、XSS）
 - **狀態**: ⚠️ 需檢查
 
-### 5.2 breaker.py — 熔斷器（合併 immune + circuit）
+<h3 style="color:#e94560;">5.2 breaker.py — 熔斷器（合併 immune + circuit）</h3>
+
 - **職責**: 連續失敗 N 次後暫時停用器官
 - **API**: record_failure(organ), record_success(organ), is_circuit_open(organ)
 - **狀態**: ⚠️ 兩份合併到 immune/
 
-### 5.3 self_heal.py — 自癒
+<h3 style="color:#e94560;">5.3 self_heal.py — 自癒</h3>
+
 - **職責**: 檢測異常後自動重啟器官
 - **狀態**: ⚠️ 需檢查
 
----
+<br>
+<hr style="border:1px solid #30363d;">
 
-## 六、電路保護（src/circuit/）— 刪除 breaker.py 和 contradiction.py，只留：
+<h2 align="center" style="color:#58a6ff;">六、電路保護（src/circuit/）— 刪除 breaker.py 和 contradiction.py，只留：</h2>
 
-### 6.1 controller.py — 控制器
+<h3 style="color:#e94560;">6.1 controller.py — 控制器</h3>
+
 - **職責**: 服務啟動/停止/重啟
 - **狀態**: ⚠️ 需檢查
 
-### 6.2 health.py — 健康檢查
+<h3 style="color:#e94560;">6.2 health.py — 健康檢查</h3>
+
 - **職責**: 回報系統整體健康狀態 → circulatory
 - **狀態**: ⚠️ 需檢查
 
----
+<br>
+<hr style="border:1px solid #30363d;">
 
-## 七、外皮系統（src/skin/）
+<h2 align="center" style="color:#58a6ff;">七、外皮系統（src/skin/）</h2>
 
-### 7.1 persona.py — 人格
+<h3 style="color:#e94560;">7.1 persona.py — 人格</h3>
+
 - **職責**: 管理 Agent 名稱、語氣、個性設定
 - **狀態**: ⚠️ 需檢查
 
-### 7.2 voice.py — 語音風格
+<h3 style="color:#e94560;">7.2 voice.py — 語音風格</h3>
+
 - **職責**: 控制輸出語氣、繁簡體、正式度
 - **狀態**: ⚠️ 需檢查
 
-### 7.3 face.py — 外觀
+<h3 style="color:#e94560;">7.3 face.py — 外觀</h3>
+
 - **職責**: 回覆格式排版、emoji 風格
 - **狀態**: ⚠️ 需檢查
 
-### 7.4 wardrobe.py — 衣櫃
+<h3 style="color:#e94560;">7.4 wardrobe.py — 衣櫃</h3>
+
 - **職責**: 切換不同人格模板（專業模式/聊天模式/導師模式）
 - **狀態**: ⚠️ 需檢查
 
----
+<br>
+<hr style="border:1px solid #30363d;">
 
-## 八、繁殖系統（src/womb/）
+<h2 align="center" style="color:#58a6ff;">八、繁殖系統（src/womb/）</h2>
 
-### 8.1 birth.py — 誕生
+<h3 style="color:#e94560;">8.1 birth.py — 誕生</h3>
+
 - **職責**: 從 agent_template 複製出新 Agent 實例
 - **狀態**: ⚠️ 需檢查
 
-### 8.2 nursery.py — 育嬰室
+<h3 style="color:#e94560;">8.2 nursery.py — 育嬰室</h3>
+
 - **職責**: 監控新生 Agent 的健康狀態，淘汰不合格的
 - **狀態**: ⚠️ 需檢查
 
-### 8.3 placenta.py — 胎盤
+<h3 style="color:#e94560;">8.3 placenta.py — 胎盤</h3>
+
 - **職責**: 為新生 Agent 分配資源（CPU/記憶體/API quota）
 - **狀態**: ⚠️ 需檢查
 
-### 8.4 agent_template.py — Agent 模板
+<h3 style="color:#e94560;">8.4 agent_template.py — Agent 模板</h3>
+
 - **職責**: 定義新 Agent 的最小基因組
 - **狀態**: ⚠️ 需檢查
 
----
+<br>
+<hr style="border:1px solid #30363d;">
 
-## 九、排泄系統（src/waste/）
+<h2 align="center" style="color:#58a6ff;">九、排泄系統（src/waste/）</h2>
 
-### 9.1 cleaner.py — 清理器
+<h3 style="color:#e94560;">9.1 cleaner.py — 清理器</h3>
+
 - **職責**: 定期刪除過期資料、舊日誌
 - **狀態**: ⚠️ 需檢查
 
-### 9.2 log_rotator.py — 日誌輪轉
+<h3 style="color:#e94560;">9.2 log_rotator.py — 日誌輪轉</h3>
+
 - **職責**: 日誌按大小/時間切割，保留最近 N 份
 - **狀態**: ⚠️ 需檢查
 
-### 9.3 tool_garbage.py — 工具回收
+<h3 style="color:#e94560;">9.3 tool_garbage.py — 工具回收</h3>
+
 - **職責**: 標記長期未使用的工具，定期清理
 - **狀態**: ⚠️ 需檢查
 
----
+<br>
+<hr style="border:1px solid #30363d;">
 
-## 十、囊袋（src/bag/）
+<h2 align="center" style="color:#58a6ff;">十、囊袋（src/bag/）</h2>
 
-### 10.1 plugin_loader.py — 外掛載入器
+<h3 style="color:#e94560;">10.1 plugin_loader.py — 外掛載入器</h3>
+
 - **職責**: 從 plugins/ 目錄動態載入外部模組
 - **狀態**: ⚠️ 需檢查
 
-### 10.2 web_search.py — 網頁搜尋
+<h3 style="color:#e94560;">10.2 web_search.py — 網頁搜尋</h3>
+
 - **職責**: DuckDuckGo/Google 搜尋，回傳摘要
 - **狀態**: ⚠️ 需檢查
 
----
+<br>
+<hr style="border:1px solid #30363d;">
 
-## 十一、骨架（src/skeleton/）
+<h2 align="center" style="color:#58a6ff;">十一、骨架（src/skeleton/）</h2>
 
-### 11.1 base_organ.py — 基礎器官類別
+<h3 style="color:#e94560;">11.1 base_organ.py — 基礎器官類別</h3>
+
 - **職責**: 所有器官的抽象父類，定義 start()/stop()/heartbeat()
 - **狀態**: ⚠️ 需檢查
 
-### 11.2 brain_component.py — 大腦組件類別
+<h3 style="color:#e94560;">11.2 brain_component.py — 大腦組件類別</h3>
+
 - **職責**: 商業器官的父類，提供 LLM 存取、日誌、錯誤處理
 - **狀態**: ⚠️ 需檢查
 
-### 11.3 assembler.py — 組裝器
+<h3 style="color:#e94560;">11.3 assembler.py — 組裝器</h3>
+
 - **職責**: 掃描目錄 → 載入 BrainComponent 子類 → 實例化 → 存入 organs dict
 - **狀態**: ✅ 完整
 
-### 11.4 dna.py — 基因
+<h3 style="color:#e94560;">11.4 dna.py — 基因</h3>
+
 - **職責**: 定義器官的配置基因（參數、能力、版本）
 - **狀態**: ⚠️ 需檢查
 
-### 11.5 registry.py — 註冊中心
+<h3 style="color:#e94560;">11.5 registry.py — 註冊中心</h3>
+
 - **職責**: 中央註冊表，記錄所有可用器官的 metadata
 - **狀態**: ⚠️ 需檢查
 
-### 11.6 manifest.py — 清單
+<h3 style="color:#e94560;">11.6 manifest.py — 清單</h3>
+
 - **職責**: 宣告每個器官的依賴、介面、版本
 - **狀態**: ⚠️ 需檢查
 
-### 11.7 auto_grow.py — 自動成長
+<h3 style="color:#e94560;">11.7 auto_grow.py — 自動成長</h3>
+
 - **職責**: 從 GitHub/社群拉取新器官，自動加入系統
 - **狀態**: ⚠️ 需檢查
 
-### 11.8 fallback.py — 降級方案
+<h3 style="color:#e94560;">11.8 fallback.py — 降級方案</h3>
+
 - **職責**: 當某器官失效時，提供最小可行替代
 - **狀態**: ⚠️ 需檢查
 
----
+<br>
+<hr style="border:1px solid #30363d;">
 
-## 十二、核心業務器官（src/core/）— 32 個，大部分需重寫
+<h2 align="center" style="color:#58a6ff;">十二、核心業務器官（src/core/）— 32 個，大部分需重寫</h2>
 
-### 區塊鏈/NFT（9 個）
+<h3 style="color:#58a6ff;">區塊鏈/NFT（9 個）</h3>
+
 | 器官 | 職責 | 狀態 |
 |------|------|------|
 | crypto_wallet.py | 建立錢包、簽署交易、查詢餘額 | ❌ 空殼 |
@@ -265,7 +326,8 @@ src/
 | nft_airdrop_checker.py | 檢查空投資格、領取空投 | ❌ 空殼 |
 | nft_manager.py | 管理 NFT 持倉、查看屬性 | ❌ 空殼 |
 
-### 市場分析（4 個）
+<h3 style="color:#58a6ff;">市場分析（4 個）</h3>
+
 | 器官 | 職責 | 狀態 |
 |------|------|------|
 | market_analyzer.py | 技術分析、趨勢判斷 | ❌ 空殼 |
@@ -273,7 +335,8 @@ src/
 | portfolio_tracker.py | 投資組合追蹤、盈虧計算 | ❌ 空殼 |
 | smart_contract_auditor.py | 合約安全掃描（呼叫外部 API） | ❌ 空殼 |
 
-### 行銷引擎（5 個）
+<h3 style="color:#58a6ff;">行銷引擎（5 個）</h3>
+
 | 器官 | 職責 | 狀態 |
 |------|------|------|
 | auto_content_creator.py | AI 生成部落格/社群貼文 | ❌ 空殼 |
@@ -282,7 +345,8 @@ src/
 | email_marketer.py | 自動化 Email 行銷 | ❌ 空殼 |
 | ad_manager.py | 廣告預算管理、ROI 追蹤 | ❌ 空殼 |
 
-### 商業智慧（4 個）
+<h3 style="color:#58a6ff;">商業智慧（4 個）</h3>
+
 | 器官 | 職責 | 狀態 |
 |------|------|------|
 | customer_persona.py | 客戶畫像分析 | ❌ 空殼 |
@@ -290,7 +354,8 @@ src/
 | landing_page_crm.py | Landing Page 管理 + CRM | ❌ 空殼 |
 | daily_growth_report.py | 每日成長報告生成 | ❌ 空殼 |
 
-### 自主系統（6 個）
+<h3 style="color:#58a6ff;">自主系統（6 個）</h3>
+
 | 器官 | 職責 | 狀態 |
 |------|------|------|
 | self_evolution_engine.py | 自我進化：評估→突變→測試→接納 | ⚠️ 需檢查 |
@@ -300,7 +365,8 @@ src/
 | auto_job_system.py | 自動化工作排程 | ❌ 空殼 |
 | planner.py | 任務規劃、優先排序、分解子任務 | ❌ 空殼 |
 
-### 基礎設施（4 個）
+<h3 style="color:#58a6ff;">基礎設施（4 個）</h3>
+
 | 器官 | 職責 | 狀態 |
 |------|------|------|
 | langgraph_executor.py | LLM 思考引擎（手寫迴圈） | ✅ 完整 |
@@ -308,9 +374,10 @@ src/
 | plugin_manager.py | 載入/管理外部外掛 | ❌ 空殼 |
 | hypothalamus.py | **與 brain/ 重複，需刪除** | ❌ 刪除 |
 
----
+<br>
+<hr style="border:1px solid #30363d;">
 
-## 十三、頂層獨立器官（src/*.py）
+<h2 align="center" style="color:#58a6ff;">十三、頂層獨立器官（src/*.py）</h2>
 
 | 檔案 | 職責 | 狀態 |
 |------|------|------|
@@ -328,9 +395,10 @@ src/
 | handler.py | Telegram 訊息處理器 | ⚠️ |
 | monitor.py | 系統監控 + 自動修復 | ⚠️ |
 
----
+<br>
+<hr style="border:1px solid #30363d;">
 
-## 十四、資料層（data/）
+<h2 align="center" style="color:#58a6ff;">十四、資料層（data/）</h2>
 
 | 檔案 | 用途 | 狀態 |
 |------|------|------|
@@ -344,9 +412,10 @@ src/
 | tools/registry.json | 工具註冊表 | ✅ |
 | state/heartbeat.json | 最後心跳 | ✅ |
 
----
+<br>
+<hr style="border:1px solid #30363d;">
 
-## 十五、合併/刪除清單
+<h2 align="center" style="color:#58a6ff;">十五、合併/刪除清單</h2>
 
 ```
 刪除:
@@ -365,49 +434,57 @@ src/
   src/models.py        → src/brain/models.py
 ```
 
----
+<br>
+<hr style="border:1px solid #30363d;">
 
-## 十六、重建優先級
+<h2 align="center" style="color:#58a6ff;">十六、重建優先級</h2>
 
-### P0 — 立刻修（阻塞啟動）
+<h3 style="color:#e94560;">P0 — 立刻修（阻塞啟動）</h3>
+
 1. 搬移 memory/tools/evolution/breath/nose/models 到 brain/ 下
 2. 刪除重複器官（hypothalamus, breaker, contradiction）
 3. 更新所有 import 路徑
 
-### P1 — 核心器官重寫（決定能不能用）
+<h3 style="color:#e94560;">P1 — 核心器官重寫（決定能不能用）</h3>
+
 4. crypto_wallet.py — 錢包是 Web3 入口
 5. market_data.py — 數據是分析基礎
 6. gas_tracker.py — 交易必需品
 7. nft_sniper.py — 核心業務
 8. cross_chain_bridge.py — 核心業務
 
-### P2 — 商業器官重寫
+<h3 style="color:#d29922;">P2 — 商業器官重寫</h3>
+
 9. market_analyzer.py
 10. portfolio_tracker.py
 11. auto_content_creator.py
 12. social_media_manager.py
 13. email_marketer.py
 
-### P3 — 輔助器官重寫
+<h3 style="color:#d29922;">P3 — 輔助器官重寫</h3>
+
 14. 剩下的 NFT 器官（floor_scanner, whale_tracker, market_maker, airdrop_checker, manager）
 15. 行銷引擎（seo_optimizer, ad_manager, landing_page_crm）
 16. 商業智慧（customer_persona, revenue_optimizer, daily_growth_report）
 
-### P4 — 自主系統重寫
+<h3 style="color:#58a6ff;">P4 — 自主系統重寫</h3>
+
 17. self_learn.py
 18. auto_learning.py
 19. auto_job_system.py
 20. planner.py
 21. plugin_manager.py
 
-### P5 — 資料層初始化
+<h3 style="color:#8b949e;">P5 — 資料層初始化</h3>
+
 22. 建立 5 個 data/*.json
 23. 補 requirements.txt
 24. 重構 main.py 啟動流程
 
----
+<br>
+<hr style="border:1px solid #30363d;">
 
-## 十七、器官間依賴圖（簡化）
+<h2 align="center" style="color:#58a6ff;">十七、器官間依賴圖（簡化）</h2>
 
 ```
 cortex ─────┬─→ llm (LLM 客戶端)
@@ -433,9 +510,10 @@ circulatory ─→ monitor (心跳)
              → self_evolution_engine (進化)
 ```
 
----
+<br>
+<hr style="border:1px solid #30363d;">
 
-## 十八、技術約定
+<h2 align="center" style="color:#58a6ff;">十八、技術約定</h2>
 
 - **語言**: Python 3.11
 - **LLM**: OpenAI-compatible API (DeepSeek/Ollama)
@@ -445,3 +523,9 @@ circulatory ─→ monitor (心跳)
 - **編碼風格**: 繁體中文 docstring，英文變數名
 - **每個器官**: 繼承 BrainComponent，實作 start()/stop()/heartbeat()
 - **工具**: 註冊到 tool_registry，executor 呼叫
+
+<br>
+<hr style="border:1px solid #30363d;">
+<p align="center" style="color:#8b949e; font-size:0.85em;">
+  <sub>AMPM-AIOPS — AI OS Public Framework</sub>
+</p>

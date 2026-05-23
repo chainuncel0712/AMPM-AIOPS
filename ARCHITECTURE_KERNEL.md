@@ -1,10 +1,14 @@
-# AMPM-KERNEL Architecture
+<p align="center"><img src="assets/300.png" width="180"></p>
 
-## Kernel Boundary
+<h1 align="center" style="color:#e94560; border-bottom:1px solid #30363d; padding-bottom:8px;">AMPM-KERNEL Architecture</h1>
 
-AMPM-KERNEL is the **private AI Brain repository**. It contains all core decision intelligence that must never be exposed in public repositories.
+<h2 align="center" style="color:#58a6ff;">Kernel Boundary</h2>
 
-### What Kernel Owns
+<p align="center" style="color:#c9d1d9;">
+AMPM-KERNEL is the <strong>private AI Brain repository</strong>. It contains all core decision intelligence that must never be exposed in public repositories.
+</p>
+
+<h3 style="color:#e94560;">What Kernel Owns</h3>
 
 | Domain | Contents |
 |--------|----------|
@@ -14,7 +18,7 @@ AMPM-KERNEL is the **private AI Brain repository**. It contains all core decisio
 | **Evolution** | Self Reflection, Adaptive Routing, Optimization Logic, Scoring Engine, Runtime Learning |
 | **Runtime Intelligence** | Internal Orchestration, Retry Intelligence, Runtime Policies, Decision Authority, Provider Strategy |
 
-### Source Directories (moved from AMPM-AIOPS)
+<h3 style="color:#e94560;">Source Directories (moved from AMPM-AIOPS)</h3>
 
 ```
 src/brain/          — Cortex, Thalamus, Insula, Memory Engine (decision hub)
@@ -35,16 +39,18 @@ src/evolution/      — Adaptive logic, self optimization, runtime learning
 top-level OPS       — Operations scripts (private)
 ```
 
-## Authority Rules
+<h2 align="center" style="color:#58a6ff;">Authority Rules</h2>
 
 1. **Only AMPM-KERNEL** holds routing, context, governance, and evolution authority.
 2. **Plugins, SDK, Dashboard must never** hold decision authority.
 3. **No direct internal import** from public repos into Kernel.
 4. All cross-repo communication goes through defined **Public API interfaces**.
 
-## Public API Contract
+<h2 align="center" style="color:#58a6ff;">Public API Contract</h2>
 
+<p style="color:#c9d1d9;">
 AMPM-AIOPS (public) interacts with AMPM-KERNEL (private) strictly through:
+</p>
 
 | Interface | Description |
 |-----------|-------------|
@@ -53,4 +59,12 @@ AMPM-AIOPS (public) interacts with AMPM-KERNEL (private) strictly through:
 | `Event Bus` | Async event publishing/subscription |
 | `Lifecycle Interface` | Start/stop/health check |
 
-Direct internal imports of AMPM-KERNEL components are **strictly prohibited**.
+<p align="center" style="color:#e94560; font-weight:bold;">
+Direct internal imports of AMPM-KERNEL components are <strong>strictly prohibited</strong>.
+</p>
+
+<br>
+<hr style="border:1px solid #30363d;">
+<p align="center" style="color:#8b949e; font-size:0.85em;">
+  <sub>AMPM-AIOPS — AI OS Public Framework</sub>
+</p>

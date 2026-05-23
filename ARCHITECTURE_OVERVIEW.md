@@ -1,13 +1,15 @@
-# AMPM-AIOPS Architecture Overview
+<p align="center"><img src="assets/300.png" width="180"></p>
 
-```ascii
+<h1 align="center" style="color:#e94560; border-bottom:1px solid #30363d; padding-bottom:8px;">AMPM-AIOPS Architecture Overview</h1>
+
+```
 ╔══════════════════════════════════════════════════════════════╗
 ║              AMPM — AI Operating System                     ║
 ║         A self-evolving AI OS with biological metaphor      ║
 ╚══════════════════════════════════════════════════════════════╝
 ```
 
-## System Architecture
+<h2 align="center" style="color:#58a6ff;">System Architecture</h2>
 
 ```
                         ┌──────────────────────┐
@@ -72,7 +74,7 @@
                      └─────────────┘
 ```
 
-## Organ System Map
+<h2 align="center" style="color:#58a6ff;">Organ System Map</h2>
 
 | Organ | Directory | Role in the AI Body |
 |-------|-----------|-------------------|
@@ -117,7 +119,7 @@
 | 📱 **Dashboard** | `src/dashboard/` | 操作面板 (Flask) |
 | 🧭 **Handler** | `src/handler.py` | 請求處理入口 |
 
-## Entry Points & Startup Flow
+<h2 align="center" style="color:#58a6ff;">Entry Points & Startup Flow</h2>
 
 ```
 main.py
@@ -144,7 +146,7 @@ daemon.sh
   └── Wraps main.py with heartbeat monitoring & auto-restart
 ```
 
-## Data Flow (Lifecycle)
+<h2 align="center" style="color:#58a6ff;">Data Flow (Lifecycle)</h2>
 
 ```
                     ┌─────────────────────────────────────┐
@@ -200,7 +202,7 @@ daemon.sh
                     └─────────────────────────────────────┘
 ```
 
-## Key Design Principles
+<h2 align="center" style="color:#58a6ff;">Key Design Principles</h2>
 
 1. **生物隱喻分層**：Decision (brain) → Execution (muscle/tools) → Memory — 三層硬切
 2. **治理優先**：所有跨層操作必須經過 Gatekeeper + SecurityZone + ControlPlane
@@ -208,3 +210,9 @@ daemon.sh
 4. **安全隔離**：子代理只能使用 whitelist 工具、寫入 jail 目錄、執行 filter 命令
 5. **演化不自動**：Evolution 只提案、觀察、記錄，不自動修改任何檔案
 6. **單一入口**：所有 thread 必須從 main.py 啟動並註冊到 Gatekeeper
+
+<br>
+<hr style="border:1px solid #30363d;">
+<p align="center" style="color:#8b949e; font-size:0.85em;">
+  <sub>AMPM-AIOPS — AI OS Public Framework</sub>
+</p>

@@ -1,4 +1,6 @@
-# Organ Responsibility Table
+<p align="center"><img src="assets/300.png" width="180"></p>
+
+<h1 align="center" style="color:#e94560; border-bottom:1px solid #30363d; padding-bottom:8px;">Organ Responsibility Table</h1>
 
 | Organ | Directory | 一句話角色 | 穩定性 | 需重構 | 風險 |
 |-------|-----------|-----------|--------|--------|------|
@@ -37,7 +39,7 @@
 | 🛣️ Bridge | `src/bridge/` | 橋接層 — Telegram / 外部服務整合 | 中 | 否 | 低 |
 | 📱 Skin | `src/skin/` | 皮膚 — 對外顯示層、格式輸出 | 低 | 是 | 低 |
 
-## 高優先級重構候選
+<h2 align="center" style="color:#58a6ff;">高優先級重構候選</h2>
 
 | 排名 | 模組 | 問題 | 建議 |
 |------|------|------|------|
@@ -46,3 +48,9 @@
 | 3 | `memory.py` + `memory_vector.py` + `civilization_memory/` | 記憶分散三處，interface 不一致 | 統一 MemoryManager interface |
 | 4 | `monitor.py` (357 行) + `immune/self_heal.py` + `core/circulatory.py` 重疊修復邏輯 | 三套修復機制重疊 | 統一 repair orchestration 到 Immune |
 | 5 | `core/langgraph_executor.py` (1542+ 行) | 超大檔案，5 種能力全部揉在一起 | 按能力拆分為 process / tool / reflect / repair / evolve |
+
+<br>
+<hr style="border:1px solid #30363d;">
+<p align="center" style="color:#8b949e; font-size:0.85em;">
+  <sub>AMPM-AIOPS — AI OS Public Framework</sub>
+</p>
