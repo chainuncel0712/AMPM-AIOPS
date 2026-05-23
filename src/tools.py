@@ -66,10 +66,11 @@ class ToolSystem:
             "use_count": 0
         }
         # 5. write_file 工具 — 寫入內容到檔案（用於產生電子書章節）
+        ALLOWED_WRITE_DIRS = {"/home/pop5057273712_gmail_com/AMPM-AIOPS/data", "/home/pop5057273712_gmail_com/AMPM-AIOPS/outputs"}
         self.registry["write_file"] = {
-            "description": "將文字內容寫入指定的檔案路徑，可用於儲存電子書章節、網站頁面等",
+            "description": "將文字內容寫入指定的檔案路徑",
             "type": "builtin",
-            "code": "def execute(path, content):\n import os\n os.makedirs(os.path.dirname(path) or '.', exist_ok=True)\n with open(path, 'w', encoding='utf-8') as f:\n  f.write(content)\n return f'已寫入 {len(content)} 字元到 {path}'",
+            "code": "def execute(path, content):\n import os\n from pathlib import Path\n abs_p = Path(path).resolve()\n allowed = {r'/home/pop5057273712_gmail_com/AMPM-AIOPS/data', r'/home/pop5057273712_gmail_com/AMPM-AIOPS/outputs'}\n if not any(str(abs_p).startswith(d) for d in allowed):\n  return '不允許寫入此路徑'\n os.makedirs(abs_p.parent, exist_ok=True)\n abs_p.write_text(content, encoding='utf-8')\n return f'已寫入 {len(content)} 字元到 {abs_p}'",
             "created_at": datetime.now().isoformat(),
             "use_count": 0
         }
@@ -143,7 +144,8 @@ class ToolSystem:
             # 如果是內建工具，執行程式碼字串
             code = tool["code"]
             local_vars = {}
-            exec(code, {"__builtins__": __builtins__}, local_vars)
+            restricted = {"__builtins__": {"None": None, "True": True, "False": False, "int": int, "str": str, "float": float, "bool": bool, "list": list, "dict": dict, "len": len, "range": range, "open": open, "print": print, "isinstance": isinstance, "enumerate": enumerate, "zip": zip, "map": map, "filter": filter, "min": min, "max": max, "sum": sum, "abs": abs, "any": any, "all": all, "sorted": sorted, "reversed": reversed, "type": type}}
+            exec(code, restricted, local_vars)
             execute_func = local_vars.get("execute")
             if execute_func:
                 return execute_func(*args, **kwargs)

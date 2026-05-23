@@ -31,11 +31,12 @@ def create_instance(user_id: int, token: str) -> str:
     # Create a run script for this instance
     INSTANCES_DIR.mkdir(parents=True, exist_ok=True)
     script = INSTANCES_DIR / f"bot_{user_id}.py"
+    safe_token = "".join(c for c in token if c.isprintable() and c not in "\"'\\\n\r")
     script.write_text(f"""#!/usr/bin/env python3
 import os, sys
 from pathlib import Path
 sys.path.insert(0, r"{Path(__file__).parent}")
-os.environ["TELEGRAM_TOKEN_OBSIDIAN"] = "{token}"
+os.environ["TELEGRAM_TOKEN_OBSIDIAN"] = "{safe_token}"
 from main import main
 main()
 """)
