@@ -35,7 +35,7 @@ sys.path.insert(0, SRC_PATH)
 import license_manager
 import payment_verifier
 import support
-from service_agent import service_agent
+from service_agent import dispatcher
 
 ERROR_CN = {
     "ModuleNotFoundError": "找不到模組",
@@ -464,8 +464,16 @@ def main():
                     else:
                         raise StopIteration("fallthrough")
                 except StopIteration:
-                    # ── 統一回覆路徑：單一 LLM 呼叫，不多代理打架 ──
-                    try:
+                    # ── 客服代理路由 ──
+                    uid_str = str(update.effective_user.id)
+                    customer_ctx = dispatcher.get_context_for_obsidian(uid_str)
+                    dispatcher.log_usage(uid_str, "chat")
+                    if any(k in msg.lower() for k in ["客服", "業務", "安裝", "售後", "方案", "價格", "試用", "trial"]):
+                        reply = dispatcher.route(uid_str, msg)
+                        _sys.stdout.write(f"[Bot] 使用客服代理\n")
+                    else:
+                        _sys.stdout.write(f"[Bot] 客戶上下文: {customer_ctx}\n")
+                        msg_with_ctx = f"[客戶資料: {customer_ctx}] {msg}"
                         if obsidian.langgraph and hasattr(obsidian.langgraph, 'process'):
                             _sys.stdout.write(f"[Bot] 使用 LangGraph 引擎\n")
                             reply = obsidian.langgraph.process(msg)
@@ -543,43 +551,68 @@ def main():
             try:
                 if cmd == "trial" and len(args) >= 2:
                     cid = abs(hash(args[1])) % 1000000
-                    service_agent.get_or_create(cid, name=args[1])
-                    reply = service_agent.start_trial(cid)
+                    dispatcher.db.get_or_create(cid)
+                    dispatcher.db.data[str(cid)]["name"] = args[1]
+                    reply = dispatcher.start_trial(cid)
                     await update.message.reply_text(reply)
                 elif cmd == "new" and len(args) >= 3:
                     cid = abs(hash(args[1])) % 1000000
-                    service_agent.get_or_create(cid, name=args[1])
-                    plan = args[2] if len(args) > 2 else "monthly"
-                    service_agent.set_plan(cid, plan)
-                    await update.message.reply_text(f"✅ 客戶已建立\nID: {cid}\n姓名: {args[1]}\n方案: {plan}")
+                    c = dispatcher.db.get_or_create(cid)
+                    c["name"] = args[1]
+                    c["plan"] = args[2]
+                    dispatcher.db.save()
+                    await update.message.reply_text(f"✅ 客戶已建立\nID: {cid}\n姓名: {args[1]}\n方案: {args[2]}")
                 elif cmd == "pay" and len(args) >= 3:
-                    reply = service_agent.confirm_payment(args[1], args[2], args[3] if len(args) > 3 else "0")
-                    await update.message.reply_text(reply)
-                elif cmd == "vps" and len(args) >= 4:
-                    reply = service_agent.set_vps(args[1], args[2], args[3])
-                    await update.message.reply_text(reply)
-                elif cmd == "install" and len(args) >= 2:
-                    path = service_agent.generate_script(args[1])
-                    if path:
-                        await update.message.reply_text(f"✅ 安裝腳本已產生: {path}")
+                    c = dispatcher.db.get(args[1])
+                    if c:
+                        c["payment"] = {"method": args[2], "amount": args[3] if len(args) > 3 else "0", "paid_at": datetime.now().isoformat()}
+                        c["status"] = "paid"
+                        dispatcher.db.save()
+                        await update.message.reply_text("✅ 付款已確認")
                     else:
-                        await update.message.reply_text("❌ 產生失敗，請先設定主機資訊")
+                        await update.message.reply_text("❌ 找不到客戶")
+                elif cmd == "vps" and len(args) >= 4:
+                    c = dispatcher.db.get(args[1])
+                    if c:
+                        c["vps"] = {"ip": args[2], "user": args[3], "port": int(args[4]) if len(args) > 4 else 22}
+                        c["status"] = "ready_for_install"
+                        dispatcher.db.save()
+                        await update.message.reply_text(f"✅ 已記錄主機 {args[2]}")
+                    else:
+                        await update.message.reply_text("❌ 找不到客戶")
+                elif cmd == "install" and len(args) >= 2:
+                    reply = dispatcher.install._generate(args[1])
+                    await update.message.reply_text(reply)
                 elif cmd == "done" and len(args) >= 2:
-                    service_agent.mark_installed(args[1])
-                    await update.message.reply_text("✅ 已標記安裝完成")
+                    c = dispatcher.db.get(args[1])
+                    if c:
+                        c["status"] = "installed"
+                        c["installed_at"] = datetime.now().isoformat()
+                        dispatcher.db.save()
+                        await update.message.reply_text("✅ 已標記安裝完成")
+                    else:
+                        await update.message.reply_text("❌ 找不到客戶")
                 elif cmd == "note" and len(args) >= 3:
-                    service_agent.add_note(args[1], " ".join(args[2:]))
-                    await update.message.reply_text("✅ 備註已新增")
+                    c = dispatcher.db.get(args[1])
+                    if c:
+                        c.setdefault("notes", []).append({"note": " ".join(args[2:]), "time": datetime.now().isoformat()})
+                        dispatcher.db.save()
+                        await update.message.reply_text("✅ 備註已新增")
+                    else:
+                        await update.message.reply_text("❌ 找不到客戶")
                 elif cmd == "summary" and len(args) >= 2:
-                    summary = service_agent.get_customer_summary(args[1])
+                    summary = dispatcher.get_customer_detail(args[1])
                     await update.message.reply_text(f"📋 客戶資料：\n{summary}")
+                elif cmd == "context" and len(args) >= 2:
+                    ctx = dispatcher.get_context_for_obsidian(args[1])
+                    await update.message.reply_text(f"📋 客戶上下文：\n{ctx}")
                 else:
                     await update.message.reply_text("❌ 指令格式錯誤，請檢查參數")
             except Exception as e:
                 await update.message.reply_text(f"❌ 錯誤: {e}")
 
         async def customers_cmd(update, context):
-            all_c = service_agent.get_all_customers()
+            all_c = dispatcher.get_customers_summary()
             if not all_c:
                 await update.message.reply_text("目前沒有客戶資料")
                 return

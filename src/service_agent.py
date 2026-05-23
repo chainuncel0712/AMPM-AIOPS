@@ -284,6 +284,34 @@ class ServiceDispatcher:
         self.install = InstallAgent()
         self.after = AfterSalesAgent()
 
+    def get_context_for_obsidian(self, cid):
+        """黑曜呼叫用 — 回傳客戶摘要文字"""
+        c = db.get(cid)
+        if not c:
+            return "新客戶，尚無資料"
+        plan = c.get("plan") or "未選擇"
+        status = c.get("status") or "new"
+        trial = f"試用中（到期 {c.get('trial_expires','?')}）" if c.get("trial") else "正式版"
+        vps = c.get("vps", {}).get("ip") or "未部署"
+        license_k = c.get("license_key") or "無"
+        return (
+            f"客戶: {c.get('name','?')} | "
+            f"方案: {plan} | "
+            f"狀態: {status} | "
+            f"{trial} | "
+            f"主機: {vps} | "
+            f"授權: {license_k}"
+        )
+
+    def log_usage(self, cid, feature):
+        """黑曜呼叫用 — 記錄客戶使用的功能"""
+        c = db.get_or_create(cid)
+        if feature and feature not in c["usage"]["features_used"]:
+            c["usage"]["features_used"].append(feature)
+        c["usage"]["login_count"] += 1
+        c["usage"]["last_active"] = datetime.now().isoformat()
+        db.save()
+
     def route(self, cid, msg):
         c = db.get_or_create(cid)
         m = msg.lower()
