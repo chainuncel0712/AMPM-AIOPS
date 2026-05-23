@@ -27,6 +27,7 @@ heiyao.log
 
 # Runtime data (private — not for public repo)
 data/
+src/cloud_instances/
 outputs/
 versions/
 memory_db/
