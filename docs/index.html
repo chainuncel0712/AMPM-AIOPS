@@ -72,7 +72,37 @@ section[data-lang]{display:none}
 section[data-lang].active{display:block}
 .lang-group{display:block}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
-@media(max-width:600px){header h1{font-size:2rem}.pricing-grid{grid-template-columns:1fr}}
+@media(max-width:700px){
+  header h1{font-size:2rem}
+  header h1::before,header h1::after{display:none}
+  header img{max-width:100% !important}
+  .pricing-grid,.features-grid{grid-template-columns:1fr}
+  .pricing-card .price{font-size:1.8rem}
+  .container{padding:0 12px}
+  .lang-bar button{padding:6px 12px;font-size:0.75rem;margin-left:4px}
+  h2{font-size:1.2rem;left:0;transform:none;padding:0}
+  h2::before,h2::after{display:none}
+  .card{padding:16px}
+  .pricing-card{padding:20px}
+  section{padding:30px 0}
+  header{padding:30px 0 30px}
+  #chat-box,#chat-box-en{max-height:300px}
+  /* 付款區塊 PayPal 按鈕 2列變1列 */
+  .card > div > div[style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr !important}
+  /* 客服快速按鈕 */
+  .lang-zh .card .lang-zh ~ div[style*="flex-wrap:wrap;gap:6px"] button,
+  .lang-en .card .lang-en ~ div[style*="flex-wrap:wrap;gap:6px"] button{font-size:0.7rem;padding:3px 8px}
+  /* 24h 橫幅 */
+  .card > div[style*="display:flex;justify-content:center;gap:20px"]{gap:10px;flex-wrap:wrap}
+  .card > div[style*="display:flex;justify-content:center;gap:20px"] > div{font-size:0.75rem}
+  /* 如何運作 4步驟 */
+  .card > div[style*="grid-template-columns:repeat(auto-fit,minmax(180px,1fr))"]{grid-template-columns:1fr 1fr}
+  /* 對比表格 */
+  table{font-size:0.75rem}
+  table th,table td{padding:8px !important}
+  /* 比較框 2列變1列 */
+  .card > div[style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr !important}
+}
 </style>
 </head>
 <body>
