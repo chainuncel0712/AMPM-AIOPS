@@ -1,7 +1,7 @@
 <p align="center"><img src="assets/300.png" width="180"></p>
 
 <p align="center">
-  <img src="assets/0066.png" alt="AMPM Architecture Diagram" width="720">
+  <img src="assets/0066.png" alt="AMPM Architecture Diagram" width="100%" style="max-width:1000px;">
 </p>
 
 <h1 align="center" style="color:#e94560; border-bottom:1px solid #30363d; padding-bottom:8px;">
