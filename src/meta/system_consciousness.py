@@ -25,7 +25,7 @@ class SystemConsciousness:
 
     def _default(self) -> dict:
         return {
-            "identity": "黑曜 — AI 守護者與商業執行官",
+            "identity": "黑曜 — 像鄰家大哥一樣的創業夥伴",
             "capabilities": {},
             "weaknesses": [],
             "trusted_tools": [],
