@@ -83,5 +83,51 @@ def service_info():
     })
 
 
+@app.route("/api/preferences", methods=["POST"])
+def save_preferences():
+    """儲存客戶偏好"""
+    data = request.get_json(silent=True) or {}
+    cid = data.get("cid") or f"web_{request.remote_addr}"
+    if _dispatcher:
+        from service_agent import db
+        c = db.get_or_create(cid)
+        prefs = c.setdefault("preferences", {})
+        for key in ("language", "contact_time", "notes", "name"):
+            if key in data:
+                prefs[key] = data[key]
+                if key == "name":
+                    c["name"] = data[key]
+        db.save()
+        return jsonify({"ok": True, "cid": cid})
+    return jsonify({"ok": False, "error": "服務尚未就緒"})
+
+
+@app.route("/api/ticket", methods=["POST"])
+def create_ticket():
+    """建立售後工單"""
+    data = request.get_json(silent=True) or {}
+    cid = data.get("cid") or f"web_{request.remote_addr}"
+    subject = (data.get("subject") or "客戶回報").strip()
+    description = (data.get("description") or "").strip()
+    if not description:
+        return jsonify({"ok": False, "error": "請描述問題"})
+    if _dispatcher:
+        from service_agent import db
+        from datetime import datetime, timezone
+        c = db.get_or_create(cid)
+        ticket = {
+            "id": len(c.get("tickets", [])) + 1,
+            "subject": subject,
+            "description": description,
+            "status": "open",
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "resolved_at": None,
+        }
+        c.setdefault("tickets", []).append(ticket)
+        db.save()
+        return jsonify({"ok": True, "ticket_id": ticket["id"]})
+    return jsonify({"ok": False, "error": "服務尚未就緒"})
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5050, debug=False)
