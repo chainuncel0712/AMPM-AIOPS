@@ -4,7 +4,7 @@ import os
 import json
 import time
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
 
 import requests
 
@@ -55,12 +55,19 @@ def verify_tx(txid: str) -> dict:
     if txid in claimed:
         return {"success": False, "message": "❌ 此 TXID 已被兌換過。"}
 
-    # Call BscScan
+    # 提前檢查 API Key
+    key = _api_key()
+    if not key or key == "YourBscScanApiKeyHere":
+        return {"success": False, "message": "❌ BscScan API Key 尚未設定。請管理員在 .env 填入 BSCSCAN_API_KEY。"}
+
+    # Call BscScan — 用收款地址篩選 token 轉帳，再匹配 txid
     params = {
         "module": "account",
         "action": "tokentx",
-        "txhash": txid,
-        "apikey": _api_key(),
+        "address": WALLET,
+        "sort": "desc",
+        "limit": "100",
+        "apikey": key,
     }
     try:
         resp = requests.get(BSCSCAN_API, params=params, timeout=15)
@@ -71,13 +78,16 @@ def verify_tx(txid: str) -> dict:
     if data.get("status") != "1" or not data.get("result"):
         msg = data.get("result", data.get("message", "查無交易"))
         if "No transactions found" in str(msg):
-            return {"success": False, "message": "❌ 該 TXID 在鏈上未找到交易。"}
+            return {"success": False, "message": "❌ 收款錢包尚無交易記錄。"}
+        if "rate limit" in str(msg).lower():
+            return {"success": False, "message": "❌ BscScan API 頻率限制，請稍後再試。"}
         return {"success": False, "message": f"❌ BscScan 查詢失敗：{msg}"}
 
     # Find matching transfer
     transfers = data["result"] if isinstance(data["result"], list) else [data["result"]]
     for tx in transfers:
-        if (tx.get("to", "").lower() == WALLET.lower()
+        if (tx.get("hash", "").lower() == txid.lower()
+                and tx.get("to", "").lower() == WALLET.lower()
                 and tx.get("contractAddress", "").lower() == USDT_CONTRACT.lower()):
             try:
                 raw_amount = tx.get("value", "0")
@@ -88,7 +98,7 @@ def verify_tx(txid: str) -> dict:
 
             from_addr = tx.get("from", "unknown")
             timestamp = int(tx.get("timeStamp", 0))
-            tx_date = datetime.utcfromtimestamp(timestamp).isoformat() if timestamp else "unknown"
+            tx_date = datetime.fromtimestamp(timestamp, tz=timezone.utc).isoformat() if timestamp else "unknown"
 
             # Find matching plan
             for min_amount, days, tier, plan in sorted(AMOUNT_PLANS, reverse=True):
@@ -110,8 +120,7 @@ def verify_tx(txid: str) -> dict:
             # Amount too small
             return {
                 "success": False,
-                "message": f"❌ 收到 {amount:.2f} USDT，但最低方案為 $10。請補足差額後聯繫管理員。"
-
+                "message": f"❌ 收到 {amount:.2f} USDT，但最低方案為 $15/月。請補足差額後聯繫管理員。"
             }
 
     return {"success": False, "message": "❌ 該交易未包含轉入收款錢包的 USDT BEP20 轉帳。"}

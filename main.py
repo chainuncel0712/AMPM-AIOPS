@@ -465,7 +465,12 @@ def main():
                     uid_str = str(update.effective_user.id)
                     customer_ctx = dispatcher.get_context_for_obsidian(uid_str)
                     dispatcher.log_usage(uid_str, "chat")
-                    if any(k in msg.lower() for k in ["客服", "業務", "安裝", "售後", "方案", "價格", "試用", "trial"]):
+                    if any(k in msg.lower() for k in [
+                        "客服", "業務", "安裝", "售後",
+                        "方案", "價格", "多少錢", "特色", "功能", "能做", "試用", "trial", "免費",
+                        "付款", "怎麼買", "購買", "pay", "usdt", "主機", "vps", "部署",
+                        "問題", "故障", "錯誤", "壞", "重啟", "慢", "更新", "記憶", "restart", "ping",
+                    ]):
                         reply = dispatcher.route(uid_str, msg)
                         _sys.stdout.write(f"[Bot] 使用客服代理\n")
                     else:
