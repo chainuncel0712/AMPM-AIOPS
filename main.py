@@ -265,24 +265,20 @@ def main():
         print(f"  [❌] 自我修復系統啟動失敗: {e}")
     print()
     
-    # 步驟 2.8：啟動科技感儀表板（只啟動一次）
-    print("🖥️ 步驟 2.8/3: 啟動科技感儀表板...")
+    # 步驟 2.8：啟動科技感儀表板 + 網站聊天 API
+    print("🖥️ 步驟 2.8/3: 啟動儀表板與聊天 API...")
     try:
         from dashboard.app import app, set_brain
-        set_brain(obsidian)
-        # 自動尋找可用埠號
-        import socket
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.bind(('127.0.0.1', 0))
-        port = sock.getsockname()[1]
-        sock.close()
+        from service_agent import dispatcher
+        set_brain(obsidian, dispatcher)
+        DASH_PORT = int(os.getenv("DASH_PORT", "5050"))
         def run_dash():
-            app.run(host="127.0.0.1", port=port, debug=False, use_reloader=False)
+            app.run(host="0.0.0.0", port=DASH_PORT, debug=False, use_reloader=False)
         t = threading.Thread(target=run_dash, daemon=True)
         t.start()
         supervisor.register("dashboard", thread=t, hb_interval=60,
                             is_restartable=False, is_critical=False)
-        print(f"  [✅] 科技感儀表板: http://127.0.0.1:{port}")
+        print(f"  [✅] 儀表板 + 聊天 API: http://0.0.0.0:{DASH_PORT}")
     except Exception as e:
         print(f"  [❌] 科技感儀表板啟動失敗: {e}")
     print()
@@ -339,6 +335,14 @@ def main():
     # 步驟 3：啟動 Bot
     print("🤖 步驟 3/3: 啟動 Bot...")
     _sys.stdout.flush()
+    
+    # ── 注入 LLM 到服務代理 ──
+    from service_agent import dispatcher
+    if obsidian.llm:
+        dispatcher.set_llm(obsidian.llm)
+        print("  [✅] 服務代理已連線 LLM")
+    else:
+        print("  [⚠️] 服務代理使用離線降級模式")
     
     # ── 建立 ExecutionContext（用於 model switching / vision / system cmd） ──
     try:
