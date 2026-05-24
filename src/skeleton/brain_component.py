@@ -12,6 +12,14 @@ class BrainComponent:
         self._wake_count = 0
         self._sleep_count = 0
 
+    def report_issue(self, issue_type: str, detail: str = ""):
+        """器官自治投票：報告問題給 repair_engine。"""
+        try:
+            from core.repair_engine import report_issue as _ri
+            _ri(self.__class__.__name__, issue_type, detail)
+        except Exception:
+            pass
+
     @abstractmethod
     def status(self) -> dict:
         ...
