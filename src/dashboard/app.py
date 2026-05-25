@@ -1,8 +1,8 @@
 """
 Dashboard + 網站聊天 API
 """
-from flask import Flask, jsonify, request
-import sys
+from flask import Flask, jsonify, request, abort
+import os, sys
 from pathlib import Path
 
 try:
@@ -15,6 +15,29 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 app = Flask(__name__)
 CORS(app)
+
+DASHBOARD_TOKEN = os.environ.get("DASHBOARD_TOKEN", "")
+
+@app.before_request
+def check_auth():
+    if not DASHBOARD_TOKEN:
+        return
+    token = request.args.get("token") or request.headers.get("Authorization", "").replace("Bearer ", "")
+    if token == DASHBOARD_TOKEN:
+        return
+    if request.path in ("/health", "/login"):
+        return
+    return jsonify({"error": "unauthorized", "hint": "?token=<你的密鑰>"}), 401
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        token = (request.form.get("token") or "").strip()
+        if token == DASHBOARD_TOKEN:
+            return f"""<html><head><meta http-equiv="refresh" content="0;url=/?token={token}"></head><body>驗證成功，跳轉中...</body></html>"""
+        return """<html><head><meta charset="utf-8"><style>body{{font-family:sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;background:#0a0a0f;color:#e0e0e0}}form{{background:#1a1a2e;padding:2rem;border-radius:12px}}input{{width:100%;padding:10px;margin:8px 0;border:1px solid #333;border-radius:6px;background:#0d0d1a;color:#fff}}button{{width:100%;padding:10px;background:#e94560;color:#fff;border:none;border-radius:6px;cursor:pointer}}h2{{margin-top:0;color:#58a6ff}}</style></head><body><form method="post"><h2>黑曜 Dashboard</h2><input type="password" name="token" placeholder="請輸入密鑰" required><p style="color:#e94560;font-size:13px">密鑰錯誤</p><button type="submit">登入</button></form></body></html>"""
+    return """<html><head><meta charset="utf-8"><style>body{{font-family:sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;background:#0a0a0f;color:#e0e0e0}}form{{background:#1a1a2e;padding:2rem;border-radius:12px}}input{{width:100%;padding:10px;margin:8px 0;border:1px solid #333;border-radius:6px;background:#0d0d1a;color:#fff}}button{{width:100%;padding:10px;background:#e94560;color:#fff;border:none;border-radius:6px;cursor:pointer}}h2{{margin-top:0;color:#58a6ff}}</style></head><body><form method="post"><h2>黑曜 Dashboard</h2><input type="password" name="token" placeholder="請輸入密鑰" required><button type="submit">登入</button></form></body></html>"""
 
 brain = None
 _dispatcher = None
