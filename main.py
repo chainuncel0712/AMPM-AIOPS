@@ -687,6 +687,14 @@ def main():
         supervisor.register("bot", hb_interval=30, hb_timeout=120,
                             is_restartable=False, is_critical=True)
 
+        # ── 啟動自我進化引擎 ──
+        try:
+            from self_evolution import evolution_engine
+            evolution_engine.start(interval_hours=168, llm_fn=None)
+            print("  [✅] 自我進化引擎已啟動 (每 7 天)")
+        except Exception as e:
+            print(f"  [⚠️] 自我進化啟動失敗: {e}")
+
         # ── 啟動關鍵字爬蟲（即時趨勢） ──
         try:
             from keyword_scout import keyword_scout
