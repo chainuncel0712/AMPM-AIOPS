@@ -165,7 +165,7 @@ class PublisherEngine:
         self._running = False
 
     def reject_topic(self, book_id: str) -> str:
-        """淘汰選題"""
+        """淘汰選題 → 記憶此類主題"""
         book = store.get(book_id)
         if not book: return "找不到書籍"
         title = book["stage_data"]["1"].get("title", "?")
@@ -176,7 +176,21 @@ class PublisherEngine:
         from pipeline_data import rejected
         rejected.add(title)
         preset = PRODUCT_TYPES.get(book.get("product_type", "ebook"), {})
-        return f"❌ {preset.get('icon','')} 《{title}》已淘汰"
+        return f"❌ {preset.get('icon','')} 《{title}》已淘汰，記憶中"
+
+    def retry_topic(self, book_id: str, new_title: str = "") -> str:
+        """敗部復活：換個標題重新選題"""
+        book = store.get(book_id)
+        if not book: return "找不到書籍"
+        old_title = book["stage_data"]["1"].get("title", "?")
+        pt = book.get("product_type", "ebook")
+        title = new_title or f"{old_title}（修訂版）"
+        store.update(book_id, {
+            "current_stage": 1,
+            "stage_data": {**book.get("stage_data", {}), "1": {**book.get("stage_data", {}).get("1", {}), "title": title, "approved": False, "reject_reason": ""}}
+        })
+        preset = PRODUCT_TYPES.get(pt, {})
+        return f"🔄 {preset.get('icon','')} 《{old_title}》→ 《{title}》重新進入選題"
 
     def set_auto_publish(self, enabled: bool):
         self._auto_publish = enabled

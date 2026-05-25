@@ -145,7 +145,7 @@ class RejectedStore:
 rejected = RejectedStore()
 
 
-def create_book(product_type: str, title: str, **kwargs) -> Dict:
+def create_book(product_type: str, title: str, language: str = "bilingual", **kwargs) -> Dict:
     """建立統一的 Book 物件"""
     ts = datetime.now().isoformat()
     book_id = hashlib.md5(f"{product_type}-{title}-{int(time.time())}".encode()).hexdigest()[:12].upper()
@@ -153,6 +153,7 @@ def create_book(product_type: str, title: str, **kwargs) -> Dict:
         "id": book_id,
         "product_type": product_type,
         "current_stage": 1,
+        "language": language,  # zh, en, bilingual
         "stage_data": {
             "1": {"title": title, "approved": False, "approved_by": "", "approved_at": "", "reject_reason": "", **kwargs},
             "2": {}, "3": {}, "4": {}, "5": {}, "6": {}, "7": {}, "8": {}, "9": {}, "10": {}

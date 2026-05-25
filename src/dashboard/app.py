@@ -157,16 +157,21 @@ def index():
         from pipeline_data import store
         from pipeline_presets import PRODUCT_TYPES
         pipeline_books = []
+        rejected_books = []
         for b in store.books:
-            if b.get("current_stage") == 1:
-                pt = PRODUCT_TYPES.get(b.get("product_type", "ebook"), {})
-                title = b.get("stage_data", {}).get("1", {}).get("title", b["id"][:8])
-                approved = b.get("stage_data", {}).get("1", {}).get("approved", False)
-                pipeline_books.append({
-                    "id": b["id"], "title": title, "approved": approved,
-                    "type": f'{pt.get("icon","?")}{pt.get("label","?")}',
-                    "type_key": b.get("product_type", "ebook")
-                })
+            pt = PRODUCT_TYPES.get(b.get("product_type", "ebook"), {})
+            title = b.get("stage_data", {}).get("1", {}).get("title", b["id"][:8])
+            approved = b.get("stage_data", {}).get("1", {}).get("approved", False)
+            info = {
+                "id": b["id"], "title": title, "approved": approved,
+                "type": f'{pt.get("icon","?")}{pt.get("label","?")}',
+                "type_key": b.get("product_type", "ebook"),
+                "stage": b.get("current_stage", 1)
+            }
+            if b.get("current_stage") == 0:
+                rejected_books.append(info)
+            elif b.get("current_stage") == 1:
+                pipeline_books.append(info)
 
         # 电子书主题分类 (output 檔案)
         topic_map = {
@@ -255,6 +260,11 @@ td{{padding:6px 8px;border-bottom:1px solid #111122}}
     {''.join(f'<tr><td>{b["type"]}</td><td>{b["title"][:40]}</td><td>{"⏸️ 待審核" if not b["approved"] else "✅ 已通過"}</td><td>' + (f'<a href="/approve-topic/{b["type_key"]}/{b["id"]}?token=' + request.args.get("token","") + '" style="color:#3fb950;font-size:12px;font-weight:bold">✓</a> <a href="/reject-topic/{b["id"]}?token=' + request.args.get("token","") + '" style="color:#e94560;font-size:12px;font-weight:bold;margin-left:8px">✗淘汰</a>' if not b["approved"] else '等待循環') + '</td></tr>' for b in pipeline_books) if pipeline_books else '<tr><td colspan="4" style="color:#8b949e;padding:12px">尚無選題</td></tr>'}
     </table>
     <div style="font-size:11px;color:#8b949e;margin-top:8px">⚠️ 選題必須通過審核，才會開始撰寫內容。不通過就不生產。</div>
+  </div>
+
+  <div class="card" style="grid-column:span 2">
+    <h3>🔄 淘汰區 — 敗部復活 (換個標題重新選題)</h3>
+    {''.join(f'<div class="stat-row"><span class="stat-label">{b["type"]} {b["title"][:40]}</span><span><a href="/retry-topic/{b["id"]}?token=' + request.args.get("token","") + '" style="color:#d29922;font-size:11px;">🔄 敗部復活</a></span></div>' for b in rejected_books[:20]) if rejected_books else '<div style="color:#8b949e;padding:8px">無淘汰書籍</div>'}
   </div>
 
   <div class="card" style="grid-column:span 2">
@@ -440,6 +450,15 @@ def approve_topic(pipeline, book_id):
 def reject_topic(book_id):
     from pipeline_engine import engine
     result = engine.reject_topic(book_id)
+    token = request.args.get("token", "")
+    return f'<meta http-equiv="refresh" content="0;url=/?token={token}"><p>{result}</p>', 200
+
+
+@app.route("/retry-topic/<book_id>")
+def retry_topic(book_id):
+    from pipeline_engine import engine
+    new_title = request.args.get("title", "")
+    result = engine.retry_topic(book_id, new_title)
     token = request.args.get("token", "")
     return f'<meta http-equiv="refresh" content="0;url=/?token={token}"><p>{result}</p>', 200
 

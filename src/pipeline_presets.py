@@ -17,7 +17,8 @@ HUMAN_GATES = {1, 8}  # 階段 1 和 8 需要人工審核
 PRODUCT_TYPES: Dict[str, Dict[str, Any]] = {
     "ebook": {
         "label": "電子書", "icon": "📚", "id_prefix": "EB",
-        "description": "AI/技術/工具類電子書",
+        "description": "AI/技術/商業/自學類電子書",
+        "market_standard": "章節式 6-10 章，每章 1500-3000 字，含實例與步驟，EPUB reflowable",
         "stages": {
             1: {"auto": False, "prompt": "ebook_topic_prompt"},
             2: {"auto": True, "prompt": "ebook_research_prompt"},

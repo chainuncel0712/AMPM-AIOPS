@@ -141,24 +141,46 @@ def stage_3_outline(book: Dict, cfg: Dict, llm_user: Optional[Callable] = None) 
 
 
 def stage_4_writing(book: Dict, cfg: Dict, llm_user=None) -> Dict:
-    """撰寫階段：結合研究結果，原創內容"""
+    """撰寫階段：支援雙語輸出"""
     title = book["stage_data"]["1"].get("title", "")
     outline = book["stage_data"].get("3", {}).get("outline", "")
     research = book["stage_data"].get("2", {}).get("research_summary", "")
+    lang = book.get("language", "bilingual")
 
-    prompt = (
-        f"你是專業作家。根據以下資料撰寫《{title}》完整內容。\n\n"
-        f"研究素材：{research[:500]}\n\n"
-        f"目錄：{outline[:800]}\n\n"
-        f"要求：\n"
-        f"1. 繁體中文，每章 400-600 字\n"
-        f"2. 用你自己的話改寫研究素材，不抄襲原文\n"
-        f"3. 加入原創觀點、實例和見解\n"
-        f"4. 初學者友善，有實際步驟\n"
-        f"5. 直接輸出書籍內容，不問問題"
-    )
-    result_text = _llm_call(prompt, "你是專業作家。原創寫作。不抄襲。")
-    return {"content": result_text, "word_count": len(result_text), "completed_at": datetime.now().isoformat()}
+    content_zh = ""
+    content_en = ""
+
+    # 中文版
+    if lang in ("zh", "bilingual"):
+        prompt_zh = (
+            f"你是專業作家。根據以下資料撰寫《{title}》繁體中文版完整內容。\n"
+            f"研究素材：{research[:400]}\n目錄：{outline[:600]}\n"
+            f"要求：繁體中文，每章 400-600 字，原創不抄襲，直接輸出內容。"
+        )
+        content_zh = _llm_call(prompt_zh, "你是專業作家。用繁體中文原創寫作。")
+
+    # 英文版
+    if lang in ("en", "bilingual"):
+        title_en = book["stage_data"]["1"].get("title_en", title)
+        prompt_en = (
+            f"You are a professional writer. Write '{title_en}' in English based on:\n"
+            f"Research: {research[:400]}\nOutline: {outline[:600]}\n"
+            f"Requirements: 400-600 words per chapter, original, professional tone."
+        )
+        content_en = _llm_call(prompt_en, "You are a professional writer. Write original content in English.")
+
+    if lang == "bilingual":
+        content = f"# {title} (中英雙語版)\n\n## 中文版\n\n{content_zh}\n\n---\n\n## English Version\n\n{content_en}"
+    elif lang == "en":
+        content = content_en
+    else:
+        content = content_zh
+
+    return {
+        "content": content, "content_zh": content_zh, "content_en": content_en,
+        "word_count": len(content), "language": lang,
+        "completed_at": datetime.now().isoformat()
+    }
 
 
 def stage_5_editing(book: Dict, cfg: Dict, llm_user=None) -> Dict:
@@ -247,27 +269,25 @@ def stage_9_publish(book: Dict, cfg: Dict, llm_user=None) -> Dict:
 
 
 def stage_10_marketing(book: Dict, cfg: Dict, llm_user=None) -> Dict:
-    """行銷廣告階段：自動生成各平台廣告文案"""
+    """行銷階段：中英雙語廣告"""
     title = book["stage_data"]["1"].get("title", "")
     channels = cfg.get("ad_channels", ["telegram"])
     description = book["stage_data"].get("9", {}).get("description", "")
+    lang = book.get("language", "bilingual")
 
     ads = {}
     for ch in channels:
         if ch == "telegram":
-            prompt = f"為《{title}》寫一段 Telegram 頻道宣傳文案，含 emoji，50 字內，吸引點擊。"
-            ads["telegram"] = _llm_call(prompt, "你是社群行銷專家。只輸出文案。")[:200]
+            zh = _llm_call(f"為《{title}》寫 Telegram 宣傳文案，繁體中文，含 emoji，50 字內。")
+            en = _llm_call(f"Write a Telegram promo for '{title}', English, under 50 words, with emoji.") if lang in ("en","bilingual") else ""
+            ads["telegram"] = {"zh": zh[:200], "en": en[:200]} if en else zh[:200]
         elif ch == "twitter":
-            prompt = f"為《{title}》寫一則推文（含 hashtags），繁體中文，280 字內。"
-            ads["twitter"] = _llm_call(prompt, "你是社群行銷專家。")[:280]
-        elif ch == "facebook":
-            prompt = f"為《{title}》寫 Facebook 貼文，含呼籲行動，繁體中文，100 字。"
-            ads["facebook"] = _llm_call(prompt, "你是社群行銷專家。")[:200]
-        elif ch == "instagram":
-            prompt = f"為《{title}》寫 Instagram 貼文，hashtags 和 emoji，繁體中文，80 字。"
-            ads["instagram"] = _llm_call(prompt, "你是 IG 行銷專家。")[:150]
+            zh = _llm_call(f"為《{title}》寫推文，繁體中文，hashtags，280 字內。")
+            en = _llm_call(f"Write a tweet for '{title}', English with hashtags.") if lang in ("en","bilingual") else ""
+            ads["twitter"] = {"zh": zh[:280], "en": en[:280]} if en else zh[:280]
+        else:
+            ads[ch] = _llm_call(f"為《{title}》寫 {ch} 行銷文案，繁體中文。")[:200]
 
-    # 儲存廣告文案
     ad_dir = BASE / "outputs" / "ads"
     ad_dir.mkdir(parents=True, exist_ok=True)
     ad_path = ad_dir / f"{book['id']}_ads.json"
