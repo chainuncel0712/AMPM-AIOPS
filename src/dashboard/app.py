@@ -463,6 +463,80 @@ def retry_topic(book_id):
     return f'<meta http-equiv="refresh" content="0;url=/?token={token}"><p>{result}</p>', 200
 
 
+@app.route("/retry-topic/<book_id>")
+def retry_topic(book_id):
+    from pipeline_engine import engine
+    new_title = request.args.get("title", "")
+    result = engine.retry_topic(book_id, new_title)
+    token = request.args.get("token", "")
+    return f'<meta http-equiv="refresh" content="0;url=/?token={token}"><p>{result}</p>', 200
+
+
+@app.route("/publishing")
+def publishing_dashboard():
+    """上架管理面板"""
+    token = request.args.get("token", "")
+    from publishing_system import publisher as pub_mgr, PLATFORM_SPECS
+    items = pub_mgr.get_prepared_books()
+    platforms = pub_mgr.get_platform_status()
+
+    items_html = ""
+    for item in items[:20]:
+        plats = ", ".join(item.get("platforms", [])[:3])
+        items_html += f"""<tr>
+            <td>{item.get('title','?')[:30]}</td>
+            <td>{item.get('status','?')}</td>
+            <td>{plats}</td>
+            <td>{item.get('metadata',{}).get('price',{}).get('ntd','?')}NTD</td>
+        </tr>"""
+
+    plat_html = ""
+    for name, p in platforms.items():
+        status = "✅" if p["status"] == "ready" else "🔧"
+        plat_html += f"""<tr>
+            <td>{p['icon']} {p['name']}</td>
+            <td>{', '.join(p['formats'])}</td>
+            <td>{p['royalty']}</td>
+            <td>{status}</td>
+        </tr>"""
+
+    return f"""<!DOCTYPE html>
+<html lang="zh-TW">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>上架系統 | 黑曜</title>
+<style>
+*{{margin:0;padding:0;box-sizing:border-box}}
+body{{font-family:system-ui,sans-serif;background:#0a0a0f;color:#e0e0e0;padding:20px;max-width:1000px;margin:0 auto}}
+h1{{color:#58a6ff;font-size:20px;margin-bottom:16px}}
+.card{{background:#111122;border:1px solid #1e1e3a;border-radius:12px;padding:20px;margin-bottom:16px}}
+.card h3{{color:#8b949e;font-size:13px;text-transform:uppercase;margin-bottom:12px}}
+a{{color:#58a6ff;text-decoration:none;font-size:12px}}
+table{{width:100%;border-collapse:collapse;font-size:12px}}
+th{{text-align:left;color:#8b949e;padding:8px;border-bottom:1px solid #1e1e3a}}
+td{{padding:8px;border-bottom:1px solid #111122}}
+.good{{color:#3fb950}}.warn{{color:#d29922}}</style></head>
+<body>
+<h1>📤 上架系統</h1>
+<a href="/?token={token}">← Dashboard</a> | <a href="/pipeline?token={token}">管線看板</a>
+
+<div class="card">
+<h3>📚 待上架書籍 ({len(items)} 本)</h3>
+<table>
+<tr><th>書名</th><th>狀態</th><th>平台</th><th>建議售價</th></tr>
+{items_html if items else '<tr><td colspan="4" style="color:#8b949e">尚無待上架書籍</td></tr>'}
+</table>
+</div>
+
+<div class="card">
+<h3>📡 上架平台 ({len(platforms)} 個)</h3>
+<table>
+<tr><th>平台</th><th>格式</th><th>版稅</th><th>狀態</th></tr>
+{plat_html}
+</table>
+</div>
+</body></html>"""
+
+
 @app.route("/pipeline")
 def pipeline_view():
     """管線看板：9 階段 Kanban"""

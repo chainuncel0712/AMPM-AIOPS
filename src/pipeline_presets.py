@@ -160,6 +160,71 @@ PRODUCT_TYPES: Dict[str, Dict[str, Any]] = {
             10: {"auto": True, "ad_channels": ["telegram", "twitter"]},
         }
     },
+    # ── 新產品類型 ──
+    "audiobook": {
+        "label": "有聲書", "icon": "🎧", "id_prefix": "AB",
+        "description": "文字轉語音有聲書 / Podcast 形式",
+        "stages": {
+            1: {"auto": False, "prompt": "audiobook_topic_prompt"},
+            2: {"auto": True, "prompt": "audiobook_research_prompt"},
+            3: {"auto": True, "prompt": "audiobook_outline_prompt"},
+            4: {"auto": True, "prompt": "audiobook_writing_prompt"},
+            5: {"auto": True, "validator": "narration_check"},
+            6: {"auto": True, "art_mode": "cover_only"},
+            7: {"auto": True, "layout_mode": "audio_chapters"},
+            8: {"auto": False},
+            9: {"auto": True, "platforms": ["audible", "kobo_audio", "soundon"]},
+            10: {"auto": True, "ad_channels": ["telegram", "spotify", "podcast"]},
+        }
+    },
+    "series": {
+        "label": "系列書籍", "icon": "📚", "id_prefix": "SR",
+        "description": "多冊系列套書 (3-10 冊)",
+        "stages": {
+            1: {"auto": False, "prompt": "series_topic_prompt"},
+            2: {"auto": True, "prompt": "series_research_prompt"},
+            3: {"auto": True, "prompt": "series_outline_prompt"},
+            4: {"auto": True, "prompt": "series_writing_prompt"},
+            5: {"auto": True, "validator": "series_consistency"},
+            6: {"auto": True, "art_mode": "series_branding"},
+            7: {"auto": True, "layout_mode": "series_boxset"},
+            8: {"auto": False},
+            9: {"auto": True, "platforms": ["kdp", "readmoo", "google_books"]},
+            10: {"auto": True, "ad_channels": ["telegram", "twitter", "facebook"]},
+        }
+    },
+    "journal": {
+        "label": "期刊/學報", "icon": "📓", "id_prefix": "JL",
+        "description": "學術期刊 / 定期學報 / 研究報告",
+        "stages": {
+            1: {"auto": False, "prompt": "journal_topic_prompt"},
+            2: {"auto": True, "prompt": "journal_research_prompt"},
+            3: {"auto": True, "prompt": "journal_outline_prompt"},
+            4: {"auto": True, "prompt": "journal_writing_prompt"},
+            5: {"auto": True, "validator": "peer_review"},
+            6: {"auto": True, "art_mode": "journal_format"},
+            7: {"auto": True, "layout_mode": "academic_pdf"},
+            8: {"auto": False},
+            9: {"auto": True, "platforms": ["kdp", "google_scholar", "researchgate"]},
+            10: {"auto": True, "ad_channels": ["telegram", "academia", "linkedin"]},
+        }
+    },
+    "social_content": {
+        "label": "社群付費內容", "icon": "📱", "id_prefix": "SC",
+        "description": "YouTube/Patreon/Substack 等社群平台付費內容",
+        "stages": {
+            1: {"auto": False, "prompt": "social_topic_prompt"},
+            2: {"auto": True, "prompt": "social_research_prompt"},
+            3: {"auto": True, "prompt": "social_outline_prompt"},
+            4: {"auto": True, "prompt": "social_writing_prompt"},
+            5: {"auto": True, "validator": "engagement_check"},
+            6: {"auto": True, "art_mode": "thumbnail_banner"},
+            7: {"auto": True, "layout_mode": "social_format"},
+            8: {"auto": False},
+            9: {"auto": True, "platforms": ["youtube", "patreon", "substack"]},
+            10: {"auto": True, "ad_channels": ["telegram", "twitter", "instagram", "tiktok"]},
+        }
+    },
 }
 
 # 選題後備清單（LLM 不可用時使用）
@@ -201,5 +266,21 @@ FALLBACK_TOPICS = {
     "reference_book": [
         "Python 標準庫手冊", "Docker 實戰指南", "Git 指令速查",
         "AWS 服務對照表", "React Hooks 大全"
+    ],
+    "audiobook": [
+        "5 分鐘冥想引導", "睡前故事 30 則", "職場說話術",
+        "投資理財入門音頻課", "英文會話 100 句"
+    ],
+    "series": [
+        "PANEY & MONEY 系列 (6 冊)", "AI 時代三部曲", "創業實戰系列",
+        "歷史大冒險 (12 冊)", "程式設計從零到專業 (5 冊)"
+    ],
+    "journal": [
+        "AI 前沿研究月刊", "數位轉型季刊", "教育科技學報",
+        "區塊鏈技術半年刊", "永續發展研究報告"
+    ],
+    "social_content": [
+        "YouTube AI 教學頻道", "Patreon 獨家寫作課", "Substack 科技週報",
+        "Instagram 設計靈感", "TikTok 程式教學短影音"
     ],
 }
