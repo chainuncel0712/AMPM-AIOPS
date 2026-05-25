@@ -687,13 +687,35 @@ def main():
         supervisor.register("bot", hb_interval=30, hb_timeout=120,
                             is_restartable=False, is_critical=True)
 
-        # ── 啟動關鍵字爬蟲機械組件 ──
+        # ── 啟動關鍵字爬蟲（即時趨勢） ──
         try:
             from keyword_scout import keyword_scout
             keyword_scout.start(interval_seconds=1800)
-            print("  [✅] 關鍵字爬蟲已啟動 (每 30 分鐘，Google/Amazon/Readmoo/博客來)")
+            print("  [✅] 關鍵字爬蟲已啟動 (每 30 分鐘)")
         except Exception as e:
             print(f"  [⚠️] 關鍵字爬蟲啟動失敗: {e}")
+
+        # ── 啟動自主循環引擎 ──
+        try:
+            from proactive_cycle import proactive
+            proactive.start(interval_seconds=14400, llm_fn=None)
+            print("  [✅] 自主循環引擎已啟動 (每 4 小時)")
+        except Exception as e:
+            print(f"  [⚠️] 自主循環啟動失敗: {e}")
+
+        # ── 啟動成長追蹤 ──
+        try:
+            from growth_tracker import growth_tracker
+            async def tg_send_report(msg):
+                for uid in AUTHORIZED:
+                    try:
+                        await app.bot.send_message(chat_id=uid, text=msg[:4000])
+                    except: pass
+            growth_tracker.set_telegram(lambda m: None)
+            growth_tracker.start(interval_hours=720, llm_fn=None)
+            print("  [✅] 成長追蹤已啟動 (每 30 天)")
+        except Exception as e:
+            print(f"  [⚠️] 成長追蹤啟動失敗: {e}")
 
         # ── 啟動資源偵查機械組件（確保管線永不枯竭） ──
         try:
