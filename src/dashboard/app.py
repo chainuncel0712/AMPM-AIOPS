@@ -85,15 +85,23 @@ def index():
         if cf.exists():
             customers = json.loads(cf.read_text())
 
-        # 产出文件
+        # 产出文件及链接
         outputs_dir = BASE / "outputs"
-        ebooks = len(list((outputs_dir / "ebooks").glob("*.md"))) if (outputs_dir / "ebooks").exists() else 0
-        children = len(list((outputs_dir / "children_book").glob("*.md"))) if (outputs_dir / "children_book").exists() else 0
-        research = len(list((outputs_dir / "research").glob("*.md"))) if (outputs_dir / "research").exists() else 0
-        websites = len(list((outputs_dir / "website").glob("*.html"))) if (outputs_dir / "website").exists() else 0
+        def get_files(subdir, ext="*.md"):
+            p = outputs_dir / subdir
+            if not p.exists(): return []
+            return sorted([f.name for f in p.glob(ext)], key=lambda x: x.lower())
+
+        ebooks = get_files("ebooks")
+        children = get_files("children_book")
+        research_files = get_files("research")
+        websites = get_files("website", "*.html")
+        website_css = get_files("website", "*.css")
+        brand_files = get_files("brand_identity", "*")
 
         # 工具数
         tool_count = len(brain.tools.list_tools()) if hasattr(brain, 'tools') and brain.tools else 0
+        tools_list = brain.tools.list_tools() if hasattr(brain, 'tools') and brain.tools else []
 
         return f"""<!DOCTYPE html>
 <html lang="zh-TW">
@@ -167,11 +175,31 @@ td{{padding:6px 8px;border-bottom:1px solid #111122}}
   </div>
 
   <div class="card">
-    <h3>📝 產出總覽</h3>
-    <div class="stat-row"><span class="stat-label">電子書</span><span class="stat-val">{ebooks} 章</span></div>
-    <div class="stat-row"><span class="stat-label">童書</span><span class="stat-val">{children} 篇</span></div>
-    <div class="stat-row"><span class="stat-label">研究報告</span><span class="stat-val">{research} 篇</span></div>
-    <div class="stat-row"><span class="stat-label">網站頁面</span><span class="stat-val">{websites} 個</span></div>
+    <h3>📝 電子書 ({len(ebooks)} 章)</h3>
+    {''.join(f'<div class="stat-row"><span class="stat-label">{f[:50]}</span><a href="/view/ebooks/{f}?token={request.args.get("token","")}" style="color:#58a6ff;font-size:11px">查看</a></div>' for f in ebooks[:10])}
+    {f'<div style="color:#8b949e;font-size:11px;padding:4px 0">...還有 {len(ebooks)-10} 章</div>' if len(ebooks)>10 else ''}
+    {'<div style="color:#8b949e;font-size:12px;padding:8px 0">尚無電子書</div>' if not ebooks else ''}
+  </div>
+
+  <div class="card">
+    <h3>📚 童書 ({len(children)} 篇)</h3>
+    {''.join(f'<div class="stat-row"><span class="stat-label">{f[:50]}</span><a href="/view/children_book/{f}?token={request.args.get("token","")}" style="color:#58a6ff;font-size:11px">查看</a></div>' for f in children[:10])}
+    {f'<div style="color:#8b949e;font-size:11px;padding:4px 0">...還有 {len(children)-10} 篇</div>' if len(children)>10 else ''}
+    {'<div style="color:#8b949e;font-size:12px;padding:8px 0">尚無童書</div>' if not children else ''}
+  </div>
+
+  <div class="card">
+    <h3>🔬 研究報告 ({len(research_files)} 篇)</h3>
+    {''.join(f'<div class="stat-row"><span class="stat-label">{f[:45]}</span><a href="/view/research/{f}?token={request.args.get("token","")}" style="color:#58a6ff;font-size:11px">查看</a></div>' for f in research_files[:10])}
+    {f'<div style="color:#8b949e;font-size:11px;padding:4px 0">...還有 {len(research_files)-10} 篇</div>' if len(research_files)>10 else ''}
+    {'<div style="color:#8b949e;font-size:12px;padding:8px 0">尚無研究報告</div>' if not research_files else ''}
+  </div>
+
+  <div class="card">
+    <h3>🌐 網站</h3>
+    <div class="stat-row"><span class="stat-label">HTML 頁面</span><span class="stat-val">{len(websites)} 個</span></div>
+    {''.join(f'<div class="stat-row"><span class="stat-label">{f[:50]}</span><a href="/view/website/{f}?token={request.args.get("token","")}" style="color:#58a6ff;font-size:11px">查看</a></div>' for f in websites[:5])}
+    <div class="stat-row"><span class="stat-label">CSS 樣式</span><span class="stat-val">{len(website_css)} 個</span></div>
   </div>
 
   <div class="card">
@@ -189,8 +217,40 @@ td{{padding:6px 8px;border-bottom:1px solid #111122}}
         return f"<h1>錯誤</h1><pre>{e}</pre>"
 
 
-@app.route("/health")
-def health():
+@app.route("/view/<path:subpath>")
+def view_file(subpath):
+    """安全查看 outputs 目录下的文件"""
+    if brain is None:
+        return "⚠️ 黑曜尚未初始化", 503
+    BASE = Path(__file__).parent.parent.parent
+    safe_path = (BASE / "outputs" / subpath).resolve()
+    if not str(safe_path).startswith(str((BASE / "outputs").resolve())):
+        return "❌ 路徑不允許", 403
+    if not safe_path.exists():
+        return "❌ 檔案不存在", 404
+    if safe_path.suffix == ".html":
+        return safe_path.read_text(encoding="utf-8")
+    content = safe_path.read_text(encoding="utf-8")
+    return f"""<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{safe_path.name} | 黑曜</title>
+<style>
+body{{font-family:'Inter',-apple-system,sans-serif;background:#0a0a0f;color:#e0e0e0;max-width:800px;margin:0 auto;padding:20px;line-height:1.7}}
+a{{color:#58a6ff}}
+pre{{background:#111122;padding:16px;border-radius:8px;overflow-x:auto;white-space:pre-wrap}}
+h1,h2,h3{{color:#58a6ff}}
+code{{background:#1a1a2e;padding:2px 6px;border-radius:4px}}
+.back{{display:inline-block;margin-bottom:16px;color:#8b949e;text-decoration:none}}
+</style>
+</head>
+<body>
+<a href="/?token={request.args.get('token','')}" class="back">← 返回 Dashboard</a>
+<div style="white-space:pre-wrap">{content}</div>
+</body>
+</html>"""
     if brain is None:
         return jsonify({"status": "not ready"})
     try:
