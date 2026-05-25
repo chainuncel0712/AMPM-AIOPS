@@ -252,6 +252,73 @@ class EbookPipeline:
         sorted_topics = sorted(sales_by_topic.items(), key=lambda x: -x[1])
         return [t for t, s in sorted_topics[:5]]
 
+PANEY_MONEY_SERIES = [
+    ("PANEY & MONEY 的收收探險：玩具回家了！", "收玩具/生活自理", "3-6", "學會找到→分類→放回家"),
+    ("PANEY & MONEY 的洗手任務：泡泡打敗細菌", "洗手/衛生習慣", "3-6", "洗手也能像闖關"),
+    ("PANEY & MONEY 的刷牙特攻：牙牙星星亮晶晶", "刷牙/睡前儀式", "3-6", "刷牙流程＋晚安收尾"),
+    ("PANEY & MONEY 的睡前安心：我有點怕黑", "怕黑/情緒安撫", "3-6", "把害怕放好再睡"),
+    ("PANEY & MONEY 的上學安心：我想家了怎麼辦？", "分離焦慮", "3-6", "分離焦慮的安撫句"),
+    ("PANEY & MONEY 的輪流遊戲：一起玩更好玩", "輪流/分享", "3-6", "輪流不等於輸"),
+    ("PANEY & MONEY 的生氣火山：我需要冷靜一下", "生氣管理", "3-6", "生氣三步驟"),
+    ("PANEY & MONEY 的難過雲朵：我想要抱抱", "難過/表達需求", "3-6", "學會說出需要"),
+    ("PANEY & MONEY 的緊張蝴蝶：第一次也可以慢慢來", "緊張/面對新事物", "3-6", "面對新事物的勇氣"),
+    ("PANEY & MONEY 的害羞小屋：我想說你好", "害羞/社交勇氣", "3-6", "社交勇氣練習"),
+    ("PANEY & MONEY 的吃飯小勇氣：先嘗一口就好", "吃飯/飲食習慣", "3-6", "不逼吃也前進"),
+    ("PANEY & MONEY 的穿衣任務：自己來我可以", "穿衣/自理", "3-6", "自理成就感"),
+    ("PANEY & MONEY 的上廁所小隊：記得先說一聲", "如廁/自理", "3-6", "如廁提醒與安心"),
+    ("PANEY & MONEY 的出門安全：牽手不走丟", "外出安全", "3-6", "安全規則小故事"),
+    ("PANEY & MONEY 的收心回家：玩完要收尾", "作息轉場", "3-6", "從玩到收的轉場"),
+    ("PANEY & MONEY 的洗澡小泡泡：水不怕我", "洗澡/怕水", "3-6", "怕洗澡也有方法"),
+    ("PANEY & MONEY 的睡醒起床：早安三步驟", "起床/早晨作息", "3-6", "起床整理出發"),
+    ("PANEY & MONEY 的整理小書包：明天出發準備好", "整理/準備", "3-6", "睡前準備明天"),
+    ("PANEY & MONEY 的失敗也可以：再試一次就好", "挫折復原", "3-6", "挫折復原力"),
+    ("PANEY & MONEY 的吵吵停一下：小聲也能被聽見", "音量/表達", "3-6", "溝通不吼叫"),
+]
+
+PANEY_MONEY_STORIES = {
+    "收收探險": ("PANEY & MONEY 的收收探險：玩具回家了！",
+"""白天，PANEY 最喜歡出發探險；晚上，MONEY 最會把一切收得剛剛好，準備說晚安。
+今天，他們玩得好開心！積木、車車、娃娃都在地上開派對。可是——要睡覺了，房間還是亂亂的。
+
+PANEY 說：「我們來玩一個遊戲吧！幫玩具找到回家的路。」
+MONEY 點點頭：「找到家以後，就能安心休息，明天再玩！」
+
+這本書用孩子聽得懂的方式，把「收玩具」變成一場小小探險：
+1) 找到：先找一找，哪些玩具還在外面？
+2) 分類：一樣的放一起，積木一堆、車車一堆。
+3) 放回家：每一堆都有自己的家——玩具箱、籃子、架子。
+
+故事最後，MONEY 會帶孩子做「收尾」：把最後一件玩具放好、伸伸懶腰、深呼吸，然後說晚安。"""),
+    "睡前安心": ("PANEY & MONEY 的睡前安心：我有點怕黑",
+"""晚上到了，MONEY 把窗簾拉上，房間慢慢變暗。
+PANEY 看著角落，小小聲說：「我……有點怕黑。」
+
+MONEY 沒有笑，也沒有說「不要怕」。MONEY 說：「謝謝你告訴我。怕黑不是壞事，是心情在提醒你——你需要安心。」
+
+於是兩隻小貓一起做「晚安安心任務」：
+1) 說出來：「我現在覺得怕怕的。」
+2) 找一個光：夜燈、窗外的月亮、或手電筒的小星星。
+3) 做一個動作：抱抱、深呼吸、或握著小毯子。
+
+PANEY 發現：黑黑的房間裡，其實也有好多小線索——月亮在窗外、星星在天上、玩具在自己的家。
+MONEY 說：「我們不是把害怕趕走，我們是把害怕放好，放到安全的地方。」"""),
+    "生氣火山": ("PANEY & MONEY 的生氣火山：我需要冷靜一下",
+"""白天，PANEY 出發去玩。
+可是——積木倒了、輪到別人先玩、想要的東西拿不到……PANEY 的胸口熱熱的，眼睛也熱熱的。
+「我生氣了！」PANEY 的生氣像火山一樣，噗——要爆出來了。
+
+MONEY 走過來，沒有說「不要生氣」。MONEY 說：
+「生氣是在告訴你：你很在乎。現在，我們先保護自己和別人，做一個冷靜任務。」
+
+PANEY 跟著 MONEY 一步一步做：
+1) 停下來：先放下手裡的東西，站到安全的地方。
+2) 說出來：用力的時候也可以好好說——「我現在很生氣。」
+3) 做一個冷靜動作：深呼吸三次、抱抱自己、或喝一口水。
+
+慢慢的，火山不再噗噗跳了。PANEY 說：「我覺得……好一點了。」
+MONEY 微笑：「生氣會來，也會走。你做到了。」"""),
+}
+
 class KidBookPipeline:
     def __init__(self):
         self.books_file = DATA / "kidbooks.json"
@@ -276,28 +343,22 @@ class KidBookPipeline:
 
     def trend_analysis(self, llm_call=None) -> list:
         if llm_call:
-            prompt = "分析當前繁體中文市場 TOP10 最熱門的兒童繪本主題趨勢。列出 5 個主題，每個含書名建議、核心教育價值、適合年齡層。只要清單。"
+            prompt = "分析當前繁體中文市場 TOP20 最熱門的兒童繪本主題趨勢。列出 5 個主題，每個含書名建議、核心教育價值、適合年齡層。只要清單。"
             result = llm_call(prompt)
             self.last_trend = result
             self._save()
             return result
-        return random.sample([
-            ("小熊學勇敢", "勇氣", "3-6"),
-            ("小兔子的一天", "生活常規", "2-5"),
-            ("星星不見了", "友誼", "4-7"),
-            ("會說話的樹", "環保", "5-8"),
-            ("彩虹下的秘密", "好奇", "3-6"),
-            ("小廚師夢想", "堅持", "4-7"),
-            ("月亮想回家", "歸屬", "3-6"),
-            ("魔法畫筆", "創造", "5-8"),
-        ], 5)
+        return random.sample(PANEY_MONEY_SERIES, 5)
 
-    def select_theme(self, title, theme, age_range):
+    def select_theme(self, title, theme, age_range, topic_summary=""):
         book_id = hashlib.md5(f"KB-{title}-{int(time.time())}".encode()).hexdigest()[:12].upper()
         self.kidbooks.append({
             "id": book_id, "title": title, "theme": theme, "age_range": age_range,
+            "topic_summary": topic_summary,
             "status": "selected", "characters": [], "story": None, "illustrations": [],
-            "created_at": datetime.now().isoformat()
+            "created_at": datetime.now().isoformat(),
+            "series": "PANEY & MONEY 日夜探險",
+            "series_slogan": "白天勇敢出發，晚上安心回家",
         })
         self._save()
         cycle_log.record("kidbook", "select_theme", book_id, f"{title}/{theme}/{age_range}")
@@ -307,26 +368,52 @@ class KidBookPipeline:
         book = self._find(book_id)
         if not book:
             return "找不到書籍"
-        if llm_call:
-            prompt = f"為童書 '{book['title']}'（主題：{book['theme']}，年齡層：{book['age_range']}）創造 2-3 個角色。包含名字、外型、性格，每個角色 50 字以內。"
-            chars_text = llm_call(prompt)
-        else:
-            chars_text = f"角色1：主角（可愛小動物），角色2：好朋友（幫忙者），角色3：小挑戰（需要克服的困難）"
-        book["characters"] = chars_text
+        book["characters"] = "PANEY（白天貓）：負責出發、探索、開始做的白天任務。\nMONEY（夜晚貓）：負責收尾、安撫、說晚安的夜晚儀式。"
         book["status"] = "characters_done"
         self._save()
         cycle_log.record("kidbook", "create_characters", book_id)
-        return chars_text
+        return "PANEY（白天貓）+ MONEY（夜晚貓）"
 
     def write_story(self, book_id, llm_call=None):
         book = self._find(book_id)
         if not book:
             return "找不到書籍"
+        title = book.get("title", "")
+        theme = book.get("theme", "")
         if llm_call:
-            prompt = f"為童書 '{book['title']}'（主題：{book['theme']}，年齡層：{book['age_range']} 歲）寫一個完整故事。約 800 字，繁體中文，有教育意義，父母會想買。角色：{str(book.get('characters',''))[:200]}"
+            prompt = f"""為童書 '{title}'（PANEY & MONEY 系列，主題：{theme}，年齡層：3-6 歲）寫一個完整故事。
+
+系列設定：
+- PANEY（白天貓）：負責出發、探索、開始做
+- MONEY（夜晚貓）：負責收尾、安撫、說晚安
+- 口號：白天勇敢出發，晚上安心回家
+
+故事結構：
+1) 白天情境：PANEY 遇到一個狀況
+2) 一句話情緒：孩子能說出口的句型
+3) 一個小技巧：1 個可做的動作
+4) 晚上收尾：MONEY 帶入習慣
+5) 最後一頁：系列口號
+
+約 600 字，繁體中文，句子短，3-6 歲聽得懂。"""
             story = llm_call(prompt)
         else:
-            story = f"從前從前，{book['title']}……"
+            for key, (t, s) in PANEY_MONEY_STORIES.items():
+                if key in title or key in theme:
+                    story = s
+                    break
+            else:
+                story = f"""白天，PANEY 出發去探險。{title}——這是今天的新任務！
+
+PANEY 說：「我們來試試看吧！」
+MONEY 在旁邊點點頭：「慢慢來，我可以陪你。」
+
+他們一起完成了任務，學到了新東西。
+太陽下山了，MONEY 說：「天黑了，我們把東西收好，準備說晚安吧。」
+
+PANEY 深呼吸一口氣，說：「白天勇敢出發，晚上安心回家。」
+
+任務完成！"""
         book["story"] = story
         book["status"] = "story_done"
         self._save()
@@ -729,12 +816,15 @@ class PublisherEngine:
             try:
                 kid_themes = self.kidbook.trend_analysis(llm_call)
                 if isinstance(kid_themes, list):
-                    theme_data = kid_themes[0] if isinstance(kid_themes[0], tuple) else (
-                        "小故事大道理", "教育", "3-6")
-                    title, theme, age = theme_data
+                    td = kid_themes[0]
+                    if isinstance(td, (list, tuple)) and len(td) >= 3:
+                        title, theme, age = td[0], td[1], td[2]
+                        summary = td[3] if len(td) > 3 else ""
+                    else:
+                        title, theme, age, summary = "PANEY & MONEY 的收收探險：玩具回家了！", "收玩具", "3-6", "學會整理"
                 else:
-                    title, theme, age = "小熊學勇敢", "勇氣", "3-6"
-                kid = self.kidbook.select_theme(title, theme, age)
+                    title, theme, age, summary = "PANEY & MONEY 的睡前安心：我有點怕黑", "怕黑", "3-6", "情緒安撫"
+                kid = self.kidbook.select_theme(title, theme, age, summary)
                 results.append(f"  📖 新選題：《{title}》（{theme}/{age}）")
             except Exception as e:
                 results.append(f"  ❌ 新選題失敗: {e}")
