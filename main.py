@@ -679,15 +679,15 @@ def main():
         supervisor.register("bot", hb_interval=30, hb_timeout=120,
                             is_restartable=False, is_critical=True)
 
-        # ── 啟動資源偵查器官（確保管線永不枯竭） ──
+        # ── 啟動資源偵查機械組件（確保管線永不枯竭） ──
         try:
             from resource_scout import scout
             scout.start(interval_seconds=3600)
-            print("  [✅] 資源偵查器官已啟動 (每 1 小時)")
+            print("  [✅] 資源偵查機械組件已啟動 (每 1 小時)")
         except Exception as e:
             print(f"  [⚠️] 資源偵查啟動失敗: {e}")
 
-        # ── 啟動品質監督器官（確保每本完成不遺漏） ──
+        # ── 啟動品質監督機械組件（確保每本完成不遺漏） ──
         try:
             from pipeline_supervisor import supervisor as pipe_supervisor
             from pipeline_engine import engine
@@ -708,7 +708,7 @@ def main():
                     return report
                 pipe_supervisor.supervise = supervised_wrapper
             pipe_supervisor.start(engine, interval_seconds=1800)
-            print("  [✅] 品質監督器官已啟動 (每 30 分鐘)")
+            print("  [✅] 品質監督機械組件已啟動 (每 30 分鐘)")
         except Exception as e:
             print(f"  [⚠️] 品質監督啟動失敗: {e}")
 

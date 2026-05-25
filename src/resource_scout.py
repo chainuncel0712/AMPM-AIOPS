@@ -1,5 +1,5 @@
 """
-Resource Scout — 資源偵查器官
+Resource Scout — 資源偵查機械組件
 ================================
 自動外出尋找免費優質資源，確保出版管線永不枯竭。
 
@@ -277,7 +277,7 @@ class ResourceScout:
 
     def report(self) -> str:
         """人類可讀的狀態報告"""
-        lines = ["🔍 資源偵查器官狀態", "=" * 30]
+        lines = ["🔍 資源偵查機械組件狀態", "=" * 30]
         lines.append(f"  背景運行：{'🟢' if self._running else '🔴'}")
         lines.append(f"  上次偵查：{self.last_scout_time or '從未'}")
         lines.append("")

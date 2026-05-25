@@ -4,7 +4,7 @@ Service Website Pipeline — AMPM-AIOPS.COM 全自動 AI 客服+安裝網站
 零人工干預的完整服務流：
   客戶需求評估 → 方案推薦 → 付款 → 自動部署 → 售後支援 → 升級續約
 
-整合 execution_context 器官循環，由 PublisherEngine 統一調度
+整合 execution_context 機械組件循環，由 PublisherEngine 統一調度
 """
 import json, os, threading, time, hashlib, random
 from pathlib import Path

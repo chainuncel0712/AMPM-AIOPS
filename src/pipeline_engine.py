@@ -4,7 +4,7 @@ Publisher Engine — 統一出版循環引擎
 整合 3 條產線（電子書、童書、AI 客服網站）成一個自動化循環：
   市場調查 → 選題 → 內容生成 → 審核 → 上架 → 銷售追蹤 → 回饋選題
 
-器官協作模式：每條產線都是一個器官，由引擎統一調度
+機械組件協作模式：每條產線都是一個機械組件，由引擎統一調度
 """
 import json, os, threading, time, hashlib, random
 from pathlib import Path
@@ -218,7 +218,7 @@ class EbookPipeline:
         return f"過去 {days} 天銷售總額：${total}"
 
     def get_pipeline_status(self):
-        stages = {"selected": 0, "outline_done": 0, "content_done": 0,
+        stages = {"selected": 0, "outline_done": 0, "content_done": 0, "epub_done": 0,
                   "pending_review": 0, "approved": 0, "published": 0, "rejected": 0}
         for b in self.ebooks:
             s = b.get("status", "selected")
@@ -333,6 +333,35 @@ class KidBookPipeline:
         cycle_log.record("kidbook", "write_story", book_id)
         return story
 
+    def compile_epub(self, book_id):
+        book = self._find(book_id)
+        if not book:
+            return "找不到書籍"
+        if book.get("epub"):
+            return f"📚 《{book['title']}》EPUB 已存在"
+
+        cover = image_gen.generate_cover(book["title"], f"適合{book['age_range']}歲", "picture_book")
+
+        chars_images = image_gen.generate_character_sheet(book_id, str(book.get("characters", "")), "picture_book")
+        char_paths = [c["path"] for c in chars_images if c["success"]]
+
+        paras = [p for p in book.get("story", "").split("\n") if p.strip()]
+        page_images = []
+        for i, para in enumerate(paras[:10]):
+            ill = image_gen.generate_illustration(f"{book['title']} - {para[:50]}", "picture_book", book_id, i+1)
+            if ill["success"]:
+                page_images.append(ill["path"])
+            else:
+                page_images.append("")
+
+        all_images = char_paths + page_images
+        epub = compiler.compile_kidbook(book, all_images, cover["path"] if cover["success"] else None)
+        book["epub"] = epub
+        book["status"] = "epub_done"
+        self._save()
+        cycle_log.record("kidbook", "compile_epub", book_id, epub.get("epub_id", ""))
+        return f"📚 《{book['title']}》EPUB 編譯完成: {epub.get('epub_id', '')}"
+
     def submit_for_review(self, book_id):
         book = self._find(book_id)
         if not book:
@@ -378,7 +407,7 @@ class KidBookPipeline:
         return f"📚 《{book['title']}》已上架到 {len(plats)} 個平台"
 
     def get_pipeline_status(self):
-        stages = {"selected": 0, "characters_done": 0, "story_done": 0,
+        stages = {"selected": 0, "characters_done": 0, "story_done": 0, "epub_done": 0,
                   "pending_review": 0, "approved": 0, "published": 0, "rejected": 0}
         for b in self.kidbooks:
             s = b.get("status", "selected")
@@ -589,6 +618,13 @@ class PublisherEngine:
                 ebook_advanced += 1
                 break
             elif status == "content_done":
+                def _compile(b=book, bid=bid):
+                    return self.ebook.compile_epub(bid)
+                result = retry_call(f"編譯EPUB {bid}", lambda: _compile())
+                results.append(result)
+                ebook_advanced += 1
+                break
+            elif status == "epub_done":
                 gate = pipeline_supervisor.check_quality_gate(book, "ebook")
                 if gate["passed"]:
                     self.ebook.submit_for_review(bid)
@@ -626,6 +662,13 @@ class PublisherEngine:
                 kid_advanced += 1
                 break
             elif status == "story_done":
+                def _compile(b=book, bid=bid):
+                    return self.kidbook.compile_epub(bid)
+                result = retry_call(f"編譯EPUB {bid}", lambda: _compile())
+                results.append(result)
+                kid_advanced += 1
+                break
+            elif status == "epub_done":
                 gate = pipeline_supervisor.check_quality_gate(book, "kidbook")
                 if gate["passed"]:
                     self.kidbook.submit_for_review(bid)
@@ -641,7 +684,7 @@ class PublisherEngine:
                 kid_advanced += 1
                 break
 
-        # ── 2.5 器官協作：ResourceScout 提供繪圖風格給內容生成 ──
+        # ── 2.5 機械組件協作：ResourceScout 提供繪圖風格給內容生成 ──
         if kid_advanced > 0 or True:
             ill_style = resource_scout.pick_random_illustration_style()
             img_src = resource_scout.pick_random_image_source()

@@ -7,7 +7,7 @@ Telegram AI Bot 授權系統 + 三條自動出版管線。用戶付 USDT → 自
 
 | Repository | 可見性 | 狀態 |
 |------------|--------|------|
-| **AMPM-AIOPS** (public) | 🔓 Public | ✅ 運行中 50 器官正常 |
+| **AMPM-AIOPS** (public) | 🔓 Public | ✅ 運行中 50 機械組件正常 |
 | **AMPM-KEL** (private) | 🔒 Private | ✅ 3 commits, 220+ 源碼檔案 |
 | **ampm-core** (public) | 🔓 Public | ✅ v0.1.0, 首次 commit |
 | **AMPM-PLUGINS** (public) | 🔓 Public | ✅ 首次 commit, 插件骨架 |
@@ -17,9 +17,9 @@ Telegram AI Bot 授權系統 + 三條自動出版管線。用戶付 USDT → 自
 
 ## 🏭 出版工廠架構（2026-05-25 新增）
 
-### 新增 3 個出版器官（原 47 → 現 50）
+### 新增 3 個出版機械組件（原 47 → 現 50）
 
-| 器官 | 檔名 | 功能 | 頻率 |
+| 機械組件 | 檔名 | 功能 | 頻率 |
 |------|------|------|------|
 | 🦅 **ResourceScout** | `src/resource_scout.py` | 外出找免費優質資源（圖片/字型/API/趨勢/工具） | 每 1 小時 |
 | 🏭 **PublisherEngine** | `src/pipeline_engine.py` | 統一出版循環引擎，整合電子書/童書/客服網站三條產線 | `/publish cycle` |
@@ -33,11 +33,11 @@ ResourceScout (資源補充)
 PublisherEngine.auto_cycle
     ├── EbookPipeline  (電子工具書)
     │   ├── trend_analysis → select_topic → generate_outline
-    │   ├── write_content → quality_gate → submit_for_review
+    │       │   ├── write_content → compile_epub → quality_gate → submit_for_review
     │   └── approve → publish (Amazon KDP + 14 平台)
     ├── KidBookPipeline (童書)
     │   ├── trend_analysis → select_theme → create_characters
-    │   ├── write_story → quality_gate → submit_for_review
+    │       ├── write_story → compile_epub → quality_gate → submit_for_review
     │   └── approve → publish (Amazon KDP + 14 平台)
     └── ServiceWebsitePipeline (AI 客服網站)
         ├── create_site → auto_deploy → record_order
@@ -49,7 +49,7 @@ Telegram 日報 (每 10 分鐘)
 ```
 
 ### 品質原則
-- **單一執行權威**：ExecutionContext 是唯一決策者，所有器官只能 observe，不能 override
+- **單一執行權威**：ExecutionContext 是唯一決策者，所有機械組件只能 observe，不能 override
 - **不跳過不卡住**：失敗自動重試 3 次，絕不跳過步驟
 - **人工審核閘門**：所有內容到 `pending_review` 停住，等人類批准才能上架
 - **品質監督只報警不阻擋**：標記問題但不阻擋流程
@@ -76,7 +76,7 @@ Telegram 日報 (每 10 分鐘)
 ### 黑曜主體
 - **PID**: 2807917
 - **運行時間**: 持續成長中
-- **器官**: 50/50 正常（47 原有 + 3 新出版器官）
+- **機械組件**: 50/50 正常（47 原有 + 3 新出版機械組件）
 - **LLM 供應鏈**: DeepSeek (primary) → NVIDIA NIM (secondary) → Ollama (fallback, 本機未啟動)
 - **Dashboard**: http://localhost:5050 ✅
 - **Log**: `/tmp/黑曜.log`
@@ -132,8 +132,8 @@ Telegram 日報 (每 10 分鐘)
 ### 出版管線（新增）
 - `src/pipeline_engine.py` — 統一出版引擎，管理三條產線的循環
 - `src/pipeline_service.py` — AMPM-AIOPS.COM 客服網站專用管線
-- `src/resource_scout.py` — 資源偵查器官，管理 37 個免費資源來源
-- `src/pipeline_supervisor.py` — 品質監督器官，計算完成率與停滯監控
+- `src/resource_scout.py` — 資源偵查機械組件，管理 37 個免費資源來源
+- `src/pipeline_supervisor.py` — 品質監督機械組件，計算完成率與停滯監控
 
 ### 資料檔案
 - `data/licenses.json` — 授權資料庫
@@ -158,9 +158,9 @@ Telegram 日報 (每 10 分鐘)
 6. `dashboard/pricing.html` 舊版定價 ($29/$99/$199) 需處理或刪除
 
 ## 核心設計原則
-- **單一執行權威**：ExecutionContext 是唯一決策者，禁止任何器官修改 execution path
+- **單一執行權威**：ExecutionContext 是唯一決策者，禁止任何機械組件修改 execution path
 - **不跳過**：失敗自動重試（最多 3 次），絕不跳過未完成的書
-- **只觀察不阻擋**：監督器官只能報警，不能 halt 流程
+- **只觀察不阻擋**：監督機械組件只能報警，不能 halt 流程
 - **人工審核閘門**：所有內容必須人類批准才能上架
 - **資源自給自足**：ResourceScout 確保 37 個免費來源永遠活著
 

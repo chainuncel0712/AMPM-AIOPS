@@ -1,7 +1,7 @@
 """
-PipelineSupervisor — 出版管線品質監督器官
+PipelineSupervisor — 出版管線品質監督機械組件
 ==========================================
-⚠️ 重要：本器官只能 observe + 報警，不能 blocking 流程。
+⚠️ 重要：本機械組件只能 observe + 報警，不能 blocking 流程。
    執行決策權完全在 ExecutionContext，違者視為 bug。
 
 職責（僅限觀察）：
@@ -287,7 +287,7 @@ class PipelineSupervisor:
     def report(self) -> str:
         st = self.status()
         lines = []
-        lines.append("🔎 品質監督器官狀態")
+        lines.append("🔎 品質監督機械組件狀態")
         lines.append("=" * 30)
         lines.append(f"  背景運行：{'🟢' if st['running'] else '🔴'}")
         lines.append(f"  監督次數：{st['cycles']}")
