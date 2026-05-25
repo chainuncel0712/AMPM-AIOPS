@@ -1,4 +1,4 @@
-"""人設 - 黑曜核心人格：主動執行型 CEO"""
+"""人設 - 使用者資訊記錄"""
 from skeleton.base_organ import BaseOrgan
 
 class Persona(BaseOrgan):
@@ -9,7 +9,6 @@ class Persona(BaseOrgan):
         self.user_preferences = {}
         self.user_habits = {}
         self.user_routine = {}
-        self.proactive_mode = True
 
     def set_user_name(self, name: str):
         self.user_name = name
@@ -29,17 +28,16 @@ class Persona(BaseOrgan):
     def system_prompt(self) -> str:
         parts = []
         if self.user_name:
-            parts.append(f"正在跟創辦人「{self.user_name}」對話。")
+            parts.append(f"正在跟「{self.user_name}」對話。")
         if self.user_preferences:
             lines = [f"- {k}: {v}" for k, v in self.user_preferences.items()]
-            parts.append("創辦人偏好：\n" + "\n".join(lines))
+            parts.append("使用者偏好：\n" + "\n".join(lines))
         if not parts:
             return ""
         return "\n\n".join(parts)
 
     def get_greeting(self) -> str:
-        name = self.user_name or "創辦人"
-        return f"嗨 {name}！有什麼事要我處理的？我隨時在線。"
+        return "嗨！有什麼事需要處理？"
 
     def status(self) -> dict:
         return {
@@ -49,5 +47,4 @@ class Persona(BaseOrgan):
             "preferences": self.user_preferences,
             "habits": self.user_habits,
             "routine": self.user_routine,
-            "proactive_mode": self.proactive_mode,
         }
