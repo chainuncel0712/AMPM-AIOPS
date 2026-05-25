@@ -662,6 +662,76 @@ def main():
             else:
                 await update.message.reply_text(reply)
 
+        async def git_status_cmd(update, context):
+            import subprocess
+            lines = ["🔧 Git 狀態", "=" * 20]
+            try:
+                r = subprocess.run(["git", "log", "--oneline", "-10"],
+                                   capture_output=True, text=True, timeout=10,
+                                   cwd=str(Path(__file__).parent))
+                if r.returncode == 0:
+                    for i, commit in enumerate(r.stdout.strip().split("\n")[:10]):
+                        lines.append(f"  {commit}")
+                else:
+                    lines.append(f"  git error: {r.stderr[:100]}")
+                r2 = subprocess.run(["git", "branch", "--show-current"],
+                                     capture_output=True, text=True, timeout=5,
+                                     cwd=str(Path(__file__).parent))
+                lines.append(f"\n🌿 分支: {r2.stdout.strip()}")
+                r3 = subprocess.run(["git", "status", "--porcelain"],
+                                     capture_output=True, text=True, timeout=5,
+                                     cwd=str(Path(__file__).parent))
+                changed = [l for l in r3.stdout.strip().split("\n") if l]
+                lines.append(f"📝 未追蹤/變更: {len(changed)} 個檔案")
+            except Exception as e:
+                lines.append(f"  錯誤: {e}")
+            await update.message.reply_text("\n".join(lines))
+
+        async def domain_status_cmd(update, context):
+            import urllib.request, ssl
+            lines = ["🌐 網域狀態", "=" * 20]
+            domains = {
+                "ampm-aiops.com": "https://ampm-aiops.com",
+                "dashboard.ampm-aiops.com": "https://dashboard.ampm-aiops.com",
+            }
+            for name, url in domains.items():
+                try:
+                    req = urllib.request.Request(url, method="HEAD")
+                    ctx = ssl.create_default_context()
+                    resp = urllib.request.urlopen(req, context=ctx, timeout=5)
+                    lines.append(f"  ✅ {name} → {resp.status}")
+                except Exception as e:
+                    lines.append(f"  ❌ {name} → {str(e)[:50]}")
+            lines.append("─" * 20)
+            lines.append("🔗 LLM 供應鏈:")
+            try:
+                import requests
+                r = requests.get("http://localhost:11434/api/tags", timeout=3)
+                models = r.json().get("models", [])
+                lines.append(f"  ✅ Ollama → {len(models)} models")
+            except:
+                lines.append("  ❌ Ollama 未連線")
+            await update.message.reply_text("\n".join(lines))
+
+        async def llm_health_cmd(update, context):
+            """ping 所有 LLM provider"""
+            import requests, os
+            lines = ["⚡ LLM 供應鏈健康", "=" * 20]
+            providers = [
+                ("DeepSeek", "https://api.deepseek.com/v1/models", os.getenv("DEEPSEEK_API_KEY","")),
+                ("NVIDIA NIM", "https://integrate.api.nvidia.com/v1/models", os.getenv("NVIDIA_API_KEY","")),
+                ("OpenRouter", "https://openrouter.ai/api/v1/models", os.getenv("OPENROUTER_API_KEY","")),
+                ("Together", "https://api.together.xyz/v1/models", os.getenv("TOGETHER_API_KEY","")),
+            ]
+            for name, url, key in providers:
+                try:
+                    r = requests.get(url, headers={"Authorization": f"Bearer {key}"}, timeout=5)
+                    status = "✅" if r.status_code < 500 else "⚠️"
+                    lines.append(f"  {status} {name} → HTTP {r.status_code}")
+                except Exception as e:
+                    lines.append(f"  ❌ {name} → {str(e)[:40]}")
+            await update.message.reply_text("\n".join(lines))
+
         async def customers_cmd(update, context):
             all_c = dispatcher.get_customers_summary()
             if not all_c:
@@ -679,13 +749,21 @@ def main():
         app.add_handler(CommandHandler("customers", customers_cmd))
         app.add_handler(CommandHandler("train", train_cmd))
         app.add_handler(CommandHandler("publish", publish_cmd))
-        app.add_handler(CommandHandler("customers", customers_cmd))
-        app.add_handler(CommandHandler("train", train_cmd))
+        app.add_handler(CommandHandler("git", git_status_cmd))
+        app.add_handler(CommandHandler("domain", domain_status_cmd))
+        app.add_handler(CommandHandler("llm", llm_health_cmd))
         app.add_handler(MessageHandler(filters.TEXT, handle))
         
         print("  [✅] Bot 已啟動")
         supervisor.register("bot", hb_interval=30, hb_timeout=120,
                             is_restartable=False, is_critical=True)
+
+        # ── Telegram 推送輔助（多模組共用） ──
+        async def tg_push(msg: str):
+            for uid in AUTHORIZED:
+                try:
+                    await app.bot.send_message(chat_id=uid, text=msg[:4000])
+                except: pass
 
         # ── 啟動自我進化引擎 ──
         try:
@@ -714,12 +792,7 @@ def main():
         # ── 啟動成長追蹤 ──
         try:
             from growth_tracker import growth_tracker
-            async def tg_send_report(msg):
-                for uid in AUTHORIZED:
-                    try:
-                        await app.bot.send_message(chat_id=uid, text=msg[:4000])
-                    except: pass
-            growth_tracker.set_telegram(lambda m: None)
+            growth_tracker.set_telegram(tg_push)
             growth_tracker.start(interval_hours=720, llm_fn=None)
             print("  [✅] 成長追蹤已啟動 (每 30 天)")
         except Exception as e:
@@ -738,13 +811,7 @@ def main():
             from pipeline_supervisor import supervisor as pipe_supervisor
             from pipeline_engine import engine
             if AUTHORIZED:
-                async def supervisor_alert(msg: str):
-                    for uid in AUTHORIZED:
-                        try:
-                            await app.bot.send_message(chat_id=uid, text=msg)
-                        except:
-                            pass
-                pipe_supervisor.set_alert_callback(lambda m: None)
+                pipe_supervisor.set_alert_callback(tg_push)
                 pipe_supervisor._last_alert = None
                 original_supervise = pipe_supervisor.supervise
                 def supervised_wrapper(engine):
@@ -808,6 +875,25 @@ def main():
             await app.start()
             await app.updater.start_polling(drop_pending_updates=True)
             print("[Bot] 輪詢已啟動，等待訊息...", flush=True)
+            if AUTHORIZED:
+                try:
+                    import subprocess
+                    r = subprocess.run(["git", "log", "--oneline", "-5"],
+                                        capture_output=True, text=True, timeout=5,
+                                        cwd=str(Path(__file__).parent))
+                    git_summary = r.stdout.strip()[:500] if r.returncode == 0 else "(無法讀取)"
+                    r2 = subprocess.run(["git", "branch", "--show-current"],
+                                         capture_output=True, text=True, timeout=5,
+                                         cwd=str(Path(__file__).parent))
+                    branch = r2.stdout.strip()
+                    startup_msg = f"🧠 黑曜已上線\n🌿 分支: {branch}\n🔧 最近更新:\n{git_summary}\n📊 dashboard.ampm-aiops.com"
+                    for uid in AUTHORIZED:
+                        try:
+                            await app.bot.send_message(chat_id=uid, text=startup_msg[:4000])
+                        except:
+                            pass
+                except Exception as e:
+                    print(f"[啟動通知] 發送失敗: {e}")
             await _asyncio.Event().wait()
         try:
             _asyncio.run(_run_bot())
