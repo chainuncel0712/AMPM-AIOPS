@@ -160,6 +160,7 @@ def index():
                 if kw in name_lower:
                     topic = label; break
             ebook_topics.append({**f, "topic": topic})
+        return f"""<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
 <meta charset="utf-8">
@@ -195,7 +196,10 @@ td{{padding:6px 8px;border-bottom:1px solid #111122}}
     <h1>⚙️ 黑曜 Dashboard</h1>
     <span>AMPM-AIOPS · 更新於 {NOW}</span>
   </div>
-  <span style="color:#3fb950">● 運行中</span>
+  <div>
+    <a href="/publish?token={request.args.get('token','')}" style="color:#3fb950;text-decoration:none;font-size:13px;margin-right:16px">🚀 上架系統</a>
+    <span style="color:#3fb950">● 運行中</span>
+  </div>
 </div>
 
 <div class="grid">
@@ -215,7 +219,9 @@ td{{padding:6px 8px;border-bottom:1px solid #111122}}
     <div class="stat-row" style="margin-top:8px"><span class="stat-label">品牌素材</span><span class="stat-val">{len(brand_data)} 個檔案</span></div>
     {''.join(f'<div class="stat-row"><span class="stat-label">{b["name"][:30]}</span><span class="stat-val">{b["size"]:,}B</span></div>' for b in brand_data[:8])}
   </div>
-    <div class="stat-row"><span class="stat-label">CPU</span><span class="stat-val">{cpu}%</span></div>
+
+  <div class="card">
+    <h3>🖥️ 系統資源</h3>    <div class="stat-row"><span class="stat-label">CPU</span><span class="stat-val">{cpu}%</span></div>
     <div class="stat-row"><span class="stat-label">記憶體</span><span class="stat-val">{mem}</span></div>
     <div class="stat-row"><span class="stat-label">磁碟</span><span class="stat-val">{disk}</span></div>
     <div class="stat-row"><span class="stat-label">Bot 運行</span><span class="stat-val">{bot_uptime}</span></div>
@@ -247,6 +253,7 @@ td{{padding:6px 8px;border-bottom:1px solid #111122}}
   <div class="card">
     <h3>📝 電子書 ({ebook_ok}/{ebook_total} 已審核)</h3>
     <div style="background:#1a1a2e;border-radius:6px;height:6px;margin-bottom:12px"><div style="background:#3fb950;height:6px;border-radius:6px;width:{ebook_ok/max(ebook_total,1)*100:.0f}%"></div></div>
+    <div style="margin-bottom:8px"><a href="/review/approved/ebooks" style="color:#3fb950;font-size:10px;text-decoration:none;margin-right:12px">✓ 全部通過</a><a href="/review/pending/ebooks" style="color:#d29922;font-size:10px;text-decoration:none">↻ 全部重置</a></div>
     {''.join(f'<div class="stat-row"><span class="stat-label">{f["icon"]} {f["name"][:30]}</span><span class="stat-val" style="font-size:10px">{f["chars"]:,}字</span><a href="/view/ebooks/{f["name"]}?token=' + request.args.get("token","") + '" style="color:#58a6ff;font-size:10px">查看</a><a href="/review/approved/{f["key"]}" style="color:#3fb950;font-size:10px;margin:0 4px">✓</a><a href="/review/rejected/{f["key"]}" style="color:#e94560;font-size:10px">✗</a></div>' for f in ebooks[:20])}
     {f'<div style="color:#8b949e;font-size:11px;padding:4px 0">...還有 {len(ebooks)-20} 章</div>' if len(ebooks)>20 else ''}
   </div>
@@ -287,7 +294,7 @@ td{{padding:6px 8px;border-bottom:1px solid #111122}}
 
 @app.route("/review/<status>/<path:subpath>")
 def review_file(status, subpath):
-    """人工審核：approved / rejected / pending"""
+    """人工審核：approved / rejected / pending (支援批次)"""
     if status not in ("approved", "rejected", "pending"):
         return "❌ 無效狀態", 400
     BASE = Path(__file__).parent.parent.parent
@@ -296,9 +303,110 @@ def review_file(status, subpath):
     reviews = {}
     if review_file.exists():
         reviews = json.loads(review_file.read_text())
+
+    batch_dirs = {"ebooks", "children_book", "research"}
+    if subpath in batch_dirs:
+        d = BASE / "outputs" / subpath
+        if d.exists():
+            for f in d.glob("*.md"):
+                reviews[f"{subpath}/{f.name}"] = status
+        review_file.write_text(json.dumps(reviews, ensure_ascii=False, indent=2))
+        return f'<script>history.back()</script><p>{subpath} → 全部 {status}</p>', 200
+
     reviews[subpath] = status
     review_file.write_text(json.dumps(reviews, ensure_ascii=False, indent=2))
     return f'<script>history.back()</script><p>{subpath} → {status}</p>', 200
+
+
+@app.route("/publish")
+def publish_page():
+    """自動上架管理頁"""
+    BASE = Path(__file__).parent.parent.parent
+    review_file = BASE / "data" / "pipeline" / "reviews.json"
+    reviews = {}
+    if review_file.exists():
+        reviews = json.loads(review_file.read_text())
+
+    pub_log_file = BASE / "data" / "publisher_log.json"
+    pub_logs = []
+    if pub_log_file.exists():
+        try: pub_logs = json.loads(pub_log_file.read_text())[-20:]
+        except: pass
+
+    # 已审核通过的电子书
+    approved_ebooks = []
+    outputs_dir = BASE / "outputs"
+    for subdir, label in [("ebooks", "電子書"), ("children_book", "童書")]:
+        d = outputs_dir / subdir
+        if d.exists():
+            for f in sorted(d.glob("*.md")):
+                key = f"{subdir}/{f.name}"
+                if reviews.get(key) == "approved":
+                    try: chars = len(f.read_text(encoding="utf-8"))
+                    except: chars = 0
+                    approved_ebooks.append({"key": key, "name": f.name, "chars": chars, "type": label})
+
+    return f"""<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>自動上架 | 黑曜</title>
+<style>
+*{{margin:0;padding:0;box-sizing:border-box}}
+body{{font-family:system-ui,sans-serif;background:#0a0a0f;color:#e0e0e0;padding:30px;max-width:900px;margin:0 auto}}
+h1{{color:#58a6ff;font-size:20px;margin-bottom:20px}}
+.card{{background:#111122;border:1px solid #1e1e3a;border-radius:12px;padding:20px;margin-bottom:16px}}
+.card h3{{color:#8b949e;font-size:13px;text-transform:uppercase;margin-bottom:12px}}
+.stat-row{{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #1a1a2e;font-size:13px}}
+.stat-label{{color:#8b949e}}
+.stat-val{{color:#e0e0e0}}
+.btn{{display:inline-block;padding:8px 16px;border-radius:6px;text-decoration:none;font-size:12px;margin:4px;cursor:pointer;border:none}}
+.btn-green{{background:#238636;color:#fff}}
+.btn-blue{{background:#1f6feb;color:#fff}}
+.btn-red{{background:#da3633;color:#fff}}
+.btn-gray{{background:#30363d;color:#8b949e}}
+.publish-log{{font-size:11px;color:#8b949e;max-height:300px;overflow-y:auto}}
+a{{color:#58a6ff}}
+</style>
+</head>
+<body>
+<h1>🚀 自動上架系統</h1>
+<a href="/?token={request.args.get('token','')}" style="color:#8b949e;font-size:12px">← 返回 Dashboard</a>
+
+<div class="card">
+<h3>✅ 已審核通過，待上架 ({len(approved_ebooks)} 本)</h3>
+{''.join(f'<div class="stat-row"><span class="stat-label">{b["type"]}: {b["name"][:40]}</span><span class="stat-val">{b["chars"]:,}字</span><a href="/view/{b["key"]}?token=' + request.args.get("token","") + '" class="btn btn-blue">预览</a></div>' for b in approved_ebooks) if approved_ebooks else '<div style="color:#8b949e;padding:8px">尚無審核通過的內容。請先到 Dashboard 審核章節。</div>'}
+</div>
+
+<div class="card">
+<h3>⚙️ 上架平台狀態</h3>
+<div class="stat-row"><span class="stat-label">Readmoo</span><span class="stat-val">{'✅ 已設定' if os.getenv('READMOO_EMAIL') else '❌ 未設定憑證'}</span></div>
+<div class="stat-row"><span class="stat-label">Amazon KDP</span><span class="stat-val">{'✅ 已設定' if os.getenv('KDP_EMAIL') else '❌ 未設定憑證'}</span></div>
+<div style="margin-top:12px;color:#8b949e;font-size:11px">
+設定位於 .env：READMOO_EMAIL / READMOO_PASSWORD / KDP_EMAIL / KDP_PASSWORD
+</div>
+</div>
+
+<div class="card">
+<h3>📋 上架紀錄 (最近 {len(pub_logs)} 筆)</h3>
+<div class="publish-log">
+{''.join(f'<div style="padding:4px 0">{e.get("ts","")[:16]} | {"✅" if e.get("success") else "❌"} {e.get("platform","?")} | {e.get("title","?")}</div>' for e in reversed(pub_logs)) if pub_logs else '<div style="color:#8b949e">尚無上架紀錄</div>'}
+</div>
+</div>
+
+<div class="card">
+<h3>📖 上架指令 (Telegram)</h3>
+<div style="font-size:12px;color:#8b949e;line-height:1.8">
+/publish status — 管線狀態<br>
+/publish ebook trend — 市場趨勢<br>
+/publish ebook select &lt;主題&gt; — 選題<br>
+/publish approve &lt;book_id&gt; — 批准<br>
+/publish publish &lt;book_id&gt; — 上架<br>
+/publish publisher status — 上架機械組件狀態
+</div>
+</div>
+
+</body></html>"""
 
 
 @app.route("/view/<path:subpath>")
@@ -315,7 +423,7 @@ def view_file(subpath):
     if safe_path.suffix == ".html":
         return safe_path.read_text(encoding="utf-8")
     content = safe_path.read_text(encoding="utf-8")
-  return f"""<!DOCTYPE html>
+    return f"""<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
 <meta charset="utf-8">
