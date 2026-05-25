@@ -153,19 +153,42 @@ def index():
                 if f.name.startswith("."): continue
                 brand_data.append({"name": f.name, "size": f.stat().st_size})
 
-        # 电子书选题 (从 ebook 文件名提取主题)
+        # 电子书主题分类
+        topic_map = {
+            "intro": {"label": "📗 AI 入门导读", "cat": "AI入门"},
+            "ai_introduction": {"label": "📗 AI 入门导读", "cat": "AI入门"},
+            "test_chapter1": {"label": "📗 AI 入门导读", "cat": "AI入门"},
+            "agent_era": {"label": "🤖 AI 代理时代", "cat": "AI代理"},
+            "agent_as_employee": {"label": "🤖 AI 代理当做员工", "cat": "AI代理"},
+            "multi_agent": {"label": "🤖 多代理协作", "cat": "AI代理"},
+            "ai_agent_money": {"label": "💰 AI 变现", "cat": "变现"},
+            "truth_about_ai_passive_income": {"label": "💰 AI 被动收入真相", "cat": "变现"},
+            "monetize": {"label": "💰 AI 变现策略", "cat": "变现"},
+            "prompt": {"label": "💬 AI 提示工程", "cat": "提示工程"},
+            "prompt_skills": {"label": "💬 提示技巧实战", "cat": "提示工程"},
+            "tools": {"label": "🔧 AI 工具介绍", "cat": "工具"},
+            "mistakes": {"label": "⚠️ 常见错误避坑", "cat": "风险管理"},
+            "you_are_written_by_rules": {"label": "⚠️ 规则陷阱", "cat": "风险管理"},
+            "what_is_aiops": {"label": "⚙️ AIOps 入门", "cat": "AIOps"},
+            "adler_philosophy": {"label": "🧠 哲学视角", "cat": "哲学"},
+            "book_structure": {"label": "📐 书籍结构研究", "cat": "结构"},
+            "ch04": {"label": "📝 第4章 暂未分类", "cat": "待分类"},
+            "ch05": {"label": "📝 第5章 暂未分类", "cat": "待分类"},
+        }
+        def match_topic(name):
+            n = name.lower().replace(".md", "")
+            for key, info in topic_map.items():
+                if key in n:
+                    return info
+            return {"label": "📝 " + n[:30], "cat": "待分类"}
+
         ebook_topics = []
-        topic_keywords = {"intro": "入门导览", "agent": "AI代理", "prompt": "提示技巧", "tools": "工具介绍",
-                          "monetize": "变现策略", "mistakes": "常见错误", "truth": "真相揭露",
-                          "passive": "被动收入", "aiops": "AIOps", "adler": "哲学视角",
-                          "multi": "多代理协作", "structure": "结构研究"}
+        seen_cats = set()
         for f in ebooks:
-            name_lower = f["name"].lower()
-            topic = "综合"
-            for kw, label in topic_keywords.items():
-                if kw in name_lower:
-                    topic = label; break
-            ebook_topics.append({**f, "topic": topic})
+            t = match_topic(f["name"])
+            ebook_topics.append({**f, "label": t["label"], "cat": t["cat"]})
+            seen_cats.add(t["cat"])
+        ebook_topics.sort(key=lambda x: (list(topic_map.values()).index(next((v for k,v in topic_map.items() if k in x["name"].lower()), {"label":"zzz","cat":"待分类"})), x["name"]))
         return f"""<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -211,16 +234,26 @@ td{{padding:6px 8px;border-bottom:1px solid #111122}}
 <div class="grid">
   <!-- 选題審閱 -->
   <div class="card" style="grid-column:span 2">
-    <h3>🎯 電子書選題審閱</h3>
+    <h3>🎯 電子書選題審閱 (依分類)</h3>
     <table>
-    <tr><th>主题</th><th>章节</th><th>字数</th><th>審核</th><th>操作</th></tr>
-    {''.join(f'<tr><td>{t["topic"]}</td><td>{t["name"][:35]}</td><td>{t["chars"]:,}</td><td>{t["icon"]}</td><td><a href="/view/ebooks/{t["name"]}?token=' + request.args.get("token","") + '" style="color:#58a6ff;font-size:11px">预览</a> <a href="/review/approved/{t["key"]}" style="color:#3fb950;font-size:11px;margin:0 4px">✓</a> <a href="/review/rejected/{t["key"]}" style="color:#e94560;font-size:11px">✗</a></td></tr>' for t in ebook_topics)}
+    <tr><th>分類</th><th>章節</th><th>字數</th><th>審核</th><th>操作</th></tr>
+    {''.join(f'<tr><td>{t["cat"]}</td><td>{t["label"]}</td><td>{t["chars"]:,}</td><td>{t["icon"]}</td><td><a href="/view/ebooks/{t["name"]}?token=' + request.args.get("token","") + '" style="color:#58a6ff;font-size:11px">预览</a> <a href="/review/approved/{t["key"]}" style="color:#3fb950;font-size:11px;margin:0 4px">✓通過</a> <a href="/review/rejected/{t["key"]}" style="color:#e94560;font-size:11px">✗淘汰</a></td></tr>' for t in ebook_topics)}
     </table>
+    <div style="font-size:11px;color:#8b949e;margin-top:8px">✓ 通過 → 進入編譯流程 | ✗ 淘汰 → 記憶此類主題減少出現</div>
   </div>
 
   <!-- IP 角色 -->
   <div class="card" style="grid-column:span 2">
-    <h3>🎭 IP 角色管理 (PANEY & MONEY)</h3>
+    <h3>🎨 美術素材 / 插畫</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+    {''.join(f'<div style="text-align:center;font-size:10px;color:#8b949e"><img src="/asset/{img.name}?token=' + request.args.get("token","") + '" style="width:80px;height:80px;object-fit:cover;border-radius:6px;border:1px solid #1e1e3a"><br>{img.name[:20]}</div>' for img in sorted((BASE/"assets").glob("*"), key=lambda x: x.name) if img.suffix in ('.png','.jpg','.svg','.webp','.gif'))}
+    {''.join(f'<div style="text-align:center;font-size:10px;color:#8b949e"><img src="/asset/brand_identity/{img.name}?token=' + request.args.get("token","") + '" style="width:80px;height:80px;object-fit:cover;border-radius:6px;border:1px solid #1e1e3a"><br>{img.name[:20]}</div>' for img in sorted((BASE/"outputs"/"brand_identity").glob("*"), key=lambda x: x.name) if img.suffix in ('.png','.jpg','.svg','.webp','.gif'))}
+    </div>
+    <div style="font-size:11px;color:#8b949e">上傳新插畫到 assets/ 目錄即可在此預覽</div>
+  </div>
+
+  <div class="card" style="grid-column:span 2">
+    <h3>🎭 IP 角色設定 (PANEY & MONEY)</h3>
     {''.join(f'<div class="stat-row"><span class="stat-label">📖 {f["name"]}</span><a href="/view/character_ip/{f["name"]}?token=' + request.args.get("token","") + '" style="color:#58a6ff;font-size:11px">查看</a></div><div style="color:#8b949e;font-size:11px;padding:4px 12px 8px">{f["preview"][:150]}...</div>' for f in ip_files) if ip_files else '<div style="color:#8b949e;font-size:12px;padding:8px 0">尚無 IP 設定檔</div>'}
     <div class="stat-row" style="margin-top:8px"><span class="stat-label">品牌素材</span><span class="stat-val">{len(brand_data)} 個檔案</span></div>
     {''.join(f'<div class="stat-row"><span class="stat-label">{b["name"][:30]}</span><span class="stat-val">{b["size"]:,}B</span></div>' for b in brand_data[:8])}
@@ -342,11 +375,34 @@ def review_file(status, subpath):
             for f in d.glob("*.md"):
                 reviews[f"{subpath}/{f.name}"] = status
         review_file.write_text(json.dumps(reviews, ensure_ascii=False, indent=2))
-        return f'<script>history.back()</script><p>{subpath} → 全部 {status}</p>', 200
+        return f'<meta http-equiv="refresh" content="0;url=/?token={request.args.get("token","")}"><p>{subpath} → 全部 {status}</p>', 200
 
     reviews[subpath] = status
     review_file.write_text(json.dumps(reviews, ensure_ascii=False, indent=2))
-    return f'<script>history.back()</script><p>{subpath} → {status}</p>', 200
+
+    # 淘汰記錄：記住不要的主題
+    if status == "rejected":
+        rejected_file = BASE / "data" / "pipeline" / "rejected_topics.json"
+        rejected_file.parent.mkdir(parents=True, exist_ok=True)
+        rejected_topics = {}
+        if rejected_file.exists():
+            rejected_topics = json.loads(rejected_file.read_text())
+        # 提取關鍵字
+        name = Path(subpath).stem.replace("_", " ").lower()
+        topic = "general"
+        for kw, label in {"intro": "入门", "agent": "AI代理", "prompt": "提示", "tools": "工具",
+                          "monetize": "变现", "mistakes": "错误", "truth": "真相",
+                          "passive": "被动收入", "aiops": "AIOps", "adler": "哲学",
+                          "multi": "多代理", "structure": "结构研究"}.items():
+            if kw in name: topic = label; break
+        rejected_topics[topic] = rejected_topics.get(topic, 0) + 1
+        rejected_file.write_text(json.dumps(rejected_topics, ensure_ascii=False, indent=2))
+        msg = f"{subpath} → 已淘汰，已記憶「{topic}」類將減少出現"
+    else:
+        msg = f"{subpath} → {status}"
+
+    token = request.args.get("token", "")
+    return f'<meta http-equiv="refresh" content="0;url=/?token={token}"><p>{msg}</p>', 200
 
 
 @app.route("/compile-book/<book_type>")
@@ -523,6 +579,20 @@ a{{color:#58a6ff}}
 </div>
 
 </body></html>"""
+
+
+@app.route("/asset/<path:subpath>")
+def serve_asset(subpath):
+    """安全提供靜態素材"""
+    BASE = Path(__file__).parent.parent.parent
+    safe = (BASE / "assets" / subpath).resolve()
+    if not str(safe).startswith(str((BASE / "assets").resolve())):
+        safe = (BASE / "outputs" / "brand_identity" / subpath).resolve()
+        if not str(safe).startswith(str((BASE / "outputs" / "brand_identity").resolve())):
+            return "", 404
+    if not safe.exists(): return "", 404
+    from flask import send_file
+    return send_file(str(safe))
 
 
 @app.route("/view/<path:subpath>")
