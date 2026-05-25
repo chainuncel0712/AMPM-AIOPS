@@ -11,6 +11,8 @@ from pathlib import Path
 from datetime import datetime, timedelta
 from resource_scout import scout as resource_scout
 from pipeline_supervisor import supervisor as pipeline_supervisor
+from core.image_generator import image_gen
+from core.epub_compiler import compiler
 
 BASE = Path(__file__).resolve().parent.parent
 DATA = BASE / "data" / "pipeline"
@@ -132,6 +134,25 @@ class EbookPipeline:
         self._save()
         cycle_log.record("ebook", "write_content", book_id)
         return content
+
+    def compile_epub(self, book_id):
+        book = self._find(book_id)
+        if not book:
+            return "找不到書籍"
+        if book.get("epub"):
+            return f"📚 《{book['topic']}》EPUB 已存在"
+        cover = image_gen.generate_cover(book["topic"])
+        interior = []
+        for i in range(3):
+            ill = image_gen.generate_illustration(f"{book['topic']} 示意圖{i+1}", "vector", book_id, i+1)
+            if ill["success"]:
+                interior.append(ill["path"])
+        epub = compiler.compile_ebook(book, interior, cover["path"] if cover["success"] else None)
+        book["epub"] = epub
+        book["status"] = "epub_done"
+        self._save()
+        cycle_log.record("ebook", "compile_epub", book_id, epub.get("epub_id", ""))
+        return f"📚 《{book['topic']}》EPUB 編譯完成: {epub.get('epub_id', '')}"
 
     def submit_for_review(self, book_id):
         book = self._find(book_id)
