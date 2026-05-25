@@ -719,28 +719,20 @@ def main():
         print("🏭 步驟 2.9.5: 啟動出版引擎自動循環...")
         try:
             from pipeline_engine import engine as pub_engine
-            # 建立 LLM 呼叫包裝，餵給管線做真實內容生成
-            if obsidian.llm:
-                def pipeline_llm(prompt: str) -> str:
-                    try:
-                        resp = obsidian.llm.call([
-                            {"role": "system", "content": "你是專業內容創作者，用繁體中文寫作。只輸出內容，不問問題。"},
-                            {"role": "user", "content": prompt}
-                        ], temperature=0.7)
-                        return resp or ""
-                    except Exception as e:
-                        print(f"[PublisherEngine] LLM 錯誤: {e}")
-                        return ""
-                pub_engine.start_auto_pilot(llm_call=pipeline_llm, interval_hours=1)
-                print("  [✅] 出版引擎自動循環已啟動 (每 1 小時)")
-                # 立刻執行第一次循環
-                def first_cycle():
-                    import time; time.sleep(10)
-                    pub_engine.auto_cycle(llm_call=pipeline_llm)
-                threading.Thread(target=first_cycle, daemon=True).start()
-                print("  [✅] 首次循環將在 10 秒後開始...")
-            else:
-                print("  [⚠️] 出版引擎使用模板模式（無 LLM）")
+            pub_engine.start_auto_pilot(llm_call=None, interval_hours=1)
+            print("  [✅] 出版引擎已啟動 (每 1 小時，9 階段流水線)")
+
+            # 立刻觸發選題
+            pub_engine.create_topic("ebook")
+            pub_engine.create_topic("kidbook")
+            print("  [✅] 初始選題已建立")
+
+            # 首次循環
+            def first_cycle():
+                import time; time.sleep(10)
+                pub_engine.auto_cycle()
+            threading.Thread(target=first_cycle, daemon=True).start()
+            print("  [✅] 首次循環將在 10 秒後開始")
         except Exception as e:
             print(f"  [⚠️] 出版引擎啟動失敗: {e}")
         print()

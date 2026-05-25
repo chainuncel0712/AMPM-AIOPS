@@ -154,14 +154,18 @@ def index():
                 brand_data.append({"name": f.name, "size": f.stat().st_size})
 
         # ── 出版管線選題數據 ──
-        from pipeline_engine import engine
+        from pipeline_data import store, PRODUCT_TYPES
         pipeline_books = []
-        for b in engine.ebook.ebooks:
-            if b.get("status") in ("selected", "selected_approved"):
-                pipeline_books.append({"id": b["id"], "topic": b["topic"], "status": b["status"], "type": "📗電子書", "pipeline": "ebook"})
-        for b in engine.kidbook.kidbooks:
-            if b.get("status") in ("selected", "selected_approved"):
-                pipeline_books.append({"id": b["id"], "topic": b.get("title", b.get("topic","?")), "status": b["status"], "type": "📚童書", "pipeline": "kidbook"})
+        for b in store.books:
+            if b.get("current_stage") == 1:
+                pt = PRODUCT_TYPES.get(b.get("product_type", "ebook"), {})
+                title = b.get("stage_data", {}).get("1", {}).get("title", b["id"][:8])
+                approved = b.get("stage_data", {}).get("1", {}).get("approved", False)
+                pipeline_books.append({
+                    "id": b["id"], "title": title, "approved": approved,
+                    "type": f'{pt.get("icon","?")}{pt.get("label","?")}',
+                    "type_key": b.get("product_type", "ebook")
+                })
 
         # 电子书主题分类 (output 檔案)
         topic_map = {
@@ -247,7 +251,7 @@ td{{padding:6px 8px;border-bottom:1px solid #111122}}
     <h3>🎯 出版管線選題審核 (通過後才開始撰寫)</h3>
     <table>
     <tr><th>類型</th><th>選題</th><th>狀態</th><th>操作</th></tr>
-    {''.join(f'<tr><td>{b["type"]}</td><td>{b["topic"][:40]}</td><td>{"⏸️ 待審核" if b["status"]=="selected" else "✅ 已通過"}</td><td>' + (f'<a href="/approve-topic/{b["pipeline"]}/{b["id"]}?token=' + request.args.get("token","") + '" style="color:#3fb950;font-size:12px;font-weight:bold">✓ 通過選題</a>' if b["status"]=="selected" else '等待下一輪循環') + '</td></tr>' for b in pipeline_books) if pipeline_books else '<tr><td colspan="4" style="color:#8b949e;padding:12px">尚無選題。管線每小時自動建立新選題。</td></tr>'}
+    {''.join(f'<tr><td>{b["type"]}</td><td>{b["title"][:40]}</td><td>{"⏸️ 待審核" if not b["approved"] else "✅ 已通過"}</td><td>' + (f'<a href="/approve-topic/{b["type_key"]}/{b["id"]}?token=' + request.args.get("token","") + '" style="color:#3fb950;font-size:12px;font-weight:bold">✓ 通過選題</a>' if not b["approved"] else '等待下一輪循環') + '</td></tr>' for b in pipeline_books) if pipeline_books else '<tr><td colspan="4" style="color:#8b949e;padding:12px">尚無選題。管線每小時自動建立新選題。</td></tr>'}
     </table>
     <div style="font-size:11px;color:#8b949e;margin-top:8px">⚠️ 選題必須通過審核，才會開始撰寫內容。不通過就不生產。</div>
   </div>
@@ -426,17 +430,79 @@ def review_file(status, subpath):
 @app.route("/approve-topic/<pipeline>/<book_id>")
 def approve_topic(pipeline, book_id):
     """通過選題審核，啟動流水線"""
-    BASE = Path(__file__).parent.parent.parent
-    sys.path.insert(0, str(BASE / "src"))
     from pipeline_engine import engine
-    if pipeline == "ebook":
-        result = engine.ebook.approve_topic(book_id)
-    elif pipeline == "kidbook":
-        result = engine.kidbook.approve_topic(book_id)
-    else:
-        result = "未知管線"
+    result = engine.approve_topic(pipeline, book_id)
     token = request.args.get("token", "")
     return f'<meta http-equiv="refresh" content="0;url=/?token={token}"><p>{result}</p>', 200
+
+
+@app.route("/pipeline")
+def pipeline_view():
+    """管線看板：9 階段 Kanban"""
+    token = request.args.get("token", "")
+    BASE = Path(__file__).parent.parent.parent
+    sys.path.insert(0, str(BASE / "src"))
+    from pipeline_presets import PRODUCT_TYPES, STAGE_LABELS, HUMAN_GATES
+
+    all_books = []
+    try:
+        from pipeline_data import store
+        all_books = store.books
+    except: pass
+
+    stages = {}
+    for i in range(1, 10):
+        stages[i] = {"label": STAGE_LABELS[i], "is_gate": i in HUMAN_GATES, "books": []}
+    for b in all_books:
+        s = b.get("current_stage", 1)
+        if s in stages:
+            pt = PRODUCT_TYPES.get(b.get("product_type", "ebook"), {})
+            title = b.get("stage_data", {}).get("1", {}).get("title", b["id"][:8])
+            stages[s]["books"].append({
+                "id": b["id"], "title": title[:20],
+                "icon": pt.get("icon", "?"), "type": pt.get("label", "?"),
+                "stage": s
+            })
+
+    cards_html = ""
+    for i in range(1, 10):
+        s = stages[i]
+        books_html = ""
+        for b in s["books"]:
+            gate_icon = "🔴" if s["is_gate"] and b["stage"] == 1 and not all_books else ""
+            btn = ""
+            if b["stage"] == 1:
+                pt_key = next((k for k, v in PRODUCT_TYPES.items() if v["label"] == b["type"]), "ebook")
+                btn = f'<a href="/approve-topic/{pt_key}/{b["id"]}?token={token}" class="btn btn-green" style="font-size:9px;padding:2px 6px">✓</a>'
+            books_html += f'<div class="pipeline-card"><span>{b["icon"]}</span> <span title="{b["title"]}">{b["title"]}</span>{gate_icon} {btn}</div>'
+        if not books_html:
+            books_html = '<div class="pipeline-empty">—</div>'
+        gate_label = " 🔴閘門" if s["is_gate"] else " ⏳自動"
+        cards_html += f'<div class="pipe-col"><div class="pipe-header">{i}. {s["label"]}{gate_label}<span style="font-size:10px;color:#8b949e"> ({len(s["books"])})</span></div>{books_html}</div>'
+
+    return f"""<!DOCTYPE html>
+<html lang="zh-TW">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>管線看板 | 黑曜</title>
+<style>
+*{{margin:0;padding:0;box-sizing:border-box}}
+body{{font-family:system-ui,sans-serif;background:#0a0a0f;color:#e0e0e0;padding:16px}}
+h1{{color:#58a6ff;font-size:18px;margin-bottom:12px}}
+a{{color:#58a6ff;text-decoration:none}}
+.btn{{display:inline-block;border-radius:4px;text-decoration:none;cursor:pointer;border:none}}
+.btn-green{{background:#238636;color:#fff}}
+.pipeline-board{{display:flex;gap:10px;overflow-x:auto;padding-bottom:16px}}
+.pipe-col{{min-width:150px;max-width:200px;flex-shrink:0}}
+.pipe-header{{background:#111122;padding:8px 10px;border-radius:8px 8px 0 0;font-size:11px;color:#58a6ff;font-weight:600;border:1px solid #1e1e3a;border-bottom:none}}
+.pipeline-card{{background:#111122;border:1px solid #1e1e3a;border-top:none;padding:8px 10px;font-size:10px;display:flex;align-items:center;gap:4px}}
+.pipeline-card:last-child{{border-radius:0 0 8px 8px}}
+.pipeline-empty{{color:#30363d;font-size:10px;padding:8px 10px;background:#111122;border:1px solid #1e1e3a;border-top:none;border-radius:0 0 8px 8px}}
+</style></head>
+<body>
+<h1>🏭 出版管線看板</h1>
+<a href="/?token={token}" style="font-size:11px">← Dashboard</a>
+<div class="pipeline-board" style="margin-top:12px">{cards_html}</div>
+</body></html>"""
 def compile_book(book_type):
     """將已審核章節編譯為完整書籍"""
     BASE = Path(__file__).parent.parent.parent
