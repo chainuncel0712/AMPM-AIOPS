@@ -30,7 +30,7 @@ class PublisherEngine:
     # ── 選題 ──
 
     def create_topic(self, product_type: str, title: str = "", **kwargs) -> str:
-        """Stage 1: 建立選題"""
+        """Stage 1: 建立選題 (自動去重)"""
         preset = PRODUCT_TYPES[product_type]
         if not title:
             fallback = FALLBACK_TOPICS.get(product_type, ["未命名"])
@@ -40,6 +40,12 @@ class PublisherEngine:
                 kwargs.update({k: v for k, v in f.items() if k != "title"})
             else:
                 title = random.choice(fallback)
+
+        # 去重檢查
+        existing = [b for b in store.books if b.get("product_type") == product_type
+                    and b.get("stage_data", {}).get("1", {}).get("title") == title]
+        if existing:
+            return f"⏭️ 《{title}》已存在，跳過"
 
         book = create_book(product_type, title, **kwargs)
         book_id = store.add(book)
@@ -114,7 +120,7 @@ class PublisherEngine:
 
         advanced = 0
         for book in store.books:
-            if book.get("current_stage", 0) in (0, 9):
+            if book.get("current_stage", 0) in (0, 10):
                 continue
             r = self.advance(book["id"], llm_call)
             if r.get("ok"):
@@ -157,6 +163,20 @@ class PublisherEngine:
 
     def stop_auto_pilot(self):
         self._running = False
+
+    def reject_topic(self, book_id: str) -> str:
+        """淘汰選題"""
+        book = store.get(book_id)
+        if not book: return "找不到書籍"
+        title = book["stage_data"]["1"].get("title", "?")
+        store.update(book_id, {
+            "current_stage": 0,
+            "stage_data": {**book.get("stage_data", {}), "1": {**book.get("stage_data", {}).get("1", {}), "approved": False, "reject_reason": "淘汰"}}
+        })
+        from pipeline_data import rejected
+        rejected.add(title)
+        preset = PRODUCT_TYPES.get(book.get("product_type", "ebook"), {})
+        return f"❌ {preset.get('icon','')} 《{title}》已淘汰"
 
     def set_auto_publish(self, enabled: bool):
         self._auto_publish = enabled

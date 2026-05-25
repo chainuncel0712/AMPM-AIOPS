@@ -115,10 +115,67 @@ def stage_7_layout(book: Dict, cfg: Dict, llm_user: Optional[Callable] = None) -
     return {"format": layout_mode, "output_path": str(out_path), "file_size": len(full), "completed_at": datetime.now().isoformat()}
 
 
-def stage_9_publish(book: Dict, cfg: Dict, llm_user: Optional[Callable] = None) -> Dict:
-    """上架階段"""
-    platforms = cfg.get("platforms", [])
-    return {"platforms": platforms, "status": "ready", "published_at": "", "completed_at": datetime.now().isoformat()}
+def stage_9_publish(book: Dict, cfg: Dict, llm_user=None) -> Dict:
+    """上架階段：準備發布素材 + 發送通知"""
+    title = book["stage_data"]["1"].get("title", "")
+    platforms = cfg.get("platforms", ["kdp", "readmoo"])
+    layout = book["stage_data"].get("7", {})
+    output_path = layout.get("output_path", "")
+
+    # 生成商品描述
+    desc_prompt = f"為《{title}》寫一段 150 字的商品描述，含賣點、目標讀者、為什麼要買。繁體中文。"
+    description = _llm_call(desc_prompt, "你是專業行銷文案撰寫者。")
+
+    # 生成關鍵字標籤
+    tag_prompt = f"為《{title}》列出 10 個 SEO 關鍵字標籤，逗號分隔。"
+    tags = _llm_call(tag_prompt, "只輸出逗號分隔的標籤。")
+
+    # 記錄到上架目錄
+    publish_dir = BASE / "outputs" / "published"
+    publish_dir.mkdir(parents=True, exist_ok=True)
+    publish_info = {
+        "title": title, "platforms": platforms, "description": description,
+        "tags": tags, "output_path": output_path,
+        "published_at": datetime.now().isoformat(), "status": "ready"
+    }
+    meta_path = publish_dir / f"{book['id']}_publish.json"
+    meta_path.write_text(json.dumps(publish_info, ensure_ascii=False, indent=2))
+
+    return {
+        "platforms": platforms, "description": description[:200], "tags": tags[:100],
+        "output_path": output_path, "status": "ready",
+        "completed_at": datetime.now().isoformat()
+    }
+
+
+def stage_10_marketing(book: Dict, cfg: Dict, llm_user=None) -> Dict:
+    """行銷廣告階段：自動生成各平台廣告文案"""
+    title = book["stage_data"]["1"].get("title", "")
+    channels = cfg.get("ad_channels", ["telegram"])
+    description = book["stage_data"].get("9", {}).get("description", "")
+
+    ads = {}
+    for ch in channels:
+        if ch == "telegram":
+            prompt = f"為《{title}》寫一段 Telegram 頻道宣傳文案，含 emoji，50 字內，吸引點擊。"
+            ads["telegram"] = _llm_call(prompt, "你是社群行銷專家。只輸出文案。")[:200]
+        elif ch == "twitter":
+            prompt = f"為《{title}》寫一則推文（含 hashtags），繁體中文，280 字內。"
+            ads["twitter"] = _llm_call(prompt, "你是社群行銷專家。")[:280]
+        elif ch == "facebook":
+            prompt = f"為《{title}》寫 Facebook 貼文，含呼籲行動，繁體中文，100 字。"
+            ads["facebook"] = _llm_call(prompt, "你是社群行銷專家。")[:200]
+        elif ch == "instagram":
+            prompt = f"為《{title}》寫 Instagram 貼文，hashtags 和 emoji，繁體中文，80 字。"
+            ads["instagram"] = _llm_call(prompt, "你是 IG 行銷專家。")[:150]
+
+    # 儲存廣告文案
+    ad_dir = BASE / "outputs" / "ads"
+    ad_dir.mkdir(parents=True, exist_ok=True)
+    ad_path = ad_dir / f"{book['id']}_ads.json"
+    ad_path.write_text(json.dumps(ads, ensure_ascii=False, indent=2))
+
+    return {"channels": channels, "ads": ads, "completed_at": datetime.now().isoformat()}
 
 
 # ═══ 階段處理器註冊 ═══
@@ -131,4 +188,5 @@ STAGE_HANDLERS = {
     6: stage_6_art,
     7: stage_7_layout,
     9: stage_9_publish,
+    10: stage_10_marketing,
 }

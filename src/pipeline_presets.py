@@ -8,7 +8,8 @@ from typing import List, Dict, Any
 
 STAGE_LABELS = {
     1: "選題", 2: "研究", 3: "大綱", 4: "撰寫",
-    5: "編輯", 6: "美術/插畫", 7: "排版", 8: "審核", 9: "上架"
+    5: "編輯", 6: "美術/插畫", 7: "排版", 8: "審核",
+    9: "上架", 10: "行銷廣告"
 }
 
 HUMAN_GATES = {1, 8}  # 階段 1 和 8 需要人工審核
@@ -27,6 +28,7 @@ PRODUCT_TYPES: Dict[str, Dict[str, Any]] = {
             7: {"auto": True, "layout_mode": "reflowable_epub"},
             8: {"auto": False},
             9: {"auto": True, "platforms": ["kdp", "readmoo", "google_books"]},
+            10: {"auto": True, "ad_channels": ["telegram", "twitter", "facebook"]},
         }
     },
     "kidbook": {
@@ -42,6 +44,7 @@ PRODUCT_TYPES: Dict[str, Dict[str, Any]] = {
             7: {"auto": True, "layout_mode": "fixed_epub"},
             8: {"auto": False},
             9: {"auto": True, "platforms": ["kdp", "readmoo"]},
+            10: {"auto": True, "ad_channels": ["telegram", "instagram"]},
         }
     },
     "comic": {
@@ -57,6 +60,7 @@ PRODUCT_TYPES: Dict[str, Dict[str, Any]] = {
             7: {"auto": True, "layout_mode": "fixed_epub"},
             8: {"auto": False},
             9: {"auto": True, "platforms": ["kdp", "readmoo"]},
+            10: {"auto": True, "ad_channels": ["telegram", "twitter"]},
         }
     },
     "novel": {
@@ -72,6 +76,7 @@ PRODUCT_TYPES: Dict[str, Dict[str, Any]] = {
             7: {"auto": True, "layout_mode": "reflowable_epub"},
             8: {"auto": False},
             9: {"auto": True, "platforms": ["kdp", "readmoo", "google_books"]},
+            10: {"auto": True, "ad_channels": ["telegram", "twitter", "facebook"]},
         }
     },
     "short_story": {
@@ -87,6 +92,7 @@ PRODUCT_TYPES: Dict[str, Dict[str, Any]] = {
             7: {"auto": True, "layout_mode": "reflowable_epub"},
             8: {"auto": False},
             9: {"auto": True, "platforms": ["kdp", "readmoo"]},
+            10: {"auto": True, "ad_channels": ["telegram"]},
         }
     },
     "magazine": {
@@ -102,6 +108,7 @@ PRODUCT_TYPES: Dict[str, Dict[str, Any]] = {
             7: {"auto": True, "layout_mode": "magazine_pdf"},
             8: {"auto": False},
             9: {"auto": True, "platforms": ["kdp", "readmoo"]},
+            10: {"auto": True, "ad_channels": ["telegram", "facebook"]},
         }
     },
     "edu_book": {
@@ -117,6 +124,7 @@ PRODUCT_TYPES: Dict[str, Dict[str, Any]] = {
             7: {"auto": True, "layout_mode": "reflowable_epub"},
             8: {"auto": False},
             9: {"auto": True, "platforms": ["kdp", "readmoo"]},
+            10: {"auto": True, "ad_channels": ["telegram", "twitter"]},
         }
     },
     "exam_book": {
@@ -132,6 +140,7 @@ PRODUCT_TYPES: Dict[str, Dict[str, Any]] = {
             7: {"auto": True, "layout_mode": "reflowable_epub"},
             8: {"auto": False},
             9: {"auto": True, "platforms": ["kdp", "readmoo"]},
+            10: {"auto": True, "ad_channels": ["telegram"]},
         }
     },
     "reference_book": {
@@ -147,6 +156,7 @@ PRODUCT_TYPES: Dict[str, Dict[str, Any]] = {
             7: {"auto": True, "layout_mode": "reflowable_epub"},
             8: {"auto": False},
             9: {"auto": True, "platforms": ["kdp", "readmoo"]},
+            10: {"auto": True, "ad_channels": ["telegram", "twitter"]},
         }
     },
 }

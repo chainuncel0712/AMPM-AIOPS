@@ -154,7 +154,8 @@ def index():
                 brand_data.append({"name": f.name, "size": f.stat().st_size})
 
         # ── 出版管線選題數據 ──
-        from pipeline_data import store, PRODUCT_TYPES
+        from pipeline_data import store
+        from pipeline_presets import PRODUCT_TYPES
         pipeline_books = []
         for b in store.books:
             if b.get("current_stage") == 1:
@@ -251,7 +252,7 @@ td{{padding:6px 8px;border-bottom:1px solid #111122}}
     <h3>🎯 出版管線選題審核 (通過後才開始撰寫)</h3>
     <table>
     <tr><th>類型</th><th>選題</th><th>狀態</th><th>操作</th></tr>
-    {''.join(f'<tr><td>{b["type"]}</td><td>{b["title"][:40]}</td><td>{"⏸️ 待審核" if not b["approved"] else "✅ 已通過"}</td><td>' + (f'<a href="/approve-topic/{b["type_key"]}/{b["id"]}?token=' + request.args.get("token","") + '" style="color:#3fb950;font-size:12px;font-weight:bold">✓ 通過選題</a>' if not b["approved"] else '等待下一輪循環') + '</td></tr>' for b in pipeline_books) if pipeline_books else '<tr><td colspan="4" style="color:#8b949e;padding:12px">尚無選題。管線每小時自動建立新選題。</td></tr>'}
+    {''.join(f'<tr><td>{b["type"]}</td><td>{b["title"][:40]}</td><td>{"⏸️ 待審核" if not b["approved"] else "✅ 已通過"}</td><td>' + (f'<a href="/approve-topic/{b["type_key"]}/{b["id"]}?token=' + request.args.get("token","") + '" style="color:#3fb950;font-size:12px;font-weight:bold">✓</a> <a href="/reject-topic/{b["id"]}?token=' + request.args.get("token","") + '" style="color:#e94560;font-size:12px;font-weight:bold;margin-left:8px">✗淘汰</a>' if not b["approved"] else '等待循環') + '</td></tr>' for b in pipeline_books) if pipeline_books else '<tr><td colspan="4" style="color:#8b949e;padding:12px">尚無選題</td></tr>'}
     </table>
     <div style="font-size:11px;color:#8b949e;margin-top:8px">⚠️ 選題必須通過審核，才會開始撰寫內容。不通過就不生產。</div>
   </div>
@@ -429,9 +430,16 @@ def review_file(status, subpath):
 
 @app.route("/approve-topic/<pipeline>/<book_id>")
 def approve_topic(pipeline, book_id):
-    """通過選題審核，啟動流水線"""
     from pipeline_engine import engine
     result = engine.approve_topic(pipeline, book_id)
+    token = request.args.get("token", "")
+    return f'<meta http-equiv="refresh" content="0;url=/?token={token}"><p>{result}</p>', 200
+
+
+@app.route("/reject-topic/<book_id>")
+def reject_topic(book_id):
+    from pipeline_engine import engine
+    result = engine.reject_topic(book_id)
     token = request.args.get("token", "")
     return f'<meta http-equiv="refresh" content="0;url=/?token={token}"><p>{result}</p>', 200
 
@@ -451,7 +459,7 @@ def pipeline_view():
     except: pass
 
     stages = {}
-    for i in range(1, 10):
+    for i in range(1, 11):
         stages[i] = {"label": STAGE_LABELS[i], "is_gate": i in HUMAN_GATES, "books": []}
     for b in all_books:
         s = b.get("current_stage", 1)
@@ -465,7 +473,7 @@ def pipeline_view():
             })
 
     cards_html = ""
-    for i in range(1, 10):
+    for i in range(1, 11):
         s = stages[i]
         books_html = ""
         for b in s["books"]:

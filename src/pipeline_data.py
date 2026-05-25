@@ -62,7 +62,7 @@ class BookStore:
         return [b for b in self.books if b.get("product_type") == product_type]
 
     def active_books(self) -> List[Dict]:
-        return [b for b in self.books if b.get("current_stage", 0) not in (0, 9)]
+        return [b for b in self.books if b.get("current_stage", 0) not in (0, 10)]
 
     def stats(self) -> Dict:
         by_stage = {}
@@ -155,7 +155,7 @@ def create_book(product_type: str, title: str, **kwargs) -> Dict:
         "current_stage": 1,
         "stage_data": {
             "1": {"title": title, "approved": False, "approved_by": "", "approved_at": "", "reject_reason": "", **kwargs},
-            "2": {}, "3": {}, "4": {}, "5": {}, "6": {}, "7": {}, "8": {}, "9": {}
+            "2": {}, "3": {}, "4": {}, "5": {}, "6": {}, "7": {}, "8": {}, "9": {}, "10": {}
         },
         "created_at": ts, "updated_at": ts
     }
