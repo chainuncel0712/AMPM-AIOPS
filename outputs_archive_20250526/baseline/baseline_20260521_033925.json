@@ -1,0 +1,125 @@
+{
+  "timestamp": "2026-05-21T03:39:25.070718",
+  "total": 29,
+  "passed": 29,
+  "failed": 0,
+  "warned": 0,
+  "details": [
+    {
+      "status": "✅",
+      "message": "Daemon PID 941737 存活"
+    },
+    {
+      "status": "✅",
+      "message": "Heartbeat 29s old, all_healthy=True"
+    },
+    {
+      "status": "✅",
+      "message": "Process alive: PID(s) 941737"
+    },
+    {
+      "status": "✅",
+      "message": "Heartbeat (data/state/heartbeat.json) — 88 bytes"
+    },
+    {
+      "status": "✅",
+      "message": "Self Awareness (data/self_awareness.json) — 1335 bytes"
+    },
+    {
+      "status": "✅",
+      "message": "Tools Registry (data/tools/registry.json) — 1116 bytes"
+    },
+    {
+      "status": "✅",
+      "message": "Planner Tasks (data/planner/tasks.json) — 586 bytes"
+    },
+    {
+      "status": "✅",
+      "message": "Runtime Rules (data/rules/runtime_rules.json) — 24679 bytes"
+    },
+    {
+      "status": "✅",
+      "message": "Evolution State (data/evolution/cycle_state.json) — 164 bytes"
+    },
+    {
+      "status": "✅",
+      "message": "Rebirth State (data/rebirth_state.json) — 123 bytes"
+    },
+    {
+      "status": "✅",
+      "message": "Startup Diagnosis (data/startup_diagnosis.json) — 44000 bytes"
+    },
+    {
+      "status": "✅",
+      "message": "Gatekeeper entry: False"
+    },
+    {
+      "status": "✅",
+      "message": "EventLog count: 0"
+    },
+    {
+      "status": "✅",
+      "message": "ControlPlane: 0 calls, avg 0.0ms"
+    },
+    {
+      "status": "✅",
+      "message": "SecurityZone violations: 0"
+    },
+    {
+      "status": "✅",
+      "message": "Audit: 0 events from 0 sources"
+    },
+    {
+      "status": "✅",
+      "message": "Recent: outputs/baseline/baseline_20260521_033517.json (0.1h old, 2974 bytes)"
+    },
+    {
+      "status": "✅",
+      "message": "Recent: outputs/baseline/baseline_20260521_033349.json (0.1h old, 2982 bytes)"
+    },
+    {
+      "status": "✅",
+      "message": "Recent: outputs/baseline/baseline_20260521_033254.json (0.1h old, 2957 bytes)"
+    },
+    {
+      "status": "✅",
+      "message": "Recent: outputs/baseline/baseline_20260521_033105.json (0.1h old, 2948 bytes)"
+    },
+    {
+      "status": "✅",
+      "message": "brain.Obsidian 可匯入"
+    },
+    {
+      "status": "✅",
+      "message": "governance.gatekeeper 可用"
+    },
+    {
+      "status": "✅",
+      "message": "governance.security_zone 可用"
+    },
+    {
+      "status": "✅",
+      "message": "governance.event_log 可用"
+    },
+    {
+      "status": "✅",
+      "message": "governance.control_plane 可用"
+    },
+    {
+      "status": "✅",
+      "message": "governance.isolation 可用"
+    },
+    {
+      "status": "✅",
+      "message": "governance.scoring 可用"
+    },
+    {
+      "status": "✅",
+      "message": "governance.audit 可用"
+    },
+    {
+      "status": "✅",
+      "message": "governance.stable_mode 可用"
+    }
+  ]
+}
