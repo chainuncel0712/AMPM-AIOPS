@@ -1,7 +1,10 @@
 """
-Pipeline Stages — 通用階段處理器
-================================
-每階段一個函數，由 ProductType 配置驅動具體行為。
+Pipeline Stages — 通用階段處理器（器官整合版）
+==============================================
+每階段調用黑曜器官來提升品質：
+- Eye (搜尋) → 研究階段
+- ResourceScout (資源) → 美術階段
+- VisionDesigner (設計) → 美術/排版階段
 """
 import requests, json
 from typing import Dict, Callable, Optional
@@ -12,6 +15,30 @@ BASE = Path(__file__).resolve().parent.parent
 
 OLLAMA_URL = "http://localhost:11434/api/chat"
 OLLAMA_MODEL = "qwen2.5:1.5b"
+
+# ═══ 懶載入器官 ═══
+
+_eye = None
+_scout = None
+
+def _get_eye():
+    global _eye
+    if _eye is None:
+        try:
+            from nerve.eye import Eye
+            _eye = Eye()
+            _eye.init()
+        except: pass
+    return _eye
+
+def _get_scout():
+    global _scout
+    if _scout is None:
+        try:
+            from resource_scout import scout as s
+            _scout = s
+        except: pass
+    return _scout
 
 # ═══ LLM 呼叫工具 ═══
 
@@ -102,34 +129,42 @@ TOPIC_PROMPTS = {
 # ═══ 階段執行函數 ═══
 
 def stage_2_research(book: Dict, cfg: Dict, llm_user=None) -> Dict:
-    """研究階段：網路爬取 + 事實收集"""
+    """研究階段：Eye 器官網路搜尋 → LLM 提煉"""
     title = book["stage_data"]["1"].get("title", "")
-
     sources = []
-    # 嘗試用 DuckDuckGo 搜尋相關資料
-    try:
-        import urllib.request, urllib.parse
-        query = urllib.parse.quote(f"{title} 教學 入門 指南")
-        req = urllib.request.Request(
-            f"https://html.duckduckgo.com/html/?q={query}",
-            headers={"User-Agent": "Mozilla/5.0"}
-        )
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            html = resp.read().decode("utf-8", errors="ignore")
-            import re
-            results = re.findall(r'class="result__snippet">(.*?)</a>', html)
-            sources = [r.strip()[:200] for r in results[:5]]
-    except Exception as e:
-        sources = [f"搜尋失敗: {str(e)[:50]}"]
 
-    # LLM 總結
-    summary_prompt = f"針對「{title}」，根據以下網路搜尋結果，提煉 5 個關鍵事實和 3 個寫作素材建議。不要抄襲原文，用自己的話改寫。\n\n搜尋結果：\n" + "\n".join(sources[:5])
-    summary = _llm_call(summary_prompt, "你是研究員。分析資料並提煉重點。不抄襲。") if sources else "無搜尋結果"
+    # 用 Eye 器官搜尋
+    eye = _get_eye()
+    if eye and eye._ready:
+        try:
+            raw = eye.search(f"{title} 教學 入門 趨勢") if hasattr(eye, 'search') else ""
+            if raw: sources.append(raw[:500])
+        except: pass
+    else:
+        # 備援：直接 DuckDuckGo
+        try:
+            import urllib.request, urllib.parse, re
+            query = urllib.parse.quote(f"{title} guide tutorial")
+            req = urllib.request.Request(f"https://html.duckduckgo.com/html/?q={query}",
+                headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                html = resp.read().decode("utf-8", errors="ignore")
+                results = re.findall(r'class="result__snippet">(.*?)</a>', html)
+                sources = [r.strip()[:200] for r in results[:5]]
+        except: pass
 
-    return {
-        "sources": sources, "research_summary": summary,
-        "completed_at": datetime.now().isoformat()
-    }
+    # Scout 找免費資源
+    scout = _get_scout()
+    if scout:
+        try:
+            styles = scout.pick_random_illustration_style()
+            sources.append(f"建議風格: {styles}")
+        except: pass
+
+    summary_prompt = f"針對「{title}」，根據以下資料提煉 5 關鍵事實 + 3 寫作素材。不抄襲，改寫。\n" + "\n".join(sources[:5])
+    summary = _llm_call(summary_prompt, "你是研究員。分析並改寫。不抄襲。") if sources else "無搜尋結果"
+
+    return {"sources": sources, "research_summary": summary, "completed_at": datetime.now().isoformat()}
 
 
 def stage_3_outline(book: Dict, cfg: Dict, llm_user: Optional[Callable] = None) -> Dict:
@@ -208,14 +243,36 @@ def stage_5_editing(book: Dict, cfg: Dict, llm_user=None) -> Dict:
     }
 
 
-def stage_6_art(book: Dict, cfg: Dict, llm_user: Optional[Callable] = None) -> Dict:
-    """美術階段：封面+插畫"""
+def stage_6_art(book: Dict, cfg: Dict, llm_user=None) -> Dict:
+    """美術階段：Scout 找資源 + LLM 設計指示"""
     title = book["stage_data"]["1"].get("title", "")
     art_mode = cfg.get("art_mode", "cover_only")
+
+    # 用 Scout 找可用的圖像資源
+    img_srcs = []
+    style = "自動"
+    scout = _get_scout()
+    if scout:
+        try:
+            style = scout.pick_random_illustration_style()
+            img = scout.pick_random_image_source()
+            if img: img_srcs.append(img.get("name", ""))
+        except: pass
+
+    # LLM 生成設計簡報
+    design_brief = _llm_call(
+        f"為《{title}》生成美術設計簡報：\n"
+        f"1. 封面概念（3 句話描述）\n"
+        f"2. 色彩方案（主色+輔色）\n"
+        f"3. 字型建議（中英文各一）\n"
+        f"4. 插畫風格：{style}\n"
+        f"模式：{art_mode}",
+        "你是專業書籍設計師。"
+    )
+
     return {
-        "style": "自動生成",
-        "cover_generated": True,
-        "art_mode": art_mode,
+        "style": style, "cover_generated": True, "art_mode": art_mode,
+        "image_sources": img_srcs, "design_brief": design_brief[:300],
         "completed_at": datetime.now().isoformat()
     }
 
