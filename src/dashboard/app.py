@@ -87,23 +87,79 @@ def index():
 
         # 产出文件及链接
         outputs_dir = BASE / "outputs"
+        review_file = BASE / "data" / "pipeline" / "reviews.json"
+        reviews = {}
+        if review_file.exists():
+            reviews = json.loads(review_file.read_text())
+
         def get_files(subdir, ext="*.md"):
             p = outputs_dir / subdir
             if not p.exists(): return []
-            return sorted([f.name for f in p.glob(ext)], key=lambda x: x.lower())
+            result = []
+            for f in sorted(p.glob(ext), key=lambda x: x.name.lower()):
+                try:
+                    size = f.stat().st_size
+                    chars = len(f.read_text(encoding="utf-8"))
+                except: size, chars = 0, 0
+                key = f"{subdir}/{f.name}"
+                review = reviews.get(key, "pending")
+                if review == "approved": icon = "✅"
+                elif review == "rejected": icon = "❌"
+                elif chars > 2000: icon = "📝"
+                elif chars > 500: icon = "🆕"
+                else: icon = "⚠️"
+                result.append({"name": f.name, "size": size, "chars": chars, "icon": icon, "review": review, "key": key})
+            return result
 
         ebooks = get_files("ebooks")
         children = get_files("children_book")
         research_files = get_files("research")
         websites = get_files("website", "*.html")
-        website_css = get_files("website", "*.css")
         brand_files = get_files("brand_identity", "*")
 
         # 工具数
         tool_count = len(brain.tools.list_tools()) if hasattr(brain, 'tools') and brain.tools else 0
         tools_list = brain.tools.list_tools() if hasattr(brain, 'tools') and brain.tools else []
 
-        return f"""<!DOCTYPE html>
+        # 计算完成度
+        def progress(items):
+            if not items: return 0, 0
+            approved = sum(1 for i in items if i["review"] == "approved")
+            return approved, len(items)
+
+        ebook_ok, ebook_total = progress(ebooks)
+        child_ok, child_total = progress(children)
+        research_ok, research_total = progress(research_files)
+
+        # IP 角色数据
+        ip_files = []
+        ip_dir = outputs_dir / "character_ip"
+        if ip_dir.exists():
+            for f in ip_dir.glob("*.md"):
+                try: ip_files.append({"name": f.name, "preview": f.read_text(encoding="utf-8")[:200]})
+                except: pass
+
+        # 品牌素材
+        brand_data = []
+        brand_dir = outputs_dir / "brand_identity"
+        if brand_dir.exists():
+            for f in sorted(brand_dir.iterdir(), key=lambda x: x.name):
+                if f.name.startswith("."): continue
+                brand_data.append({"name": f.name, "size": f.stat().st_size})
+
+        # 电子书选题 (从 ebook 文件名提取主题)
+        ebook_topics = []
+        topic_keywords = {"intro": "入门导览", "agent": "AI代理", "prompt": "提示技巧", "tools": "工具介绍",
+                          "monetize": "变现策略", "mistakes": "常见错误", "truth": "真相揭露",
+                          "passive": "被动收入", "aiops": "AIOps", "adler": "哲学视角",
+                          "multi": "多代理协作", "structure": "结构研究"}
+        for f in ebooks:
+            name_lower = f["name"].lower()
+            topic = "综合"
+            for kw, label in topic_keywords.items():
+                if kw in name_lower:
+                    topic = label; break
+            ebook_topics.append({**f, "topic": topic})
 <html lang="zh-TW">
 <head>
 <meta charset="utf-8">
@@ -143,8 +199,22 @@ td{{padding:6px 8px;border-bottom:1px solid #111122}}
 </div>
 
 <div class="grid">
-  <div class="card">
-    <h3>🖥️ 系統資源</h3>
+  <!-- 选題審閱 -->
+  <div class="card" style="grid-column:span 2">
+    <h3>🎯 電子書選題審閱</h3>
+    <table>
+    <tr><th>主题</th><th>章节</th><th>字数</th><th>審核</th><th>操作</th></tr>
+    {''.join(f'<tr><td>{t["topic"]}</td><td>{t["name"][:35]}</td><td>{t["chars"]:,}</td><td>{t["icon"]}</td><td><a href="/view/ebooks/{t["name"]}?token=' + request.args.get("token","") + '" style="color:#58a6ff;font-size:11px">预览</a> <a href="/review/approved/{t["key"]}" style="color:#3fb950;font-size:11px;margin:0 4px">✓</a> <a href="/review/rejected/{t["key"]}" style="color:#e94560;font-size:11px">✗</a></td></tr>' for t in ebook_topics)}
+    </table>
+  </div>
+
+  <!-- IP 角色 -->
+  <div class="card" style="grid-column:span 2">
+    <h3>🎭 IP 角色管理 (PANEY & MONEY)</h3>
+    {''.join(f'<div class="stat-row"><span class="stat-label">📖 {f["name"]}</span><a href="/view/character_ip/{f["name"]}?token=' + request.args.get("token","") + '" style="color:#58a6ff;font-size:11px">查看</a></div><div style="color:#8b949e;font-size:11px;padding:4px 12px 8px">{f["preview"][:150]}...</div>' for f in ip_files) if ip_files else '<div style="color:#8b949e;font-size:12px;padding:8px 0">尚無 IP 設定檔</div>'}
+    <div class="stat-row" style="margin-top:8px"><span class="stat-label">品牌素材</span><span class="stat-val">{len(brand_data)} 個檔案</span></div>
+    {''.join(f'<div class="stat-row"><span class="stat-label">{b["name"][:30]}</span><span class="stat-val">{b["size"]:,}B</span></div>' for b in brand_data[:8])}
+  </div>
     <div class="stat-row"><span class="stat-label">CPU</span><span class="stat-val">{cpu}%</span></div>
     <div class="stat-row"><span class="stat-label">記憶體</span><span class="stat-val">{mem}</span></div>
     <div class="stat-row"><span class="stat-label">磁碟</span><span class="stat-val">{disk}</span></div>
@@ -175,31 +245,29 @@ td{{padding:6px 8px;border-bottom:1px solid #111122}}
   </div>
 
   <div class="card">
-    <h3>📝 電子書 ({len(ebooks)} 章)</h3>
-    {''.join(f'<div class="stat-row"><span class="stat-label">{f[:50]}</span><a href="/view/ebooks/{f}?token={request.args.get("token","")}" style="color:#58a6ff;font-size:11px">查看</a></div>' for f in ebooks[:10])}
-    {f'<div style="color:#8b949e;font-size:11px;padding:4px 0">...還有 {len(ebooks)-10} 章</div>' if len(ebooks)>10 else ''}
-    {'<div style="color:#8b949e;font-size:12px;padding:8px 0">尚無電子書</div>' if not ebooks else ''}
+    <h3>📝 電子書 ({ebook_ok}/{ebook_total} 已審核)</h3>
+    <div style="background:#1a1a2e;border-radius:6px;height:6px;margin-bottom:12px"><div style="background:#3fb950;height:6px;border-radius:6px;width:{ebook_ok/max(ebook_total,1)*100:.0f}%"></div></div>
+    {''.join(f'<div class="stat-row"><span class="stat-label">{f["icon"]} {f["name"][:30]}</span><span class="stat-val" style="font-size:10px">{f["chars"]:,}字</span><a href="/view/ebooks/{f["name"]}?token=' + request.args.get("token","") + '" style="color:#58a6ff;font-size:10px">查看</a><a href="/review/approved/{f["key"]}" style="color:#3fb950;font-size:10px;margin:0 4px">✓</a><a href="/review/rejected/{f["key"]}" style="color:#e94560;font-size:10px">✗</a></div>' for f in ebooks[:20])}
+    {f'<div style="color:#8b949e;font-size:11px;padding:4px 0">...還有 {len(ebooks)-20} 章</div>' if len(ebooks)>20 else ''}
   </div>
 
   <div class="card">
-    <h3>📚 童書 ({len(children)} 篇)</h3>
-    {''.join(f'<div class="stat-row"><span class="stat-label">{f[:50]}</span><a href="/view/children_book/{f}?token={request.args.get("token","")}" style="color:#58a6ff;font-size:11px">查看</a></div>' for f in children[:10])}
-    {f'<div style="color:#8b949e;font-size:11px;padding:4px 0">...還有 {len(children)-10} 篇</div>' if len(children)>10 else ''}
-    {'<div style="color:#8b949e;font-size:12px;padding:8px 0">尚無童書</div>' if not children else ''}
+    <h3>📚 童書 ({child_ok}/{child_total} 已審核)</h3>
+    <div style="background:#1a1a2e;border-radius:6px;height:6px;margin-bottom:12px"><div style="background:#3fb950;height:6px;border-radius:6px;width:{child_ok/max(child_total,1)*100:.0f}%"></div></div>
+    {''.join(f'<div class="stat-row"><span class="stat-label">{f["icon"]} {f["name"][:30]}</span><span class="stat-val" style="font-size:10px">{f["chars"]:,}字</span><a href="/view/children_book/{f["name"]}?token=' + request.args.get("token","") + '" style="color:#58a6ff;font-size:10px">查看</a><a href="/review/approved/{f["key"]}" style="color:#3fb950;font-size:10px;margin:0 4px">✓</a><a href="/review/rejected/{f["key"]}" style="color:#e94560;font-size:10px">✗</a></div>' for f in children[:20])}
   </div>
 
   <div class="card">
-    <h3>🔬 研究報告 ({len(research_files)} 篇)</h3>
-    {''.join(f'<div class="stat-row"><span class="stat-label">{f[:45]}</span><a href="/view/research/{f}?token={request.args.get("token","")}" style="color:#58a6ff;font-size:11px">查看</a></div>' for f in research_files[:10])}
-    {f'<div style="color:#8b949e;font-size:11px;padding:4px 0">...還有 {len(research_files)-10} 篇</div>' if len(research_files)>10 else ''}
-    {'<div style="color:#8b949e;font-size:12px;padding:8px 0">尚無研究報告</div>' if not research_files else ''}
+    <h3>🔬 研究報告 ({research_ok}/{research_total} 已審核)</h3>
+    <div style="background:#1a1a2e;border-radius:6px;height:6px;margin-bottom:12px"><div style="background:#3fb950;height:6px;border-radius:6px;width:{research_ok/max(research_total,1)*100:.0f}%"></div></div>
+    {''.join(f'<div class="stat-row"><span class="stat-label">{f["icon"]} {f["name"][:30]}</span><span class="stat-val" style="font-size:10px">{f["chars"]:,}字</span><a href="/view/research/{f["name"]}?token=' + request.args.get("token","") + '" style="color:#58a6ff;font-size:10px">查看</a><a href="/review/approved/{f["key"]}" style="color:#3fb950;font-size:10px;margin:0 4px">✓</a><a href="/review/rejected/{f["key"]}" style="color:#e94560;font-size:10px">✗</a></div>' for f in research_files[:20])}
   </div>
 
   <div class="card">
-    <h3>🌐 網站</h3>
-    <div class="stat-row"><span class="stat-label">HTML 頁面</span><span class="stat-val">{len(websites)} 個</span></div>
-    {''.join(f'<div class="stat-row"><span class="stat-label">{f[:50]}</span><a href="/view/website/{f}?token={request.args.get("token","")}" style="color:#58a6ff;font-size:11px">查看</a></div>' for f in websites[:5])}
-    <div class="stat-row"><span class="stat-label">CSS 樣式</span><span class="stat-val">{len(website_css)} 個</span></div>
+    <h3>🌐 品牌與網站</h3>
+    <div class="stat-row"><span class="stat-label">網站頁面</span><span class="stat-val">{len(websites)} 個</span></div>
+    {''.join(f'<div class="stat-row"><span class="stat-label">{f["name"][:30]}</span><a href="/view/website/{f["name"]}?token=' + request.args.get("token","") + '" style="color:#58a6ff;font-size:11px">查看</a></div>' for f in websites[:5])}
+    <div class="stat-row"><span class="stat-label">品牌素材</span><span class="stat-val">{len(brand_files)} 個</span></div>
   </div>
 
   <div class="card">
@@ -217,6 +285,22 @@ td{{padding:6px 8px;border-bottom:1px solid #111122}}
         return f"<h1>錯誤</h1><pre>{e}</pre>"
 
 
+@app.route("/review/<status>/<path:subpath>")
+def review_file(status, subpath):
+    """人工審核：approved / rejected / pending"""
+    if status not in ("approved", "rejected", "pending"):
+        return "❌ 無效狀態", 400
+    BASE = Path(__file__).parent.parent.parent
+    review_file = BASE / "data" / "pipeline" / "reviews.json"
+    review_file.parent.mkdir(parents=True, exist_ok=True)
+    reviews = {}
+    if review_file.exists():
+        reviews = json.loads(review_file.read_text())
+    reviews[subpath] = status
+    review_file.write_text(json.dumps(reviews, ensure_ascii=False, indent=2))
+    return f'<script>history.back()</script><p>{subpath} → {status}</p>', 200
+
+
 @app.route("/view/<path:subpath>")
 def view_file(subpath):
     """安全查看 outputs 目录下的文件"""
@@ -231,7 +315,7 @@ def view_file(subpath):
     if safe_path.suffix == ".html":
         return safe_path.read_text(encoding="utf-8")
     content = safe_path.read_text(encoding="utf-8")
-    return f"""<!DOCTYPE html>
+  return f"""<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
 <meta charset="utf-8">
