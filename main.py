@@ -682,10 +682,35 @@ def main():
         # ── 啟動資源偵查器官（確保管線永不枯竭） ──
         try:
             from resource_scout import scout
-            scout.start(interval_seconds=3600)  # 每 1 小時外出偵查
+            scout.start(interval_seconds=3600)
             print("  [✅] 資源偵查器官已啟動 (每 1 小時)")
         except Exception as e:
             print(f"  [⚠️] 資源偵查啟動失敗: {e}")
+
+        # ── 啟動品質監督器官（確保每本完成不遺漏） ──
+        try:
+            from pipeline_supervisor import supervisor as pipe_supervisor
+            from pipeline_engine import engine
+            if AUTHORIZED:
+                async def supervisor_alert(msg: str):
+                    for uid in AUTHORIZED:
+                        try:
+                            await app.bot.send_message(chat_id=uid, text=msg)
+                        except:
+                            pass
+                pipe_supervisor.set_alert_callback(lambda m: None)
+                pipe_supervisor._last_alert = None
+                original_supervise = pipe_supervisor.supervise
+                def supervised_wrapper(engine):
+                    report = original_supervise(engine)
+                    if "🛑" in report:
+                        pipe_supervisor._last_alert = report
+                    return report
+                pipe_supervisor.supervise = supervised_wrapper
+            pipe_supervisor.start(engine, interval_seconds=1800)
+            print("  [✅] 品質監督器官已啟動 (每 30 分鐘)")
+        except Exception as e:
+            print(f"  [⚠️] 品質監督啟動失敗: {e}")
 
         # ── 出版工廠定時日報 (每 N 小時自動推送 Telegram) ──
         REPORT_INTERVAL = int(os.getenv("PUBLISH_REPORT_INTERVAL", "86400"))

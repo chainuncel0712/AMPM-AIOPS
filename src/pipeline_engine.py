@@ -10,6 +10,7 @@ import json, os, threading, time, hashlib, random
 from pathlib import Path
 from datetime import datetime, timedelta
 from resource_scout import scout as resource_scout
+from pipeline_supervisor import supervisor as pipeline_supervisor
 
 BASE = Path(__file__).resolve().parent.parent
 DATA = BASE / "data" / "pipeline"
@@ -172,6 +173,7 @@ class EbookPipeline:
         book["published_at"] = datetime.now().isoformat()
         self._save()
         cycle_log.record("ebook", "publish", book_id, str(plats))
+        pipeline_supervisor.record_completion(book_id, "ebook")
         return f"📚 《{book['topic']}》已上架到 {len(plats)} 個平台"
 
     def record_sale(self, book_id, platform, amount):
@@ -349,6 +351,7 @@ class KidBookPipeline:
         book["published_at"] = datetime.now().isoformat()
         self._save()
         cycle_log.record("kidbook", "publish", book_id, str(plats))
+        pipeline_supervisor.record_completion(book_id, "kidbook")
         return f"📚 《{book['title']}》已上架到 {len(plats)} 個平台"
 
     def get_pipeline_status(self):
@@ -505,6 +508,7 @@ class PublisherEngine:
         parts.append(self.service.get_pipeline_status())
         parts.append("")
         parts.append(f"📈 銷售摘要：{self.ebook.get_sales_summary()}")
+        parts.append(f"🔎 品質監督：{pipeline_supervisor.status()['completion_rate']}% 完成率")
         parts.append("")
         parts.append(f"🔄 循環引擎：{'🟢 運行中' if self._running else '🔴 已停止'}")
         recent = cycle_log.recent(5)
@@ -600,6 +604,12 @@ class PublisherEngine:
                 results.append(f"  ⏸️ 《{book['title']}》已被退回，待人工處理")
                 kid_advanced += 1
                 break
+
+        # ── 2.5 器官協作：ResourceScout 提供繪圖風格給內容生成 ──
+        if kid_advanced > 0 or True:
+            ill_style = resource_scout.pick_random_illustration_style()
+            img_src = resource_scout.pick_random_image_source()
+            results.append(f"  🎨 資源偵查提供：{ill_style} / {img_src.get('name','通用')}")
 
         # ── 3. 只有完全沒有進行中的書，才開新選題 ──
         if ebook_advanced == 0:
