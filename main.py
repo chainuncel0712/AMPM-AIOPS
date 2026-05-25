@@ -741,7 +741,6 @@ def main():
                 pub_engine.start_auto_pilot(llm_call=pipeline_llm, interval_hours=1)
                 print("  [✅] 出版引擎自動循環已啟動 (每 1 小時)")
                 # 立刻執行第一次循環
-                import threading
                 def first_cycle():
                     import time; time.sleep(10)
                     pub_engine.auto_cycle(llm_call=pipeline_llm)
