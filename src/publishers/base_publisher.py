@@ -34,7 +34,7 @@ class PublisherBase:
 
     @property
     def cookie_path(self) -> Path:
-        return COOKIE_DIR / f"{self.platform.toLowerCase() if hasattr(self.platform,'toLowerCase') else self.platform.lower()}_cookies.json"
+        return COOKIE_DIR / f"{self.platform.lower()}_cookies.json"
 
     async def _launch(self):
         from playwright.async_api import async_playwright

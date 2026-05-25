@@ -17,13 +17,17 @@ Telegram AI Bot 授權系統 + 三條自動出版管線。用戶付 USDT → 自
 
 ## 🏭 出版工廠架構（2026-05-25 新增）
 
-### 新增 3 個出版機械組件（原 47 → 現 50）
+### 新增 7 個出版機械組件（原 47 → 現 54）
 
 | 機械組件 | 檔名 | 功能 | 頻率 |
 |------|------|------|------|
 | 🦅 **ResourceScout** | `src/resource_scout.py` | 外出找免費優質資源（圖片/字型/API/趨勢/工具） | 每 1 小時 |
 | 🏭 **PublisherEngine** | `src/pipeline_engine.py` | 統一出版循環引擎，整合電子書/童書/客服網站三條產線 | `/publish cycle` |
 | 🛡️ **PipelineSupervisor** | `src/pipeline_supervisor.py` | 品質監督/停滯偵測/生產力指標 | 每 30 分鐘 |
+| 📤 **ReadmooPublisher** | `src/publishers/readmoo_publisher.py` | Readmoo mooPub 自動上架（Playwright 瀏覽器自動化） | publish 時觸發 |
+| 📤 **KDPPublisher** | `src/publishers/kdp_publisher.py` | Amazon KDP 自動上架 Kindle 電子書（Playwright 瀏覽器自動化） | publish 時觸發 |
+| 📤 **PublisherBase** | `src/publishers/base_publisher.py` | 上架機械組件基底類別（瀏覽器管理 + Cookie 持久化） | — |
+| 📤 **PublisherManager** | `src/publishers/manager.py` | 上架機械組件管理器（協調多平台上架 + 結果紀錄） | — |
 
 ### 三條產線循環
 
@@ -56,21 +60,23 @@ Telegram 日報 (每 10 分鐘)
 
 ### Telegram 指令
 ```
-/publish status                  — 三條產線即時狀態
-/publish cycle                   — 執行一次完整循環
-/publish ebook trend             — 電子書市場趨勢
-/publish kidbook trend           — 童書市場趨勢
-/publish ebook select <主題>      — 新選題
+/publish status                    — 三條產線即時狀態
+/publish cycle                     — 執行一次完整循環
+/publish ebook trend               — 電子書市場趨勢
+/publish kidbook trend             — 童書市場趨勢
+/publish ebook select <主題>        — 新選題
 /publish kidbook select <書名> <主題> <年齡>
-/publish approve <book_id>       — 批准上架
-/publish reject <book_id> <原因>  — 退回
-/publish supervisor inspect      — 品質體檢
-/publish resource scout          — 資源偵查
-/publish resource status         — 資源庫狀態
-/publish auto on <小時>          — 啟動自動循環
-/publish auto off                — 停止自動循環
-/publish auto publish on/off     — 自動上架開關
-/publish website                 — 註冊網站網址
+/publish approve <book_id>         — 批准上架（自動判斷書種）
+/publish reject <book_id> <原因>    — 退回
+/publish publish <book_id>         — 上架到 Readmoo / KDP（Playwright 瀏覽器自動化）
+/publish publisher status          — 上架機械組件狀態
+/publish supervisor inspect        — 品質體檢
+/publish resource scout            — 資源偵查
+/publish resource status           — 資源庫狀態
+/publish auto on <小時>            — 啟動自動循環
+/publish auto off                  — 停止自動循環
+/publish auto publish on/off       — 自動上架開關
+/publish website                   — 註冊網站網址
 ```
 
 ## 當前運行狀態
@@ -78,7 +84,7 @@ Telegram 日報 (每 10 分鐘)
 ### 黑曜主體
 - **PID**: 2807917
 - **運行時間**: 持續成長中
-- **機械組件**: 50/50 正常（47 原有 + 3 新出版機械組件）
+- **機械組件**: 54/54 正常（47 原有 + 7 新出版/上架機械組件）
 - **LLM 供應鏈**: DeepSeek (primary) → NVIDIA NIM (secondary) → Ollama (fallback, 本機未啟動)
 - **Dashboard**: http://localhost:5050 ✅
 - **Log**: `/tmp/黑曜.log`
@@ -136,6 +142,10 @@ Telegram 日報 (每 10 分鐘)
 - `src/pipeline_service.py` — AMPM-AIOPS.COM 客服網站專用管線
 - `src/resource_scout.py` — 資源偵查機械組件，管理 37 個免費資源來源
 - `src/pipeline_supervisor.py` — 品質監督機械組件，計算完成率與停滯監控
+- `src/publishers/base_publisher.py` — 上架機械組件基底（Playwright 瀏覽器自動化 + Cookie 持久化）
+- `src/publishers/readmoo_publisher.py` — Readmoo mooPub 自動上架
+- `src/publishers/kdp_publisher.py` — Amazon KDP 自動上架
+- `src/publishers/manager.py` — 上架機械組件管理器（協調多平台上架）
 
 ### 資料檔案
 - `data/licenses.json` — 授權資料庫
@@ -158,6 +168,9 @@ Telegram 日報 (每 10 分鐘)
 4. 童書插圖尚未接入真實圖片生成 API（需整合 Stable Diffusion / DALL-E）
 5. AMPM-AIOPS.COM 網站尚未建置（domain 已保留但尚未部署）
 6. `dashboard/pricing.html` 舊版定價 ($29/$99/$199) 需處理或刪除
+7. **Readmoo/KDP 憑證未設定**：需在 `.env` 填入 `READMOO_EMAIL` / `READMOO_PASSWORD` / `KDP_EMAIL` / `KDP_PASSWORD`
+8. **Readmoo/KDP 選擇器需調校**：Playwright 自動化腳本的選擇器是推測值，需實際登入測試後調整
+9. **Amazon KDP 2FA**：若開啟雙因子驗證需手動介入
 
 ## 核心設計原則
 - **單一執行權威**：ExecutionContext 是唯一決策者，禁止任何機械組件修改 execution path

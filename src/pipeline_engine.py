@@ -13,6 +13,7 @@ from resource_scout import scout as resource_scout
 from pipeline_supervisor import supervisor as pipeline_supervisor
 from core.image_generator import image_gen
 from core.epub_compiler import compiler
+from publishers import publisher_manager
 
 BASE = Path(__file__).resolve().parent.parent
 DATA = BASE / "data" / "pipeline"
@@ -183,7 +184,7 @@ class EbookPipeline:
         cycle_log.record("ebook", "reject", book_id, reason)
         return f"❌ 《{book['topic']}》已退回：{reason}"
 
-    def publish(self, book_id, platforms=None):
+    def publish(self, book_id, platforms=None, auto_platforms=None):
         book = self._find(book_id)
         if not book:
             return "找不到書籍"
@@ -194,6 +195,19 @@ class EbookPipeline:
         book["status"] = "published"
         book["published_at"] = datetime.now().isoformat()
         self._save()
+
+        epub = book.get("epub", {})
+        epub_path = epub.get("path", "") if isinstance(epub, dict) else book.get("epub_path", "")
+        if epub_path and os.path.exists(epub_path):
+            meta = {
+                "id": book_id, "title": book.get("topic", ""),
+                "author": "AMPM AI",
+                "description": book.get("content", "")[:300],
+                "price": 99, "category": "Computer & Technology",
+            }
+            publisher_results = publisher_manager.publish_sync(epub_path, meta)
+            book["publisher_results"] = publisher_results
+
         cycle_log.record("ebook", "publish", book_id, str(plats))
         pipeline_supervisor.record_completion(book_id, "ebook")
         return f"📚 《{book['topic']}》已上架到 {len(plats)} 個平台"
@@ -478,7 +492,7 @@ PANEY 深呼吸一口氣，說：「白天勇敢出發，晚上安心回家。�
         cycle_log.record("kidbook", "reject", book_id, reason)
         return f"❌ 《{book['title']}》已退回：{reason}"
 
-    def publish(self, book_id, platforms=None):
+    def publish(self, book_id, platforms=None, auto_platforms=None):
         book = self._find(book_id)
         if not book:
             return "找不到書籍"
@@ -489,6 +503,19 @@ PANEY 深呼吸一口氣，說：「白天勇敢出發，晚上安心回家。�
         book["status"] = "published"
         book["published_at"] = datetime.now().isoformat()
         self._save()
+
+        epub = book.get("epub", {})
+        epub_path = epub.get("path", "") if isinstance(epub, dict) else book.get("epub_path", "")
+        if epub_path and os.path.exists(epub_path):
+            meta = {
+                "id": book_id, "title": book.get("title", ""),
+                "author": "AMPM AI",
+                "description": book.get("story", "")[:300],
+                "price": 99, "category": "Children's Books",
+            }
+            publisher_results = publisher_manager.publish_sync(epub_path, meta)
+            book["publisher_results"] = publisher_results
+
         cycle_log.record("kidbook", "publish", book_id, str(plats))
         pipeline_supervisor.record_completion(book_id, "kidbook")
         return f"📚 《{book['title']}》已上架到 {len(plats)} 個平台"
@@ -650,6 +677,15 @@ class PublisherEngine:
         parts.append("")
         parts.append(f"📈 銷售摘要：{self.ebook.get_sales_summary()}")
         parts.append(f"🔎 品質監督：{pipeline_supervisor.status()['completion_rate']}% 完成率")
+        try:
+            pm = __import__("publishers", fromlist=["publisher_manager"]).publisher_manager
+            ps = pm.status()
+            plat_info = []
+            for plat, info in ps.get("platforms", {}).items():
+                plat_info.append(f"{plat}: {'🟢' if info.get('logged_in') else '🔴'}")
+            parts.append(f"📤 上架機械組件：{' | '.join(plat_info)}")
+        except:
+            pass
         parts.append("")
         parts.append(f"🔄 循環引擎：{'🟢 運行中' if self._running else '🔴 已停止'}")
         recent = cycle_log.recent(5)
@@ -910,6 +946,17 @@ class PublisherEngine:
 
         # ── 資源狀態 ──
         lines.append(f"🔍 資源庫：{rs.get('catalog_entries', 0)} 項 | 風格 {rs.get('styles_available', 10)} 種")
+
+        # ── 上架機械組件 ──
+        try:
+            pm = __import__("publishers", fromlist=["publisher_manager"]).publisher_manager
+            ps = pm.status()
+            lines.append(f"📤 上架紀錄：{ps.get('total_uploads', 0)} 次 | 忙碌: {'🟡' if ps.get('busy') else '🔴'}")
+            for e in ps.get("recent_uploads", [])[-2:]:
+                icon = "✅" if e.get("success") else "❌"
+                lines.append(f"  {icon} {e.get('book', '?')} → {e.get('platform', '?')}")
+        except:
+            pass
 
         # ── 銷售 ──
         sales = self.ebook.get_sales_summary()
