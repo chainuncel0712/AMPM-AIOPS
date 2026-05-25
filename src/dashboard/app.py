@@ -27,7 +27,9 @@ def check_auth():
         return
     if request.path in ("/health", "/login"):
         return
-    return jsonify({"error": "unauthorized", "hint": "?token=<你的密鑰>"}), 401
+    if request.path == "/" and request.method == "GET":
+        return f"""<html><head><meta http-equiv="refresh" content="0;url=/login"></head><body></body></html>"""
+    return jsonify({"error": "unauthorized", "hint": "/login 登入或 ?token=密鑰"}), 401
 
 
 @app.route("/login", methods=["GET", "POST"])
