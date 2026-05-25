@@ -7,49 +7,53 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
+:root { --dark: #241E1C; --orange: #FF8C1A; --blue: #189FFF; --light: #F7F7F7; --gold: #FFD966; }
 * { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:'Inter',sans-serif; background:#0a0a1a; color:#e0e0e0; min-height:100vh; }
-.header { background:linear-gradient(135deg,#1a1a3e,#0d0d2b); padding:40px 20px; text-align:center; border-bottom:1px solid #2a2a5a; }
-.header h1 { font-size:2.2em; font-weight:700; background:linear-gradient(90deg,#00d4ff,#7b2ff7); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-.header p { color:#888; margin-top:8px; font-size:1em; }
-.plans { display:flex; gap:20px; justify-content:center; padding:40px 20px; flex-wrap:wrap; max-width:900px; margin:0 auto; }
-.plan { background:#12122a; border:1px solid #2a2a5a; border-radius:16px; padding:30px; width:250px; text-align:center; transition:transform .2s,border-color .2s; }
-.plan:hover { transform:translateY(-4px); border-color:#7b2ff7; }
-.plan.popular { border-color:#7b2ff7; position:relative; }
-.plan.popular::before { content:"最熱門"; position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:#7b2ff7; color:#fff; padding:4px 16px; border-radius:20px; font-size:.8em; font-weight:600; }
-.plan h3 { font-size:1.3em; color:#fff; }
-.plan .price { font-size:2.5em; font-weight:700; color:#00d4ff; margin:15px 0; }
+body { font-family:'Inter','Noto Sans TC',sans-serif; background:var(--dark); color:var(--light); min-height:100vh; }
+.header { background:linear-gradient(135deg,#1a1515,#2a1a10); padding:50px 20px; text-align:center; border-bottom:2px solid var(--gold); }
+.header h1 { font-size:2.5em; font-weight:700; color:var(--gold); letter-spacing:2px; }
+.header p { color:#bbb; margin-top:8px; font-size:1em; }
+.header .badge { display:inline-block; border:2px solid var(--gold); border-radius:50%; width:60px; height:60px; line-height:60px; color:var(--gold); font-size:.7em; font-weight:700; margin-bottom:12px; }
+.plans { display:flex; gap:20px; justify-content:center; padding:50px 20px 30px; flex-wrap:wrap; max-width:900px; margin:0 auto; }
+.plan { background:#2a2220; border:1px solid #3a3230; border-radius:16px; padding:30px; width:250px; text-align:center; transition:transform .2s,border-color .2s; }
+.plan:hover { transform:translateY(-4px); border-color:var(--orange); }
+.plan.popular { border-color:var(--orange); position:relative; }
+.plan.popular::before { content:"最熱門"; position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:var(--orange); color:var(--dark); padding:4px 16px; border-radius:20px; font-size:.8em; font-weight:700; }
+.plan h3 { font-size:1.3em; color:var(--light); }
+.plan .price { font-size:2.5em; font-weight:700; color:var(--gold); margin:15px 0; }
 .plan .price span { font-size:.4em; color:#888; }
 .plan ul { list-style:none; text-align:left; margin:20px 0; }
-.plan ul li { padding:6px 0; font-size:.9em; color:#aaa; }
-.plan ul li::before { content:"✓ "; color:#00d4ff; font-weight:700; }
+.plan ul li { padding:6px 0; font-size:.9em; color:#bbb; }
+.plan ul li::before { content:"✓ "; color:var(--blue); font-weight:700; }
 .activate-section { max-width:600px; margin:0 auto 60px; padding:0 20px; }
-.activate-card { background:#12122a; border:1px solid #2a2a5a; border-radius:16px; padding:40px; }
-.activate-card h2 { text-align:center; margin-bottom:8px; font-size:1.4em; }
+.activate-card { background:#2a2220; border:1px solid #3a3230; border-radius:16px; padding:40px; }
+.activate-card h2 { text-align:center; margin-bottom:8px; font-size:1.4em; color:var(--gold); }
 .activate-card p.desc { text-align:center; color:#888; font-size:.9em; margin-bottom:24px; }
 .form-group { margin-bottom:16px; }
 .form-group label { display:block; font-size:.85em; color:#aaa; margin-bottom:6px; }
-.form-group input { width:100%; padding:12px 16px; background:#1a1a3e; border:1px solid #2a2a5a; border-radius:8px; color:#fff; font-size:1em; outline:none; transition:border-color .2s; }
-.form-group input:focus { border-color:#7b2ff7; }
+.form-group input { width:100%; padding:12px 16px; background:#1a1515; border:1px solid #3a3230; border-radius:8px; color:var(--light); font-size:1em; outline:none; transition:border-color .2s; }
+.form-group input:focus { border-color:var(--orange); }
 .form-group .hint { font-size:.8em; color:#666; margin-top:4px; }
-.btn-submit { width:100%; padding:14px; background:linear-gradient(90deg,#00d4ff,#7b2ff7); border:none; border-radius:8px; color:#fff; font-size:1.1em; font-weight:600; cursor:pointer; transition:opacity .2s; }
+.btn-submit { width:100%; padding:14px; background:linear-gradient(135deg,var(--orange),#cc6a00); border:none; border-radius:8px; color:var(--dark); font-size:1.1em; font-weight:700; cursor:pointer; transition:opacity .2s; }
 .btn-submit:hover { opacity:.9; }
 .btn-submit:disabled { opacity:.5; cursor:not-allowed; }
 .result { margin-top:20px; padding:16px; border-radius:8px; display:none; }
-.result.success { display:block; background:#0d2d1a; border:1px solid #2d6a3d; color:#7ddfa0; }
-.result.error { display:block; background:#2d0d1a; border:1px solid #6a2d3d; color:#df7d7d; }
-.result pre { margin-top:12px; padding:12px; background:#0a0a1a; border-radius:6px; font-size:.85em; word-break:break-all; }
-footer { text-align:center; padding:30px; color:#555; font-size:.85em; }
+.result.success { display:block; background:#1a2a1a; border:1px solid #2a5a2a; color:#8ddf8d; }
+.result.error { display:block; background:#2a1a1a; border:1px solid #5a2a2a; color:#df7d7d; }
+.result pre { margin-top:12px; padding:12px; background:var(--dark); border-radius:6px; font-size:.85em; word-break:break-all; color:var(--gold); }
+footer { text-align:center; padding:30px; color:#666; font-size:.85em; border-top:1px solid #2a2220; }
+footer code { background:#2a2220; padding:2px 6px; border-radius:4px; }
 .loading { display:none; text-align:center; margin-top:20px; }
-.loading .spinner { display:inline-block; width:24px; height:24px; border:3px solid #2a2a5a; border-top-color:#7b2ff7; border-radius:50%; animation:spin .8s linear infinite; }
+.loading .spinner { display:inline-block; width:24px; height:24px; border:3px solid #3a3230; border-top-color:var(--orange); border-radius:50%; animation:spin .8s linear infinite; }
 @keyframes spin { to { transform:rotate(360deg); } }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <h1>AMPM AI</h1>
-  <p>Telegram AI Bot 授權系統 — 付款後自動啟用</p>
+  <div class="badge">AM<br/>&amp;<br/>PM</div>
+  <h1>AM&amp;PM ADVENTURE</h1>
+  <p>從白天到夜晚，用知識與想像陪伴每個冒險靈魂</p>
 </div>
 
 <div class="plans">
@@ -108,7 +112,7 @@ footer { text-align:center; padding:30px; color:#555; font-size:.85em; }
 </div>
 
 <footer>
-  AMPM AI &mdash; 付款即全解鎖，不分級<br>
+  AM&amp;PM ADVENTURE &mdash; 白天勇敢出發，晚上安心回家<br>
   收款地址：<code>0x7f3110c1314bD68Fdf8E32cD921E646912108587</code>（BEP20）
 </footer>
 

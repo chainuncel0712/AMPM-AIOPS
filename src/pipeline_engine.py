@@ -837,7 +837,7 @@ class PublisherEngine:
         cycle_log.record("engine", "auto_cycle", "; ".join(results))
         return "\n".join(results)
 
-    def start_auto_pilot(self, llm_call=None, interval_hours=24):
+    def start_auto_pilot(self, llm_call=None, interval_hours=6):
         """啟動自動循環（背景執行）"""
         if self._running:
             return "🔄 循環引擎已在運行中"
@@ -874,38 +874,93 @@ class PublisherEngine:
             "auto_publish": self._auto_publish,
         }
 
+    def _book_progress_lines(self, books: list, label: str, title_key: str = "topic") -> list:
+        lines = [f"  📌 {label}："]
+        by_stage = {}
+        for b in books:
+            s = b.get("status", "unknown")
+            by_stage.setdefault(s, []).append(b.get(title_key, "?")[:30])
+        for stage, titles in sorted(by_stage.items()):
+            emoji = {"selected": "🆕", "outline_done": "📝", "content_done": "✍️",
+                     "epub_done": "📦", "pending_review": "🔍", "approved": "✅",
+                     "published": "📚", "rejected": "⛔", "characters_done": "🎭",
+                     "story_done": "📖"}.get(stage, "•")
+            lines.append(f"    {emoji} {stage} ({len(titles)}): {', '.join(titles[:3])}")
+            if len(titles) > 3:
+                lines[-1] += f" 等 {len(titles)} 本"
+        return lines
+
     def generate_report(self, detailed: bool = False) -> str:
         st = self.status()
         rs = resource_scout.status()
+        sv = pipeline_supervisor.status()
+
         lines = []
         lines.append("🏭 出版工廠日報")
+        lines.append(datetime.now().strftime("%Y-%m-%d %H:%M"))
         lines.append("=" * 30)
-        lines.append(f"📚 電子書已出版：{st['ebook_published']} 本")
-        lines.append(f"📖 童書已出版：{st['kidbook_published']} 本")
-        lines.append(f"🌐 客服網站啟用：{st['service_active']} 個")
-        lines.append(f"🔍 資源庫：{rs['catalog_entries']} 項")
-        lines.append(f"🔄 自動循環：{'🟢 運行中' if st['engine_running'] else '🔴 已停止'}")
-        lines.append(f"🔄 累積循環次數：{st['cycle_count']}")
-        lines.append(f"🚀 自動上架：{'🟢 開啟' if st.get('auto_publish', False) else '🔴 關閉'}")
 
+        # ── 綜合統計 ──
+        lines.append(f"📦 累計出版：電子書 {st['ebook_published']} 本 | 童書 {st['kidbook_published']} 本")
+        lines.append(f"🌐 客服網站：{st['service_active']} 個啟用中")
+        lines.append(f"🔄 循環引擎：{'🟢 運行中' if st['engine_running'] else '🔴 已停止'} | 次數 {st['cycle_count']} | 自動上架 {'🟢' if st.get('auto_publish') else '🔴'}")
+
+        # ── 品質監督 ──
+        lines.append(f"🛡️ 品質監督：完成率 {sv['completion_rate']}% | 停滯 {sv.get('stalled_count', 0)} 本 | 警報 {sv.get('alert_count', 0)}")
+
+        # ── 資源狀態 ──
+        lines.append(f"🔍 資源庫：{rs.get('catalog_entries', 0)} 項 | 風格 {rs.get('styles_available', 10)} 種")
+
+        # ── 銷售 ──
         sales = self.ebook.get_sales_summary()
         lines.append(f"💰 {sales}")
 
-        recent = cycle_log.recent(3)
+        # ── 各書進度明細 ──
+        lines.append("")
+        lines.extend(self._book_progress_lines(self.ebook.ebooks, "電子工具書", "topic"))
+        lines.append("")
+        lines.extend(self._book_progress_lines(self.kidbook.kidbooks, "童書繪本", "title"))
+        lines.append("")
+        lines.extend(self._book_progress_lines(self.service.service_sites, "客服網站", "domain"))
+
+        # ── 最近活動 ──
+        recent = cycle_log.recent(5)
         if recent:
             lines.append("")
-            lines.append("最近活動：")
+            lines.append("━━ 最近活動 ━━")
             for e in recent:
-                lines.append(f"  [{e['ts'][:19]}] {e['pipeline']}/{e['stage']}")
+                detail = e.get("detail", "")
+                d_short = f" — {detail[:40]}" if detail else ""
+                lines.append(f"  [{e['ts'][11:19]}] {e['pipeline']}/{e['stage']}{d_short}")
+
+        # ── 待辦提醒 ──
+        todo = []
+        pending_ebooks = [b for b in self.ebook.ebooks if b.get("status") == "pending_review"]
+        pending_kids = [b for b in self.kidbook.kidbooks if b.get("status") == "pending_review"]
+        if pending_ebooks and not self._auto_publish:
+            todo.append(f"  ⏸️ {len(pending_ebooks)} 本電子書待審核：/publish approve <id>")
+        if pending_kids and not self._auto_publish:
+            todo.append(f"  ⏸️ {len(pending_kids)} 本童書待審核：/publish approve <id>")
+        rejected = [b for b in self.ebook.ebooks if b.get("status") == "rejected"]
+        rejected += [b for b in self.kidbook.kidbooks if b.get("status") == "rejected"]
+        if rejected:
+            todo.append(f"  ⛔ {len(rejected)} 本被退回需人工處理")
+        if todo:
+            lines.append("")
+            lines.append("━━ 待辦提醒 ━━")
+            lines.extend(todo)
 
         if detailed:
             lines.append("")
-            lines.append("── 各產線詳細 ──")
+            lines.append("━━ 各產線詳細統計 ━━")
             lines.append(self.ebook.get_pipeline_status())
             lines.append("")
             lines.append(self.kidbook.get_pipeline_status())
             lines.append("")
             lines.append(self.service.get_pipeline_status())
+            lines.append("")
+            lines.append(f"🔎 品質監督完整報告：")
+            lines.append(pipeline_supervisor.report())
 
         return "\n".join(lines)
 

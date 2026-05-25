@@ -14,5 +14,21 @@
     "path": "/home/pop5057273712_gmail_com/AMPM-AIOPS/output/58aa547f-037.epub",
     "type": "kidbook",
     "created_at": "2026-05-25T21:54:21.025592"
+  },
+  "f8647f27-b15": {
+    "book_id": "86841421CFFA",
+    "title": "Python 自動化入門",
+    "epub_id": "f8647f27-b15",
+    "path": "/home/pop5057273712_gmail_com/AMPM-AIOPS/output/f8647f27-b15.epub",
+    "type": "ebook",
+    "created_at": "2026-05-25T21:57:07.606991"
+  },
+  "d778674c-c5d": {
+    "book_id": "CB2B7153B01A",
+    "title": "PANEY & MONEY 的吵吵停一下：小聲也能被聽見",
+    "epub_id": "d778674c-c5d",
+    "path": "/home/pop5057273712_gmail_com/AMPM-AIOPS/output/d778674c-c5d.epub",
+    "type": "kidbook",
+    "created_at": "2026-05-25T21:57:07.615805"
   }
 }
