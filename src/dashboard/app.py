@@ -2,7 +2,7 @@
 Dashboard + 網站聊天 API
 """
 from flask import Flask, jsonify, request, abort
-import os, sys
+import os, sys, json
 from pathlib import Path
 
 try:
@@ -116,6 +116,9 @@ def index():
         research_files = get_files("research")
         websites = get_files("website", "*.html")
         brand_files = get_files("brand_identity", "*")
+        comics = get_files("comics")
+        novels = get_files("novels")
+        short_stories = get_files("short_stories")
 
         # 工具数
         tool_count = len(brain.tools.list_tools()) if hasattr(brain, 'tools') and brain.tools else 0
@@ -130,6 +133,9 @@ def index():
         ebook_ok, ebook_total = progress(ebooks)
         child_ok, child_total = progress(children)
         research_ok, research_total = progress(research_files)
+        comics_ok, comics_total = progress(comics)
+        novels_ok, novels_total = progress(novels)
+        stories_ok, stories_total = progress(short_stories)
 
         # IP 角色数据
         ip_files = []
@@ -253,7 +259,11 @@ td{{padding:6px 8px;border-bottom:1px solid #111122}}
   <div class="card">
     <h3>📝 電子書 ({ebook_ok}/{ebook_total} 已審核)</h3>
     <div style="background:#1a1a2e;border-radius:6px;height:6px;margin-bottom:12px"><div style="background:#3fb950;height:6px;border-radius:6px;width:{ebook_ok/max(ebook_total,1)*100:.0f}%"></div></div>
-    <div style="margin-bottom:8px"><a href="/review/approved/ebooks" style="color:#3fb950;font-size:10px;text-decoration:none;margin-right:12px">✓ 全部通過</a><a href="/review/pending/ebooks" style="color:#d29922;font-size:10px;text-decoration:none">↻ 全部重置</a></div>
+    <div style="margin-bottom:8px">
+      <a href="/review/approved/ebooks" style="color:#3fb950;font-size:10px;text-decoration:none;margin-right:12px">✓ 全部通過</a>
+      <a href="/review/pending/ebooks" style="color:#d29922;font-size:10px;text-decoration:none;margin-right:12px">↻ 全部重置</a>
+      <a href="/compile-book/ebooks?token={request.args.get('token','')}" style="color:#58a6ff;font-size:10px;text-decoration:none;font-weight:bold">📖 編譯成書</a>
+    </div>
     {''.join(f'<div class="stat-row"><span class="stat-label">{f["icon"]} {f["name"][:30]}</span><span class="stat-val" style="font-size:10px">{f["chars"]:,}字</span><a href="/view/ebooks/{f["name"]}?token=' + request.args.get("token","") + '" style="color:#58a6ff;font-size:10px">查看</a><a href="/review/approved/{f["key"]}" style="color:#3fb950;font-size:10px;margin:0 4px">✓</a><a href="/review/rejected/{f["key"]}" style="color:#e94560;font-size:10px">✗</a></div>' for f in ebooks[:20])}
     {f'<div style="color:#8b949e;font-size:11px;padding:4px 0">...還有 {len(ebooks)-20} 章</div>' if len(ebooks)>20 else ''}
   </div>
@@ -268,6 +278,27 @@ td{{padding:6px 8px;border-bottom:1px solid #111122}}
     <h3>🔬 研究報告 ({research_ok}/{research_total} 已審核)</h3>
     <div style="background:#1a1a2e;border-radius:6px;height:6px;margin-bottom:12px"><div style="background:#3fb950;height:6px;border-radius:6px;width:{research_ok/max(research_total,1)*100:.0f}%"></div></div>
     {''.join(f'<div class="stat-row"><span class="stat-label">{f["icon"]} {f["name"][:30]}</span><span class="stat-val" style="font-size:10px">{f["chars"]:,}字</span><a href="/view/research/{f["name"]}?token=' + request.args.get("token","") + '" style="color:#58a6ff;font-size:10px">查看</a><a href="/review/approved/{f["key"]}" style="color:#3fb950;font-size:10px;margin:0 4px">✓</a><a href="/review/rejected/{f["key"]}" style="color:#e94560;font-size:10px">✗</a></div>' for f in research_files[:20])}
+  </div>
+
+  <div class="card">
+    <h3>🎨 漫畫 ({comics_ok}/{comics_total} 已審核)</h3>
+    <div style="background:#1a1a2e;border-radius:6px;height:6px;margin-bottom:12px"><div style="background:#3fb950;height:6px;border-radius:6px;width:{comics_ok/max(comics_total,1)*100:.0f}%"></div></div>
+    {''.join(f'<div class="stat-row"><span class="stat-label">{f["icon"]} {f["name"][:30]}</span><span class="stat-val" style="font-size:10px">{f["chars"]:,}字</span><a href="/view/comics/{f["name"]}?token=' + request.args.get("token","") + '" style="color:#58a6ff;font-size:10px">查看</a><a href="/review/approved/{f["key"]}" style="color:#3fb950;font-size:10px;margin:0 4px">✓</a><a href="/review/rejected/{f["key"]}" style="color:#e94560;font-size:10px">✗</a></div>' for f in comics[:20])}
+    {'<div style="color:#8b949e;font-size:12px;padding:8px 0">尚無漫畫內容</div>' if not comics else ''}
+  </div>
+
+  <div class="card">
+    <h3>📖 長篇小說 ({novels_ok}/{novels_total})</h3>
+    <div style="background:#1a1a2e;border-radius:6px;height:6px;margin-bottom:12px"><div style="background:#3fb950;height:6px;border-radius:6px;width:{novels_ok/max(novels_total,1)*100:.0f}%"></div></div>
+    {''.join(f'<div class="stat-row"><span class="stat-label">{f["icon"]} {f["name"][:30]}</span><span class="stat-val" style="font-size:10px">{f["chars"]:,}字</span><a href="/view/novels/{f["name"]}?token=' + request.args.get("token","") + '" style="color:#58a6ff;font-size:10px">查看</a><a href="/review/approved/{f["key"]}" style="color:#3fb950;font-size:10px;margin:0 4px">✓</a><a href="/review/rejected/{f["key"]}" style="color:#e94560;font-size:10px">✗</a></div>' for f in novels[:20])}
+    {'<div style="color:#8b949e;font-size:12px;padding:8px 0">尚無小說內容</div>' if not novels else ''}
+  </div>
+
+  <div class="card">
+    <h3>📝 短篇小說 ({stories_ok}/{stories_total})</h3>
+    <div style="background:#1a1a2e;border-radius:6px;height:6px;margin-bottom:12px"><div style="background:#3fb950;height:6px;border-radius:6px;width:{stories_ok/max(stories_total,1)*100:.0f}%"></div></div>
+    {''.join(f'<div class="stat-row"><span class="stat-label">{f["icon"]} {f["name"][:30]}</span><span class="stat-val" style="font-size:10px">{f["chars"]:,}字</span><a href="/view/short_stories/{f["name"]}?token=' + request.args.get("token","") + '" style="color:#58a6ff;font-size:10px">查看</a><a href="/review/approved/{f["key"]}" style="color:#3fb950;font-size:10px;margin:0 4px">✓</a><a href="/review/rejected/{f["key"]}" style="color:#e94560;font-size:10px">✗</a></div>' for f in short_stories[:20])}
+    {'<div style="color:#8b949e;font-size:12px;padding:8px 0">尚無短篇小說</div>' if not short_stories else ''}
   </div>
 
   <div class="card">
@@ -304,7 +335,7 @@ def review_file(status, subpath):
     if review_file.exists():
         reviews = json.loads(review_file.read_text())
 
-    batch_dirs = {"ebooks", "children_book", "research"}
+    batch_dirs = {"ebooks", "children_book", "research", "comics", "novels", "short_stories"}
     if subpath in batch_dirs:
         d = BASE / "outputs" / subpath
         if d.exists():
@@ -316,6 +347,76 @@ def review_file(status, subpath):
     reviews[subpath] = status
     review_file.write_text(json.dumps(reviews, ensure_ascii=False, indent=2))
     return f'<script>history.back()</script><p>{subpath} → {status}</p>', 200
+
+
+@app.route("/compile-book/<book_type>")
+def compile_book(book_type):
+    """將已審核章節編譯為完整書籍"""
+    BASE = Path(__file__).parent.parent.parent
+    review_file = BASE / "data" / "pipeline" / "reviews.json"
+    reviews = {}
+    if review_file.exists():
+        reviews = json.loads(review_file.read_text())
+
+    book_dir = BASE / "outputs" / book_type
+    if not book_dir.exists():
+        return f"<script>history.back()</script><p>路徑不存在: {book_type}</p>", 404
+
+    chapters = []
+    for f in sorted(book_dir.glob("*.md")):
+        key = f"{book_type}/{f.name}"
+        if reviews.get(key) == "approved":
+            try:
+                content = f.read_text(encoding="utf-8")
+                chapters.append({"name": f.stem, "content": content})
+            except: pass
+
+    if not chapters:
+        return f"<script>history.back()</script><p>沒有已審核的章節可編譯</p>"
+
+    book_name = {"ebooks": "AI入門指南", "children_book": "PANEY & MONEY 童書", "research": "研究報告合集",
+                 "comics": "漫畫合集", "novels": "長篇小說", "short_stories": "短篇小說集"}.get(book_type, book_type)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M")
+
+    toc = f"# {book_name}\n\n> 自動編譯於 {datetime.now().strftime('%Y-%m-%d %H:%M')}\n\n## 目錄\n\n"
+    body = ""
+    for i, ch in enumerate(chapters, 1):
+        safe_name = ch["name"].replace("_", " ").replace("ch", "第").replace(" ", "")
+        toc += f"{i}. [{safe_name}](#{ch['name']})\n"
+        body += f"\n\n---\n\n# 第{i}章: {safe_name}\n\n{ch['content']}"
+
+    full_book = toc + "\n" + body
+    compile_dir = BASE / "outputs" / "compiled"
+    compile_dir.mkdir(parents=True, exist_ok=True)
+    out_path = compile_dir / f"{book_type}_{timestamp}.md"
+    out_path.write_text(full_book, encoding="utf-8")
+
+    total_chars = sum(len(c["content"]) for c in chapters)
+    return f"""<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>編譯完成 | 黑曜</title>
+<style>
+body{{font-family:system-ui,sans-serif;background:#0a0a0f;color:#e0e0e0;padding:30px;max-width:700px;margin:0 auto}}
+h1{{color:#3fb950}}a{{color:#58a6ff}}.card{{background:#111122;border:1px solid #1e1e3a;border-radius:12px;padding:20px;margin:16px 0}}
+.stat{{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #1a1a2e}}
+</style>
+</head>
+<body>
+<h1>✅ 書籍編譯完成</h1>
+<div class="card">
+<div class="stat"><span>書名</span><span>{book_name}</span></div>
+<div class="stat"><span>章節數</span><span>{len(chapters)} 章</span></div>
+<div class="stat"><span>總字數</span><span>{total_chars:,} 字</span></div>
+<div class="stat"><span>檔案</span><span>{out_path.name}</span></div>
+</div>
+<div style="display:flex;gap:12px;margin-top:16px">
+<a href="/view/compiled/{out_path.name}?token={request.args.get('token','')}" style="background:#1f6feb;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none">📖 預覽完整書籍</a>
+<a href="/publish?token={request.args.get('token','')}" style="background:#238636;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none">🚀 前往上架</a>
+<a href="javascript:history.back()" style="color:#8b949e;padding:10px 20px">← 返回</a>
+</div>
+</body></html>"""
 
 
 @app.route("/publish")
@@ -333,10 +434,17 @@ def publish_page():
         try: pub_logs = json.loads(pub_log_file.read_text())[-20:]
         except: pass
 
-    # 已审核通过的电子书
     approved_ebooks = []
     outputs_dir = BASE / "outputs"
-    for subdir, label in [("ebooks", "電子書"), ("children_book", "童書")]:
+    compiled_books = []
+    compiled_dir = outputs_dir / "compiled"
+    if compiled_dir.exists():
+        for f in sorted(compiled_dir.glob("*.md"), reverse=True):
+            try: compiled_books.append({"name": f.name, "chars": len(f.read_text(encoding="utf-8"))})
+            except: pass
+
+    for subdir, label in [("ebooks", "電子書"), ("children_book", "童書"),
+                           ("comics", "漫畫"), ("novels", "長篇小說"), ("short_stories", "短篇小說")]:
         d = outputs_dir / subdir
         if d.exists():
             for f in sorted(d.glob("*.md")):
@@ -374,8 +482,16 @@ a{{color:#58a6ff}}
 <a href="/?token={request.args.get('token','')}" style="color:#8b949e;font-size:12px">← 返回 Dashboard</a>
 
 <div class="card">
-<h3>✅ 已審核通過，待上架 ({len(approved_ebooks)} 本)</h3>
-{''.join(f'<div class="stat-row"><span class="stat-label">{b["type"]}: {b["name"][:40]}</span><span class="stat-val">{b["chars"]:,}字</span><a href="/view/{b["key"]}?token=' + request.args.get("token","") + '" class="btn btn-blue">预览</a></div>' for b in approved_ebooks) if approved_ebooks else '<div style="color:#8b949e;padding:8px">尚無審核通過的內容。請先到 Dashboard 審核章節。</div>'}
+<h3>✅ 已審核通過，待上架 ({len(approved_ebooks)} 章)</h3>
+{''.join(f'<div class="stat-row"><span class="stat-label">{b["type"]}: {b["name"][:40]}</span><span class="stat-val">{b["chars"]:,}字</span><a href="/view/{b["key"]}?token=' + request.args.get("token","") + '" class="btn btn-blue">预览</a></div>' for b in approved_ebooks) if approved_ebooks else '<div style="color:#8b949e;padding:8px">尚無審核通過的章節。請先到 Dashboard 審核。</div>'}
+<div style="margin-top:12px">
+<a href="/compile-book/ebooks?token={request.args.get('token','')}" class="btn btn-green">📖 將已審核章節編譯成書</a>
+</div>
+</div>
+
+<div class="card">
+<h3>📚 已編譯書籍 ({len(compiled_books)} 本)</h3>
+{''.join(f'<div class="stat-row"><span class="stat-label">📗 {b["name"]}</span><span class="stat-val">{b["chars"]:,}字</span><a href="/view/compiled/{b["name"]}?token=' + request.args.get("token","") + '" class="btn btn-blue">预览</a></div>' for b in compiled_books[:10]) if compiled_books else '<div style="color:#8b949e;padding:8px">尚未編譯完整書籍。審核章節後點「編譯成書」</div>'}
 </div>
 
 <div class="card">
