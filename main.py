@@ -769,7 +769,7 @@ def main():
         try:
             from self_evolution import evolution_engine
             evolution_engine.start(interval_hours=12, llm_fn=None)
-            print("  [✅] 自我進化引擎已啟動 (每 7 天)")
+            print("  [✅] 自我進化引擎已啟動 (每 12 小時)")
         except Exception as e:
             print(f"  [⚠️] 自我進化啟動失敗: {e}")
 
@@ -777,7 +777,7 @@ def main():
         try:
             from keyword_scout import keyword_scout
             keyword_scout.start(interval_seconds=900)
-            print("  [✅] 關鍵字爬蟲已啟動 (每 30 分鐘)")
+            print("  [✅] 關鍵字爬蟲已啟動 (每 15 分鐘)")
         except Exception as e:
             print(f"  [⚠️] 關鍵字爬蟲啟動失敗: {e}")
 
