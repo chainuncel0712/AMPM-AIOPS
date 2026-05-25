@@ -57,17 +57,136 @@ def index():
     if brain is None:
         return "⚠️ 黑曜尚未初始化"
     try:
-        status = brain.cortex.status()
-        return jsonify({
-            "name": brain.name,
-            "cortex": status,
-            "organs": {
-                "memory": str(brain.memory.is_alive()),
-                "tools": str(brain.tools.list_tools()),
-            }
-        })
+        import json, subprocess, time
+        BASE = Path(__file__).parent.parent.parent
+        NOW = time.strftime("%Y-%m-%d %H:%M:%S")
+
+        # 系统资源
+        cpu = subprocess.run("top -bn1 | grep 'Cpu(s)' | awk '{printf \"%.1f\",100-$8}'", shell=True, capture_output=True, text=True).stdout.strip() or "?"
+        mem = subprocess.run("free -m | awk 'NR==2{printf \"%d/%dMB (%.0f%%)\",$3,$2,$3*100/$2}'", shell=True, capture_output=True, text=True).stdout.strip() or "?"
+        disk = subprocess.run("df -h / | awk 'NR==2{print $5}'", shell=True, capture_output=True, text=True).stdout.strip() or "?"
+        uptime_sec = 0
+        bot_uptime = "?"
+        try:
+            pid = subprocess.run("pgrep -f 'python3.*main.py' | head -1", shell=True, capture_output=True, text=True).stdout.strip()
+            if pid:
+                bot_uptime = subprocess.run(f"ps -p {pid} -o etime=", shell=True, capture_output=True, text=True).stdout.strip()
+        except: pass
+
+        # 进化数据
+        evo = {}
+        evo_file = BASE / "data" / "evolution" / "cycle_state.json"
+        if evo_file.exists():
+            evo = json.loads(evo_file.read_text())
+
+        # 客户数据
+        customers = {}
+        cf = BASE / "data" / "customers.json"
+        if cf.exists():
+            customers = json.loads(cf.read_text())
+
+        # 产出文件
+        outputs_dir = BASE / "outputs"
+        ebooks = len(list((outputs_dir / "ebooks").glob("*.md"))) if (outputs_dir / "ebooks").exists() else 0
+        children = len(list((outputs_dir / "children_book").glob("*.md"))) if (outputs_dir / "children_book").exists() else 0
+        research = len(list((outputs_dir / "research").glob("*.md"))) if (outputs_dir / "research").exists() else 0
+        websites = len(list((outputs_dir / "website").glob("*.html"))) if (outputs_dir / "website").exists() else 0
+
+        # 工具数
+        tool_count = len(brain.tools.list_tools()) if hasattr(brain, 'tools') and brain.tools else 0
+
+        return f"""<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>黑曜 Dashboard | AMPM-AIOPS</title>
+<style>
+*{{margin:0;padding:0;box-sizing:border-box}}
+body{{font-family:'Inter',-apple-system,sans-serif;background:#0a0a0f;color:#e0e0e0;min-height:100vh}}
+.header{{background:#111122;border-bottom:1px solid #1e1e3a;padding:20px 30px;display:flex;justify-content:space-between;align-items:center}}
+.header h1{{font-size:22px;color:#58a6ff}}
+.header span{{font-size:12px;color:#8b949e}}
+.grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;padding:20px 30px}}
+.card{{background:#111122;border:1px solid #1e1e3a;border-radius:12px;padding:20px}}
+.card h3{{font-size:13px;color:#8b949e;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}}
+.card .value{{font-size:28px;font-weight:700;color:#58a6ff}}
+.card .sub{{font-size:12px;color:#8b949e;margin-top:4px}}
+.stat-row{{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #1a1a2e;font-size:13px}}
+.stat-row:last-child{{border:none}}
+.stat-label{{color:#8b949e}}
+.stat-val{{color:#e0e0e0;font-weight:600}}
+.good{{color:#3fb950}}
+.warn{{color:#d29922}}
+.bad{{color:#e94560}}
+table{{width:100%;border-collapse:collapse;font-size:12px}}
+th{{text-align:left;color:#8b949e;padding:6px 8px;border-bottom:1px solid #1e1e3a}}
+td{{padding:6px 8px;border-bottom:1px solid #111122}}
+.footer{{text-align:center;padding:20px;color:#484f58;font-size:11px}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div>
+    <h1>⚙️ 黑曜 Dashboard</h1>
+    <span>AMPM-AIOPS · 更新於 {NOW}</span>
+  </div>
+  <span style="color:#3fb950">● 運行中</span>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <h3>🖥️ 系統資源</h3>
+    <div class="stat-row"><span class="stat-label">CPU</span><span class="stat-val">{cpu}%</span></div>
+    <div class="stat-row"><span class="stat-label">記憶體</span><span class="stat-val">{mem}</span></div>
+    <div class="stat-row"><span class="stat-label">磁碟</span><span class="stat-val">{disk}</span></div>
+    <div class="stat-row"><span class="stat-label">Bot 運行</span><span class="stat-val">{bot_uptime}</span></div>
+  </div>
+
+  <div class="card">
+    <h3>🤖 黑曜核心</h3>
+    <div class="stat-row"><span class="stat-label">狀態</span><span class="stat-val good">✅ alive</span></div>
+    <div class="stat-row"><span class="stat-label">記憶模組</span><span class="stat-val good">✅</span></div>
+    <div class="stat-row"><span class="stat-label">工具系統</span><span class="stat-val">{tool_count} 個工具</span></div>
+    <div class="stat-row"><span class="stat-label">思考引擎</span><span class="stat-val good">✅</span></div>
+  </div>
+
+  <div class="card">
+    <h3>🧬 進化循環</h3>
+    <div class="stat-row"><span class="stat-label">循環次數</span><span class="stat-val">{evo.get('cycle_count', evo.get('cycles','?'))}</span></div>
+    <div class="stat-row"><span class="stat-label">進化分數</span><span class="stat-val">{evo.get('evolution_score','?')}</span></div>
+    <div class="stat-row"><span class="stat-label">吸收資訊</span><span class="stat-val">{evo.get('total_absorbed','?')}</span></div>
+    <div class="stat-row"><span class="stat-label">學習次數</span><span class="stat-val">{evo.get('total_learned','?')}</span></div>
+  </div>
+
+  <div class="card">
+    <h3>👤 客戶 ({len(customers)})</h3>
+    {''.join(f'<div class="stat-row"><span class="stat-label">#{cid[:8]}</span><span class="stat-val">{c.get("name","?")} · {c.get("status","?")}</span></div>' for cid, c in list(customers.items())[:5])}
+    {f'<div class="stat-row"><span class="stat-label" style="color:#8b949e">...還有 {len(customers)-5} 位</span></div>' if len(customers)>5 else ''}
+    {'<div style="color:#8b949e;font-size:12px;padding:8px 0">尚無客戶</div>' if not customers else ''}
+  </div>
+
+  <div class="card">
+    <h3>📝 產出總覽</h3>
+    <div class="stat-row"><span class="stat-label">電子書</span><span class="stat-val">{ebooks} 章</span></div>
+    <div class="stat-row"><span class="stat-label">童書</span><span class="stat-val">{children} 篇</span></div>
+    <div class="stat-row"><span class="stat-label">研究報告</span><span class="stat-val">{research} 篇</span></div>
+    <div class="stat-row"><span class="stat-label">網站頁面</span><span class="stat-val">{websites} 個</span></div>
+  </div>
+
+  <div class="card">
+    <h3>🔧 工具清單 ({tool_count})</h3>
+    <div style="max-height:200px;overflow-y:auto;font-size:11px;color:#8b949e;line-height:1.8">
+      {', '.join(brain.tools.list_tools() if hasattr(brain,'tools') and brain.tools else [])}
+    </div>
+  </div>
+</div>
+
+<div class="footer">AMPM-AIOPS 黑曜 · Dashboard v1.0</div>
+</body>
+</html>"""
     except Exception as e:
-        return jsonify({"error": str(e)})
+        return f"<h1>錯誤</h1><pre>{e}</pre>"
 
 
 @app.route("/health")
