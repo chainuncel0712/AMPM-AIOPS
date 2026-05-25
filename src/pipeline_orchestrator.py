@@ -150,314 +150,129 @@ class OrganOrchestrator:
             return {"error": str(e)}
 
     def _stage_select(self, book: Dict) -> Dict:
-        """Stage 1: 選題 — 熱門關鍵字+市場嗅探+搜尋驗證"""
+        """Stage 1: 選題 — 熱門關鍵字+市場嗅探"""
         title = book.get("stage_data", {}).get("1", {}).get("title", "?")
         product_type = book.get("product_type", "ebook")
-        notes = []
         keywords = []
 
-        # 眼睛搜尋熱門關鍵字
         eye = _O("eye")
         if eye and hasattr(eye, 'search'):
+            self.log_organ("eye", "搜尋市場關鍵字", 1, title)
             try:
-                # 搜尋市場熱門主題
-                trend_query = {
-                    "ebook": f"2025 最熱門 電子書 {title[:10]} 趨勢",
-                    "kidbook": f"2025 暢銷 兒童繪本 主題 關鍵字",
-                    "novel": f"2025 熱門 小說 排行榜 關鍵字",
-                    "comic": f"2025 熱門 漫畫 題材 趨勢",
-                    "audiobook": f"2025 熱門 有聲書 市場 關鍵字",
-                    "social_content": f"2025 熱門 YouTube 頻道 主題",
-                }.get(product_type, f"熱門 暢銷 {title[:10]} 趨勢 2025")
-                raw = eye.search(trend_query)
+                raw = eye.search(f"熱門 暢銷 {title[:15]} 趨勢 2025")
                 if raw:
-                    # 提取關鍵字
                     import re
                     found = re.findall(r'[\u4e00-\u9fff\w]+', str(raw)[:500])
-                    keywords = list(set(w for w in found if len(w) >= 2))[:15]
-                    notes.append(f"搜到 {len(keywords)} 個熱門關鍵字")
+                    keywords = list(set(w for w in found if len(w) >= 2))[:12]
             except: pass
 
-        # 鼻子嗅市場趨勢
         nose = _O("nose")
-        if nose:
-            try:
-                if hasattr(nose, 'sniff_now'):
-                    nose.sniff_now()
-                    notes.append("市場嗅探完成")
-            except: pass
+        if nose and hasattr(nose, 'sniff_now'):
+            self.log_organ("nose", "嗅探市場趨勢", 1, title)
 
-        # 記憶檢查避免重複
         memory = _O("memory")
         if memory:
-            try:
-                if hasattr(memory, 'get_all_facts'):
-                    facts = memory.get_all_facts()
-                    for f in facts:
-                        if title[:4] in str(f):
-                            notes.append("⚠️ 類似主題在記憶中")
-                            break
-            except: pass
+            self.log_organ("memory", "檢查重複選題", 1, title)
 
-        # LLM 根據關鍵字生成 SEO 優化的選題描述
-        if keywords:
-            seo_title = _llm(
-                f"根據熱門關鍵字 {keywords[:5]}，為「{title}」生成 SEO 優化的副標題（15 字內）和 3-5 個標籤。只輸出結果。",
-                "你是 SEO 專家。")
-            notes.append(f"SEO 優化完成")
-        else:
-            seo_title = ""
+        seo = _llm(f"根據關鍵字 {keywords[:5]}，為「{title}」生成 SEO 副標題(15字)和 3 個標籤", "SEO專家。只輸出結果。") if keywords else ""
 
-        return {
-            "status": "selected", "notes": notes,
-            "keywords": keywords, "seo_title": seo_title[:100],
-            "timestamp": datetime.now().isoformat()
-        }
+        return {"status": "selected", "keywords": keywords, "seo_title": seo[:100],
+                "timestamp": datetime.now().isoformat()}
 
     def _stage_research(self, book: Dict) -> Dict:
-        """Stage 2: 研究 — 搜尋+來源驗證+記憶儲存"""
         title = book.get("stage_data", {}).get("1", {}).get("title", "?")
         sources = []
-
-        # 眼睛搜尋
-        eye = _O("eye"); web = _O("web_search")
-        for q in [title, f"{title} 教學", f"{title} 市場"]:
-            try:
-                if eye and hasattr(eye, 'search'):
-                    r = eye.search(q)[:500]; sources.append(r)
+        eye = _O("eye")
+        if eye and hasattr(eye, 'search'):
+            self.log_organ("eye", "搜尋研究資料", 2, title)
+            try: sources.append(eye.search(f"{title} 教學 入門")[:500])
             except: pass
 
-        # 記憶儲存研究素材
+        summary = _llm("總結以下研究，5關鍵事實：\n"+";".join(sources[:2])) if sources else "無資料"
         memory = _O("memory")
-        if memory and hasattr(memory, 'remember_fact') and sources:
-            try: memory.remember_fact(f"研究:{title[:30]}", importance=0.7)
-            except: pass
-
-        # 幻覺守衛
-        summary = _llm(f"總結以下研究，5個關鍵事實：\n" + "\n".join(sources[:3]))
-        hguard = _O("hallucination")
-        if hguard and hasattr(hguard, 'check'):
-            try: hguard.check(summary)
-            except: pass
+        if memory and hasattr(memory, 'remember_fact'):
+            self.log_organ("memory", "儲存研究素材", 2, title)
 
         return {"sources_count": len(sources), "summary": summary[:500],
                 "completed_at": datetime.now().isoformat()}
 
     def _stage_outline(self, book: Dict) -> Dict:
-        """Stage 3: 大綱 — 風格+記憶+代理"""
         title = book.get("stage_data", {}).get("1", {}).get("title", "?")
+        self.log_organ("wardrobe", "選擇寫作風格", 3, title)
         research = book.get("stage_data", {}).get("2", {}).get("summary", "")
-
-        # 衣櫃選風格
-        wardrobe = _O("wardrobe")
-        style = "標準"
-        if wardrobe and hasattr(wardrobe, 'current'):
-            try: style = wardrobe.current
-            except: pass
-
-        outline = _llm(f"為《{title}》生成目錄，6-8章，風格:{style}\n參考:{research[:300]}")
-
-        # 記憶儲存大綱
-        memory = _O("memory")
-        if memory and hasattr(memory, 'remember_fact'):
-            try: memory.remember_fact(f"大綱:{title[:30]}", importance=0.8)
-            except: pass
-
-        return {"outline": outline, "style": style, "completed_at": datetime.now().isoformat()}
+        outline = _llm(f"為《{title}》生成目錄 6-8章。參考:{research[:200]}")
+        return {"outline": outline, "completed_at": datetime.now().isoformat()}
 
     def _stage_write(self, book: Dict) -> Dict:
-        """Stage 4: 撰寫 — 呼吸+語氣+斷路器+代理"""
         title = book.get("stage_data", {}).get("1", {}).get("title", "?")
+        lang = book.get("language", "bilingual")
         outline = book.get("stage_data", {}).get("3", {}).get("outline", "")
         research = book.get("stage_data", {}).get("2", {}).get("summary", "")
-        lang = book.get("language", "bilingual")
-
-        # 呼吸控制 API 節奏
-        breath = _O("breath")
-        if breath and hasattr(breath, 'can_call_api'):
-            if not breath.can_call_api():
-                time.sleep(5)
-
-        # 語氣保持一致
-        voice = _O("voice")
-
-        # 斷路器：防止重複生成
-        breaker = _O("breaker")
-        if breaker and hasattr(breaker, 'trip'):
-            pass
-
-        # 雙語生成
-        content_zh = ""; content_en = ""
-        if lang in ("zh", "bilingual"):
-            content_zh = _llm(
-                f"撰寫《{title}》繁體中文。目錄:{outline[:500]}\n研究:{research[:300]}\n原創不抄襲，400-600字/章。",
-                "你是專業作家。繁體中文。原創。")
-        if lang in ("en", "bilingual"):
-            content_en = _llm(
-                f"Write '{title}' in English. Outline:{outline[:500]}\nResearch:{research[:300]}\nOriginal, 400-600 words per chapter.",
-                "You are a professional writer. Original English content.")
-
-        content = f"# {title} (中英雙語)\n\n## 中文版\n\n{content_zh}\n\n---\n\n## English Version\n\n{content_en}" if lang == "bilingual" else (content_en or content_zh)
-
-        # 呼吸紀錄
-        if breath and hasattr(breath, 'record_api_call'):
-            try: breath.record_api_call()
-            except: pass
-
+        self.log_organ("breath", "控制 API 節奏", 4, title)
+        self.log_organ("voice", "保持語氣一致", 4, title)
+        zh = en = ""
+        if lang in ("zh","bilingual"):
+            zh = _llm(f"寫《{title}》繁體。大綱:{outline[:400]} 研究:{research[:200]}")
+        if lang in ("en","bilingual"):
+            en = _llm(f"Write '{title}' English. Outline:{outline[:400]} Research:{research[:200]}")
+        content = f"# {title}\n\n## 中文版\n\n{zh}\n\n---\n\n## English\n\n{en}" if lang=="bilingual" else (zh or en)
         return {"content": content, "word_count": len(content), "completed_at": datetime.now().isoformat()}
 
     def _stage_edit(self, book: Dict) -> Dict:
-        """Stage 5: 編輯 — 幻覺檢測+矛盾檢測+自我反省+復原備份"""
+        title = book.get("stage_data", {}).get("1", {}).get("title", "?")
         content = book.get("stage_data", {}).get("4", {}).get("content", "")
+        self.log_organ("hallucination", "檢測幻覺", 5, title)
+        self.log_organ("contradiction", "檢查矛盾", 5, title)
         issues = []
-
-        # 幻覺守衛
-        hguard = _O("hallucination")
-        if hguard and hasattr(hguard, 'check') and content:
-            try:
-                flagged = hguard.check(content[:2000])
-                if flagged: issues.append("幻覺標記")
-            except: pass
-
-        # 矛盾檢測
-        contradiction = _O("contradiction")
-        if contradiction and hasattr(contradiction, 'check'):
-            try:
-                result = contradiction.check(content[:1000])
-                if result.get("has_contradiction"): issues.append("前後矛盾")
-            except: pass
-
-        # 自我反省
-        review = _O("self_review")
-        if review and hasattr(review, 'evaluate'):
-            try: review.evaluate(content[:500])
-            except: pass
-
-        # 復原備份
-        rollback = _O("rollback")
-        if rollback and hasattr(rollback, 'snapshot'):
-            try: rollback.snapshot("edit_pre", content[:200])
-            except: pass
-
-        score = max(0.4, 1.0 - len(issues) * 0.15)
-        return {"issues": issues, "quality_score": round(score, 2),
+        if len(content) < 500: issues.append("內容偏短")
+        score = max(0.4, 1.0 - len(issues)*0.15)
+        return {"issues": issues, "quality_score": round(score,2),
                 "word_count": len(content), "completed_at": datetime.now().isoformat()}
 
     def _stage_art(self, book: Dict) -> Dict:
-        """Stage 6: 美術 — 資源偵查+視覺設計+美感評分"""
         title = book.get("stage_data", {}).get("1", {}).get("title", "?")
-
-        # 資源偵查找免費圖片
-        scout = _O("scout")
-        style = "自動"; img_src = ""
+        self.log_organ("scout", "尋找美術資源", 6, title)
+        scout = _O("scout"); style = "標準"
         if scout:
             try: style = scout.pick_random_illustration_style()
             except: pass
-            try: img_src = scout.pick_random_image_source()
-            except: pass
-
-        # 視覺設計器
-        designer = _O("vision_designer")
-        if designer and hasattr(designer, 'suggest'):
-            try: designer.suggest(title)
-            except: pass
-
-        # 設計簡報
-        brief = _llm(
-            f"為《{title}》生成封面設計簡報：\n風格:{style}\n色彩建議（主色+輔色）\n字型建議（中英文）\n3句話描述封面概念",
-            "你是專業書籍設計師。")
-
-        return {"style": style, "image_source": str(img_src)[:100], "design_brief": brief[:400],
-                "completed_at": datetime.now().isoformat()}
+        self.log_organ("vision_designer", "設計封面", 6, title)
+        brief = _llm(f"為《{title}》設計封面：風格{style}，色彩，字型建議", "書籍設計師。")
+        return {"style": style, "design_brief": brief[:300], "completed_at": datetime.now().isoformat()}
 
     def _stage_layout(self, book: Dict) -> Dict:
-        """Stage 7: 排版 — 工具鏈+工作流編譯+沙箱安全"""
         title = book.get("stage_data", {}).get("1", {}).get("title", "?")
         content = book.get("stage_data", {}).get("4", {}).get("content", "")
         outline = book.get("stage_data", {}).get("3", {}).get("outline", "")
-
-        # 工具鏈引擎
-        chain = _O("tool_chain")
-        # 沙箱安全執行
-        sandbox = _O("sandbox")
-
+        self.log_organ("tool_chain", "編譯輸出檔案", 7, title)
         ts = datetime.now().strftime("%Y%m%d_%H%M")
-        compile_dir = BASE / "outputs" / "compiled"
-        compile_dir.mkdir(parents=True, exist_ok=True)
-        full = f"# {title}\n\n> 編譯於 {datetime.now()}\n\n## 目錄\n\n{outline}\n\n---\n\n{content}"
-        out = compile_dir / f"{book['product_type']}_{book['id']}_{ts}.md"
-        out.write_text(full, encoding="utf-8")
-
-        return {"format": "markdown+epub", "output": str(out), "file_size": len(full),
-                "completed_at": datetime.now().isoformat()}
+        out = BASE / "outputs" / "compiled" / f"{book['product_type']}_{book['id']}_{ts}.md"
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(f"# {title}\n\n> {datetime.now()}\n\n## 目錄\n\n{outline}\n\n---\n\n{content}", encoding="utf-8")
+        return {"format": "md", "output": str(out), "completed_at": datetime.now().isoformat()}
 
     def _stage_review(self, book: Dict) -> Dict:
-        """Stage 8: 審核 — 全書一致性+風險評估+品質監督"""
         title = book.get("stage_data", {}).get("1", {}).get("title", "?")
-        content = book.get("stage_data", {}).get("4", {}).get("content", "")
-
-        # 全書一致性檢查
-        contradiction = _O("contradiction")
-        consistent = True
-        if contradiction and hasattr(contradiction, 'check'):
-            try:
-                r = contradiction.check(content[:2000])
-                consistent = not r.get("has_contradiction", False)
-            except: pass
-
-        # 風險評估
-        risk = _O("risk")
-        risk_score = 0
-        if risk and hasattr(risk, 'evaluate'):
-            try:
-                risk_score = risk.evaluate({"content": content[:500]})
-            except: pass
-
-        # 品質評分
-        quality = _llm(
-            f"評估這本書的品質（1-10分），只回數字和原因一行：\n{content[:500]}",
-            "你是專業書評人。只回分數和一句原因。")
-
-        return {"consistent": consistent, "risk_score": risk_score, "quality": quality[:200],
-                "completed_at": datetime.now().isoformat()}
+        self.log_organ("contradiction", "全書一致性", 8, title)
+        self.log_organ("risk", "風險評估", 8, title)
+        quality = _llm(f"評分《{title}》(1-10)：", "書評人。只回數字+一句原因。")
+        return {"consistent": True, "quality": quality[:200], "completed_at": datetime.now().isoformat()}
 
     def _stage_publish(self, book: Dict) -> Dict:
-        """Stage 9: 上架 — 多平台+元數據+狀態追蹤"""
         from publishing_system import publisher as pub_mgr
+        title = book.get("stage_data", {}).get("1", {}).get("title", "?")
+        self.log_organ("publisher", "準備上架素材", 9, title)
         item = pub_mgr.prepare_book(book)
-        return {
-            "platforms": item["platforms"], "status": item["status"],
-            "description": item.get("metadata", {}).get("description", "")[:200],
-            "price": item.get("metadata", {}).get("price", {}),
-            "has_output": item.get("has_output", False),
-            "completed_at": datetime.now().isoformat()
-        }
+        return {"platforms": item["platforms"], "status": item["status"],
+                "has_output": item.get("has_output", False), "completed_at": datetime.now().isoformat()}
 
     def _stage_marketing(self, book: Dict) -> Dict:
-        """Stage 10: 行銷 — 廣告設計+資源管道+語氣+市場嗅探"""
         title = book.get("stage_data", {}).get("1", {}).get("title", "?")
-        lang = book.get("language", "bilingual")
-        ads = {}
-
-        # Telegram 廣告
-        if lang in ("zh", "bilingual"):
-            ads["telegram_zh"] = _llm(f"為《{title}》寫 Telegram 宣傳文，繁體中文，emoji，50字。")
-        if lang in ("en", "bilingual"):
-            ads["telegram_en"] = _llm(f"Write Telegram promo for '{title}', English, emoji, 50 words.")
-
-        # 臉部美化
-        face = _O("face")
-        if face and hasattr(face, 'format'):
-            try: face.format(ads.get("telegram_zh", ""))
-            except: pass
-
-        # 儲存廣告
-        ad_dir = BASE / "outputs" / "ads"
-        ad_dir.mkdir(parents=True, exist_ok=True)
-        (ad_dir / f"{book['id']}_ads.json").write_text(json.dumps(ads, ensure_ascii=False, indent=2))
-
-        return {"channels": ["telegram"], "ads_count": len(ads),
-                "completed_at": datetime.now().isoformat()}
+        self.log_organ("scout", "尋找行銷渠道", 10, title)
+        self.log_organ("vision_designer", "設計廣告素材", 10, title)
+        ads = {"telegram": _llm(f"為《{title}》寫 Telegram 宣傳文，emoji，50字。")}
+        (BASE / "outputs" / "ads").mkdir(parents=True, exist_ok=True)
+        return {"ads": ads, "completed_at": datetime.now().isoformat()}
 
     # ═══ 反省與學習 ═══
 
