@@ -715,26 +715,20 @@ def main():
         except Exception as e:
             print(f"  [⚠️] 品質監督啟動失敗: {e}")
 
-        # ── 啟動出版引擎自動循環 ──
-        print("🏭 步驟 2.9.5: 啟動出版引擎自動循環...")
+        # ── 啟動出版引擎 ──
+        print("🏭 步驟 2.9.5: 注入器官到出版管線...")
         try:
+            from pipeline_orchestrator import orchestrator
+            orchestrator.inject_organs(obsidian.organs)
+            print(f"  [✅] 出版管線已接收 {len(obsidian.organs)} 個器官")
+
             from pipeline_engine import engine as pub_engine
-            pub_engine.start_auto_pilot(llm_call=None, interval_hours=1)
-            print("  [✅] 出版引擎已啟動 (每 1 小時，9 階段流水線)")
-
-            # 立刻觸發選題
-            pub_engine.create_topic("ebook")
-            pub_engine.create_topic("kidbook")
-            print("  [✅] 初始選題已建立")
-
-            # 首次循環
-            def first_cycle():
-                import time; time.sleep(10)
-                pub_engine.auto_cycle()
-            threading.Thread(target=first_cycle, daemon=True).start()
-            print("  [✅] 首次循環將在 10 秒後開始")
+            # 立刻觸發初始選題
+            r1 = pub_engine.create_topic("ebook")
+            r2 = pub_engine.create_topic("kidbook")
+            print(f"  [✅] 初始選題: {r1}")
         except Exception as e:
-            print(f"  [⚠️] 出版引擎啟動失敗: {e}")
+            print(f"  [⚠️] 出版引擎啟動: {e}")
         print()
         REPORT_INTERVAL = int(os.getenv("PUBLISH_REPORT_INTERVAL", "86400"))
         if AUTHORIZED:
