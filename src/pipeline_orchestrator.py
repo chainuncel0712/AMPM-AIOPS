@@ -104,6 +104,7 @@ class OrganOrchestrator:
     def __init__(self):
         self.reflection_log: List[Dict] = self._load_log("reflections.json")
         self.quality_history: List[Dict] = self._load_log("quality_history.json")
+        self.organ_activity: List[Dict] = self._load_log("organ_activity.json")
         self.strategies: Dict = self._load_json("strategies.json")
 
     def _load_log(self, filename: str) -> list:
@@ -510,8 +511,35 @@ class OrganOrchestrator:
             "你是出版策略分析師。只輸出 3 改進方向 + 2 成功模式。")
         return summary
 
-    def get_recent_quality(self, n: int = 10) -> List[Dict]:
-        return self.quality_history[-n:]
+    def log_organ(self, organ: str, action: str, stage: int, book_title: str = ""):
+        """記錄器官活動"""
+        self.organ_activity.append({
+            "ts": datetime.now().isoformat(),
+            "organ": organ, "action": action, "stage": stage, "book": book_title[:30]
+        })
+        if len(self.organ_activity) > 200:
+            self.organ_activity = self.organ_activity[-100:]
+        self._save_log("organ_activity.json", self.organ_activity)
+
+    def get_organ_status(self) -> Dict:
+        """取得器官活動摘要"""
+        recent = self.organ_activity[-50:]
+        by_organ = {}
+        for a in recent:
+            org = a["organ"]
+            if org not in by_organ:
+                by_organ[org] = {"count": 0, "last_action": "", "last_stage": 0}
+            by_organ[org]["count"] += 1
+            by_organ[org]["last_action"] = a["action"][:50]
+            by_organ[org]["last_stage"] = a["stage"]
+
+        loaded = sum(1 for v in _organs.values() if v is not None)
+        return {
+            "organs_loaded": loaded,
+            "organs_total": len(_organs),
+            "recent_activity": self.organ_activity[-10:],
+            "by_organ": by_organ,
+        }
 
 
 # 全域單例
