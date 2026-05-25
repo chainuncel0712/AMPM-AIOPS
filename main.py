@@ -758,10 +758,9 @@ def main():
             print(f"  [✅] 出版管線已接收 {len(obsidian.organs)} 個器官")
 
             from pipeline_engine import engine as pub_engine
-            # 立刻觸發初始選題
-            r1 = pub_engine.create_topic("ebook")
-            r2 = pub_engine.create_topic("kidbook")
-            print(f"  [✅] 初始選題: {r1}")
+            # 立刻嘗試初始選題
+            r1 = pub_engine.create_topic("ebook", "預設選題：" + __import__("time").strftime("%m/%d"))
+            print(f"  [✅] 初始選題: {r1[:80]}")
         except Exception as e:
             print(f"  [⚠️] 出版引擎啟動: {e}")
         print()
