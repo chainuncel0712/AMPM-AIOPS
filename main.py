@@ -634,6 +634,26 @@ def main():
             result = dispatcher.train(uid, topic, content)
             await update.message.reply_text(f"🧠 {result}")
 
+        async def publish_cmd(update, context):
+            """出版引擎指令：/publish status / cycle / ebook ... / kidbook ..."""
+            from pipeline_engine import engine as pub_engine
+            from runtime.execution_context import RequestSandbox
+            ec = getattr(obsidian, 'execution_context', None)
+            full_msg = update.message.text
+            if ec:
+                reply = ec.handle(full_msg)
+            else:
+                sandbox = RequestSandbox(user_msg=full_msg)
+                from runtime.execution_context import ExecutionContext
+                tmp_ec = ExecutionContext(obsidian)
+                reply = tmp_ec._route_pipeline(sandbox)
+                reply = sandbox.response or "出版引擎未就緒"
+            if len(reply) > 4000:
+                for i in range(0, len(reply), 4000):
+                    await update.message.reply_text(reply[i:i+4000])
+            else:
+                await update.message.reply_text(reply)
+
         async def customers_cmd(update, context):
             all_c = dispatcher.get_customers_summary()
             if not all_c:
@@ -648,6 +668,9 @@ def main():
         app.add_handler(CommandHandler("start", start_cmd))
         app.add_handler(CommandHandler("status", status_cmd))
         app.add_handler(CommandHandler("service", service_cmd))
+        app.add_handler(CommandHandler("customers", customers_cmd))
+        app.add_handler(CommandHandler("train", train_cmd))
+        app.add_handler(CommandHandler("publish", publish_cmd))
         app.add_handler(CommandHandler("customers", customers_cmd))
         app.add_handler(CommandHandler("train", train_cmd))
         app.add_handler(MessageHandler(filters.TEXT, handle))
