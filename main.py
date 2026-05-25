@@ -682,6 +682,14 @@ def main():
         supervisor.register("bot", hb_interval=30, hb_timeout=120,
                             is_restartable=False, is_critical=True)
 
+        # ── 啟動關鍵字爬蟲機械組件 ──
+        try:
+            from keyword_scout import keyword_scout
+            keyword_scout.start(interval_seconds=1800)
+            print("  [✅] 關鍵字爬蟲已啟動 (每 30 分鐘，Google/Amazon/Readmoo/博客來)")
+        except Exception as e:
+            print(f"  [⚠️] 關鍵字爬蟲啟動失敗: {e}")
+
         # ── 啟動資源偵查機械組件（確保管線永不枯竭） ──
         try:
             from resource_scout import scout
