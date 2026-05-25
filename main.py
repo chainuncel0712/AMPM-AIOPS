@@ -682,21 +682,21 @@ def main():
         # ── 出版工廠定時日報 (每 N 小時自動推送 Telegram) ──
         REPORT_INTERVAL = int(os.getenv("PUBLISH_REPORT_INTERVAL", "86400"))
         if AUTHORIZED:
-            async def send_pipeline_report(context):
+            async def send_pipeline_report_task(app_ref):
+                import asyncio
                 from pipeline_engine import engine
-                report = engine.generate_report(detailed=False)
-                for uid in AUTHORIZED:
+                while True:
                     try:
-                        await context.bot.send_message(chat_id=uid, text=report)
+                        await asyncio.sleep(REPORT_INTERVAL)
+                        report = engine.generate_report(detailed=False)
+                        for uid in AUTHORIZED:
+                            try:
+                                await app_ref.bot.send_message(chat_id=uid, text=report)
+                            except Exception as e:
+                                print(f"[出版日報] 發送失敗給 {uid}: {e}")
                     except Exception as e:
-                        print(f"[出版日報] 發送失敗給 {uid}: {e}")
-
-            job_queue = app.job_queue
-            if job_queue:
-                job_queue.run_repeating(send_pipeline_report, interval=REPORT_INTERVAL, first=REPORT_INTERVAL)
-                print(f"  [✅] 出版日報已排程 (每 {REPORT_INTERVAL//3600} 小時)")
-            else:
-                print(f"  [⚠️] Job queue 不可用，無法排程日報")
+                        print(f"[出版日報] 錯誤: {e}")
+            # 排程會在 _run_bot() 內用 create_task 啟動
 
         try:
             from heartbeat import start as start_heartbeat
@@ -708,6 +708,10 @@ def main():
         
         import asyncio as _asyncio
         async def _run_bot():
+            if AUTHORIZED:
+                _asyncio.create_task(send_pipeline_report_task(app))
+                interval_display = f"{REPORT_INTERVAL//60} 分鐘" if REPORT_INTERVAL < 3600 else f"{REPORT_INTERVAL//3600} 小時"
+                print(f"  [✅] 出版日報已排程 (每 {interval_display})")
             await app.initialize()
             await app.start()
             await app.updater.start_polling(drop_pending_updates=True)
