@@ -149,45 +149,69 @@ class OrganOrchestrator:
             return {"error": str(e)}
 
     def _stage_select(self, book: Dict) -> Dict:
-        """Stage 1: 選題 — 嗅覺+搜尋+記憶+目標"""
+        """Stage 1: 選題 — 熱門關鍵字+市場嗅探+搜尋驗證"""
         title = book.get("stage_data", {}).get("1", {}).get("title", "?")
+        product_type = book.get("product_type", "ebook")
         notes = []
+        keywords = []
 
-        # 鼻子嗅市場
-        nose = _O("nose")
-        if nose and hasattr(nose, 'sniff_now'):
-            try: notes.append(f"市場嗅探完成")
-            except: pass
-
-        # 眼睛搜尋驗證
+        # 眼睛搜尋熱門關鍵字
         eye = _O("eye")
         if eye and hasattr(eye, 'search'):
             try:
-                search_result = eye.search(f"{title} 書評 評價")[:300]
-                notes.append(f"市場搜尋完成")
+                # 搜尋市場熱門主題
+                trend_query = {
+                    "ebook": f"2025 最熱門 電子書 {title[:10]} 趨勢",
+                    "kidbook": f"2025 暢銷 兒童繪本 主題 關鍵字",
+                    "novel": f"2025 熱門 小說 排行榜 關鍵字",
+                    "comic": f"2025 熱門 漫畫 題材 趨勢",
+                    "audiobook": f"2025 熱門 有聲書 市場 關鍵字",
+                    "social_content": f"2025 熱門 YouTube 頻道 主題",
+                }.get(product_type, f"熱門 暢銷 {title[:10]} 趨勢 2025")
+                raw = eye.search(trend_query)
+                if raw:
+                    # 提取關鍵字
+                    import re
+                    found = re.findall(r'[\u4e00-\u9fff\w]+', str(raw)[:500])
+                    keywords = list(set(w for w in found if len(w) >= 2))[:15]
+                    notes.append(f"搜到 {len(keywords)} 個熱門關鍵字")
             except: pass
 
-        # 記憶檢查是否做過類似主題
+        # 鼻子嗅市場趨勢
+        nose = _O("nose")
+        if nose:
+            try:
+                if hasattr(nose, 'sniff_now'):
+                    nose.sniff_now()
+                    notes.append("市場嗅探完成")
+            except: pass
+
+        # 記憶檢查避免重複
         memory = _O("memory")
         if memory:
             try:
-                facts = memory.get_all_facts() if hasattr(memory, 'get_all_facts') else []
-                for f in facts:
-                    if title[:4] in str(f):
-                        notes.append(f"⚠️ 類似主題存在記憶中")
-                        break
+                if hasattr(memory, 'get_all_facts'):
+                    facts = memory.get_all_facts()
+                    for f in facts:
+                        if title[:4] in str(f):
+                            notes.append("⚠️ 類似主題在記憶中")
+                            break
             except: pass
 
-        # 目標層級校準
-        goals = _O("goals")
-        if goals and hasattr(goals, 'check'):
-            try:
-                if hasattr(goals, 'check_alignment'):
-                    aligned = goals.check_alignment(title)
-                    notes.append(f"目標校準: {'✅' if aligned else '⚠️'}")
-            except: pass
+        # LLM 根據關鍵字生成 SEO 優化的選題描述
+        if keywords:
+            seo_title = _llm(
+                f"根據熱門關鍵字 {keywords[:5]}，為「{title}」生成 SEO 優化的副標題（15 字內）和 3-5 個標籤。只輸出結果。",
+                "你是 SEO 專家。")
+            notes.append(f"SEO 優化完成")
+        else:
+            seo_title = ""
 
-        return {"status": "selected", "notes": notes, "timestamp": datetime.now().isoformat()}
+        return {
+            "status": "selected", "notes": notes,
+            "keywords": keywords, "seo_title": seo_title[:100],
+            "timestamp": datetime.now().isoformat()
+        }
 
     def _stage_research(self, book: Dict) -> Dict:
         """Stage 2: 研究 — 搜尋+來源驗證+記憶儲存"""

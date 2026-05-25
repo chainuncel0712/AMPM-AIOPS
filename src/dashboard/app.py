@@ -463,15 +463,6 @@ def retry_topic(book_id):
     return f'<meta http-equiv="refresh" content="0;url=/?token={token}"><p>{result}</p>', 200
 
 
-@app.route("/retry-topic/<book_id>")
-def retry_topic(book_id):
-    from pipeline_engine import engine
-    new_title = request.args.get("title", "")
-    result = engine.retry_topic(book_id, new_title)
-    token = request.args.get("token", "")
-    return f'<meta http-equiv="refresh" content="0;url=/?token={token}"><p>{result}</p>', 200
-
-
 @app.route("/publishing")
 def publishing_dashboard():
     """上架管理面板"""
