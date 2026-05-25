@@ -71,6 +71,7 @@ class EbookPipeline:
                 setattr(self, f.stem, default() if callable(default) else default)
 
     def _save(self):
+        DATA.mkdir(parents=True, exist_ok=True)
         self.books_file.write_text(json.dumps(self.ebooks, ensure_ascii=False, indent=2))
         self.keywords_file.write_text(json.dumps(self.keywords, ensure_ascii=False, indent=2))
         self.sales_file.write_text(json.dumps(self.ebook_sales, ensure_ascii=False, indent=2))
@@ -248,6 +249,7 @@ class KidBookPipeline:
                 setattr(self, f.stem, default)
 
     def _save(self):
+        DATA.mkdir(parents=True, exist_ok=True)
         self.books_file.write_text(json.dumps(self.kidbooks, ensure_ascii=False, indent=2))
         self.themes_file.write_text(json.dumps(self.kid_themes, ensure_ascii=False, indent=2))
 
@@ -395,6 +397,7 @@ class ServiceWebsitePipeline:
                 setattr(self, f.stem, default)
 
     def _save(self):
+        DATA.mkdir(parents=True, exist_ok=True)
         self.sites_file.write_text(json.dumps(self.service_sites, ensure_ascii=False, indent=2))
         self.orders_file.write_text(json.dumps(self.service_orders, ensure_ascii=False, indent=2))
 
@@ -565,8 +568,14 @@ class PublisherEngine:
                 ebook_advanced += 1
                 break
             elif status == "content_done":
-                self.ebook.submit_for_review(bid)
-                results.append(f"  📋 《{book['topic']}》已送審")
+                gate = pipeline_supervisor.check_quality_gate(book, "ebook")
+                if gate["passed"]:
+                    self.ebook.submit_for_review(bid)
+                    results.append(f"  📋 《{book['topic']}》品質通過，已送審")
+                else:
+                    self.ebook.submit_for_review(bid)
+                    issues_str = "; ".join(gate["issues"][:2])
+                    results.append(f"  📋 《{book['topic']}》已送審（⚠️ 品質標記: {issues_str}）")
                 ebook_advanced += 1
                 break
             elif status == "rejected":
@@ -596,8 +605,14 @@ class PublisherEngine:
                 kid_advanced += 1
                 break
             elif status == "story_done":
-                self.kidbook.submit_for_review(bid)
-                results.append(f"  📋 《{book['title']}》已送審")
+                gate = pipeline_supervisor.check_quality_gate(book, "kidbook")
+                if gate["passed"]:
+                    self.kidbook.submit_for_review(bid)
+                    results.append(f"  📋 《{book['title']}》品質通過，已送審")
+                else:
+                    self.kidbook.submit_for_review(bid)
+                    issues_str = "; ".join(gate["issues"][:2])
+                    results.append(f"  📋 《{book['title']}》已送審（⚠️ 品質標記: {issues_str}）")
                 kid_advanced += 1
                 break
             elif status == "rejected":
