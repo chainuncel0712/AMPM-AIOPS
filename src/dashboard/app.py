@@ -153,7 +153,17 @@ def index():
                 if f.name.startswith("."): continue
                 brand_data.append({"name": f.name, "size": f.stat().st_size})
 
-        # 电子书主题分类
+        # ── 出版管線選題數據 ──
+        from pipeline_engine import engine
+        pipeline_books = []
+        for b in engine.ebook.ebooks:
+            if b.get("status") in ("selected", "selected_approved"):
+                pipeline_books.append({"id": b["id"], "topic": b["topic"], "status": b["status"], "type": "📗電子書", "pipeline": "ebook"})
+        for b in engine.kidbook.kidbooks:
+            if b.get("status") in ("selected", "selected_approved"):
+                pipeline_books.append({"id": b["id"], "topic": b.get("title", b.get("topic","?")), "status": b["status"], "type": "📚童書", "pipeline": "kidbook"})
+
+        # 电子书主题分类 (output 檔案)
         topic_map = {
             "intro": {"label": "📗 AI 入门导读", "cat": "AI入门"},
             "ai_introduction": {"label": "📗 AI 入门导读", "cat": "AI入门"},
@@ -234,12 +244,20 @@ td{{padding:6px 8px;border-bottom:1px solid #111122}}
 <div class="grid">
   <!-- 选題審閱 -->
   <div class="card" style="grid-column:span 2">
-    <h3>🎯 電子書選題審閱 (依分類)</h3>
+    <h3>🎯 出版管線選題審核 (通過後才開始撰寫)</h3>
+    <table>
+    <tr><th>類型</th><th>選題</th><th>狀態</th><th>操作</th></tr>
+    {''.join(f'<tr><td>{b["type"]}</td><td>{b["topic"][:40]}</td><td>{"⏸️ 待審核" if b["status"]=="selected" else "✅ 已通過"}</td><td>' + (f'<a href="/approve-topic/{b["pipeline"]}/{b["id"]}?token=' + request.args.get("token","") + '" style="color:#3fb950;font-size:12px;font-weight:bold">✓ 通過選題</a>' if b["status"]=="selected" else '等待下一輪循環') + '</td></tr>' for b in pipeline_books) if pipeline_books else '<tr><td colspan="4" style="color:#8b949e;padding:12px">尚無選題。管線每小時自動建立新選題。</td></tr>'}
+    </table>
+    <div style="font-size:11px;color:#8b949e;margin-top:8px">⚠️ 選題必須通過審核，才會開始撰寫內容。不通過就不生產。</div>
+  </div>
+
+  <div class="card" style="grid-column:span 2">
+    <h3>📋 輸出檔案審閱 (依分類)</h3>
     <table>
     <tr><th>分類</th><th>章節</th><th>字數</th><th>審核</th><th>操作</th></tr>
     {''.join(f'<tr><td>{t["cat"]}</td><td>{t["label"]}</td><td>{t["chars"]:,}</td><td>{t["icon"]}</td><td><a href="/view/ebooks/{t["name"]}?token=' + request.args.get("token","") + '" style="color:#58a6ff;font-size:11px">预览</a> <a href="/review/approved/{t["key"]}" style="color:#3fb950;font-size:11px;margin:0 4px">✓通過</a> <a href="/review/rejected/{t["key"]}" style="color:#e94560;font-size:11px">✗淘汰</a></td></tr>' for t in ebook_topics)}
     </table>
-    <div style="font-size:11px;color:#8b949e;margin-top:8px">✓ 通過 → 進入編譯流程 | ✗ 淘汰 → 記憶此類主題減少出現</div>
   </div>
 
   <!-- IP 角色 -->
@@ -405,7 +423,20 @@ def review_file(status, subpath):
     return f'<meta http-equiv="refresh" content="0;url=/?token={token}"><p>{msg}</p>', 200
 
 
-@app.route("/compile-book/<book_type>")
+@app.route("/approve-topic/<pipeline>/<book_id>")
+def approve_topic(pipeline, book_id):
+    """通過選題審核，啟動流水線"""
+    BASE = Path(__file__).parent.parent.parent
+    sys.path.insert(0, str(BASE / "src"))
+    from pipeline_engine import engine
+    if pipeline == "ebook":
+        result = engine.ebook.approve_topic(book_id)
+    elif pipeline == "kidbook":
+        result = engine.kidbook.approve_topic(book_id)
+    else:
+        result = "未知管線"
+    token = request.args.get("token", "")
+    return f'<meta http-equiv="refresh" content="0;url=/?token={token}"><p>{result}</p>', 200
 def compile_book(book_type):
     """將已審核章節編譯為完整書籍"""
     BASE = Path(__file__).parent.parent.parent

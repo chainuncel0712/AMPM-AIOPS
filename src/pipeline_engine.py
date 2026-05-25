@@ -106,6 +106,17 @@ class EbookPipeline:
         cycle_log.record("ebook", "select_topic", book_id, topic)
         return book_id
 
+    def approve_topic(self, book_id):
+        book = self._find(book_id)
+        if not book:
+            return "找不到書籍"
+        if book["status"] != "selected":
+            return f"狀態為 {book['status']}，無法審核選題"
+        book["status"] = "selected_approved"
+        self._save()
+        cycle_log.record("ebook", "topic_approved", book_id)
+        return f"✅ 《{book['topic']}》選題已通過，進入生成流程"
+
     def generate_outline(self, book_id, llm_call=None):
         book = self._find(book_id)
         if not book:
@@ -377,6 +388,15 @@ class KidBookPipeline:
         self._save()
         cycle_log.record("kidbook", "select_theme", book_id, f"{title}/{theme}/{age_range}")
         return book_id
+
+    def approve_topic(self, book_id):
+        book = self._find(book_id)
+        if not book: return "找不到書籍"
+        if book["status"] != "selected": return f"狀態為 {book['status']}，無法審核"
+        book["status"] = "selected_approved"
+        self._save()
+        cycle_log.record("kidbook", "topic_approved", book_id)
+        return f"✅ 《{book['title']}》選題已通過，進入生成流程"
 
     def create_characters(self, book_id, llm_call=None):
         book = self._find(book_id)
@@ -726,6 +746,11 @@ class PublisherEngine:
             status = book.get("status", "selected")
             bid = book["id"]
             if status == "selected":
+                # 選題等待人工審核通過
+                results.append(f"  ⏸️ 《{book['topic']}》選題待審核")
+                ebook_advanced += 1
+                break
+            elif status == "selected_approved":
                 def _gen_outline(b=book, bid=bid):
                     self.ebook.generate_outline(bid, llm_call)
                     return f"  📝 《{b['topic']}》目錄已生成"
@@ -779,6 +804,10 @@ class PublisherEngine:
             status = book.get("status", "selected")
             bid = book["id"]
             if status == "selected":
+                results.append(f"  ⏸️ 《{book['title']}》選題待審核")
+                kid_advanced += 1
+                break
+            elif status == "selected_approved":
                 def _chars(b=book, bid=bid):
                     self.kidbook.create_characters(bid, llm_call)
                     return f"  🎭 《{b['title']}》角色已設定"
