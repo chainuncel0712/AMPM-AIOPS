@@ -221,6 +221,11 @@ def main():
     AUTHORIZED = [int(x.strip()) for x in AUTHORIZED_STR.split(",") if x.strip()] if AUTHORIZED_STR else []
     obsidian.telegram_token = TOKEN
     obsidian.telegram_chat_id = AUTHORIZED[0] if AUTHORIZED else None
+
+    # 啟動呼吸系統
+    if hasattr(obsidian, 'breath'):
+        obsidian.breath.start()
+        print("  [✅] 呼吸系統已啟動")
     
     # 步驟 2.5：建立 LangGraph 引擎並注入
     print("🔗 步驟 2.5/3: 初始化 LangGraph 引擎...")
