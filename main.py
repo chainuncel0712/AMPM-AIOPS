@@ -678,6 +678,26 @@ def main():
         print("  [✅] Bot 已啟動")
         supervisor.register("bot", hb_interval=30, hb_timeout=120,
                             is_restartable=False, is_critical=True)
+
+        # ── 出版工廠定時日報 (每 N 小時自動推送 Telegram) ──
+        REPORT_INTERVAL = int(os.getenv("PUBLISH_REPORT_INTERVAL", "86400"))
+        if AUTHORIZED:
+            async def send_pipeline_report(context):
+                from pipeline_engine import engine
+                report = engine.generate_report(detailed=False)
+                for uid in AUTHORIZED:
+                    try:
+                        await context.bot.send_message(chat_id=uid, text=report)
+                    except Exception as e:
+                        print(f"[出版日報] 發送失敗給 {uid}: {e}")
+
+            job_queue = app.job_queue
+            if job_queue:
+                job_queue.run_repeating(send_pipeline_report, interval=REPORT_INTERVAL, first=REPORT_INTERVAL)
+                print(f"  [✅] 出版日報已排程 (每 {REPORT_INTERVAL//3600} 小時)")
+            else:
+                print(f"  [⚠️] Job queue 不可用，無法排程日報")
+
         try:
             from heartbeat import start as start_heartbeat
             start_heartbeat()

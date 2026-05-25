@@ -594,4 +594,37 @@ class PublisherEngine:
             "cycle_count": len([e for e in cycle_log.log if e.get("stage") == "auto_cycle"]),
         }
 
+    def generate_report(self, detailed: bool = False) -> str:
+        st = self.status()
+        lines = []
+        lines.append("🏭 出版工廠日報")
+        lines.append("=" * 30)
+        lines.append(f"📚 電子書已出版：{st['ebook_published']} 本")
+        lines.append(f"📖 童書已出版：{st['kidbook_published']} 本")
+        lines.append(f"🌐 客服網站啟用：{st['service_active']} 個")
+        lines.append(f"🔄 自動循環：{'🟢 運行中' if st['engine_running'] else '🔴 已停止'}")
+        lines.append(f"🔄 累積循環次數：{st['cycle_count']}")
+
+        sales = self.ebook.get_sales_summary()
+        lines.append(f"💰 {sales}")
+
+        recent = cycle_log.recent(3)
+        if recent:
+            lines.append("")
+            lines.append("最近活動：")
+            for e in recent:
+                lines.append(f"  [{e['ts'][:19]}] {e['pipeline']}/{e['stage']}")
+
+        if detailed:
+            lines.append("")
+            lines.append("── 各產線詳細 ──")
+            lines.append(self.ebook.get_pipeline_status())
+            lines.append("")
+            lines.append(self.kidbook.get_pipeline_status())
+            lines.append("")
+            lines.append(self.service.get_pipeline_status())
+
+        return "\n".join(lines)
+
+
 engine = PublisherEngine()
