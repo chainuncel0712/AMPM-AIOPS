@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 import os, sys, atexit, tempfile
 
+from dotenv import load_dotenv
+load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env"))
+
 LOCK_FILE = os.path.join(tempfile.gettempdir(), "ampm_obsidian.lock")
 if os.path.exists(LOCK_FILE):
     with open(LOCK_FILE) as f:

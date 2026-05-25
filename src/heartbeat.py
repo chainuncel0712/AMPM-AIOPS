@@ -34,10 +34,14 @@ def check_bot():
 def auto_heal():
     if not check_bot():
         print("[心跳] 黑曜離線，正在重啟...")
-        key = os.environ.get("DEEPSEEK_API_KEY", "")
         env = os.environ.copy()
-        if key:
-            env["DEEPSEEK_API_KEY"] = key
+        env_file = BASE / ".env"
+        if env_file.exists():
+            for line in env_file.read_text().splitlines():
+                line = line.strip()
+                if line and not line.startswith("#") and "=" in line:
+                    k, v = line.split("=", 1)
+                    env[k.strip()] = v.strip()
         subprocess.Popen(["python3", "main.py"], cwd=str(BASE), env=env, stdout=open("/tmp/黑曜.log","a"), stderr=subprocess.STDOUT)
         return "重啟"
     return "正常"
