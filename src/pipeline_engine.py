@@ -547,6 +547,7 @@ class PublisherEngine:
         self.lock = threading.RLock()
         self._running = False
         self._cycle_thread = None
+        self._auto_publish = False
 
     def full_status(self) -> str:
         parts = []
@@ -635,6 +636,15 @@ class PublisherEngine:
                     results.append(f"  📋 《{book['topic']}》已送審（⚠️ 品質標記: {issues_str}）")
                 ebook_advanced += 1
                 break
+            elif status == "pending_review":
+                if self._auto_publish:
+                    self.ebook.approve(bid)
+                    r = self.ebook.publish(bid)
+                    results.append(f"  🚀 《{book['topic']}》{r}")
+                else:
+                    results.append(f"  ⏸️ 《{book['topic']}》待審核（/publish approve {bid}）")
+                ebook_advanced += 1
+                break
             elif status == "rejected":
                 results.append(f"  ⏸️ 《{book['topic']}》已被退回，待人工處理")
                 ebook_advanced += 1
@@ -677,6 +687,15 @@ class PublisherEngine:
                     self.kidbook.submit_for_review(bid)
                     issues_str = "; ".join(gate["issues"][:2])
                     results.append(f"  📋 《{book['title']}》已送審（⚠️ 品質標記: {issues_str}）")
+                kid_advanced += 1
+                break
+            elif status == "pending_review":
+                if self._auto_publish:
+                    self.kidbook.approve(bid)
+                    r = self.kidbook.publish(bid)
+                    results.append(f"  🚀 《{book['title']}》{r}")
+                else:
+                    results.append(f"  ⏸️ 《{book['title']}》待審核（/publish approve {bid}）")
                 kid_advanced += 1
                 break
             elif status == "rejected":
@@ -751,6 +770,10 @@ class PublisherEngine:
         self._running = False
         return "🔄 循環引擎已停止"
 
+    def set_auto_publish(self, enabled: bool):
+        self._auto_publish = enabled
+        return f"自動上架：{'🟢 已開啟' if enabled else '🔴 已關閉'}"
+
     def status(self) -> dict:
         return {
             "ebook_published": self.ebook.total_published(),
@@ -758,6 +781,7 @@ class PublisherEngine:
             "service_active": self.service.total_active(),
             "engine_running": self._running,
             "cycle_count": len([e for e in cycle_log.log if e.get("stage") == "auto_cycle"]),
+            "auto_publish": self._auto_publish,
         }
 
     def generate_report(self, detailed: bool = False) -> str:
