@@ -679,6 +679,14 @@ def main():
         supervisor.register("bot", hb_interval=30, hb_timeout=120,
                             is_restartable=False, is_critical=True)
 
+        # ── 啟動資源偵查器官（確保管線永不枯竭） ──
+        try:
+            from resource_scout import scout
+            scout.start(interval_seconds=3600)  # 每 1 小時外出偵查
+            print("  [✅] 資源偵查器官已啟動 (每 1 小時)")
+        except Exception as e:
+            print(f"  [⚠️] 資源偵查啟動失敗: {e}")
+
         # ── 出版工廠定時日報 (每 N 小時自動推送 Telegram) ──
         REPORT_INTERVAL = int(os.getenv("PUBLISH_REPORT_INTERVAL", "86400"))
         if AUTHORIZED:

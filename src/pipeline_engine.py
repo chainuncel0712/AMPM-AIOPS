@@ -9,6 +9,7 @@ Publisher Engine — 統一出版循環引擎
 import json, os, threading, time, hashlib, random
 from pathlib import Path
 from datetime import datetime, timedelta
+from resource_scout import scout as resource_scout
 
 BASE = Path(__file__).resolve().parent.parent
 DATA = BASE / "data" / "pipeline"
@@ -514,52 +515,128 @@ class PublisherEngine:
         return "\n".join(parts)
 
     def auto_cycle(self, llm_call=None):
-        """執行一次完整循環：市場調查 → 選題 → 內容 → 審核 → 上架 → 追蹤"""
+        """執行一次完整循環 — 永不跳過，失敗則重試，直到每本書完成"""
         results = []
 
-        # 1. 市場調查 + 選題
-        ebook_topics = self.ebook.trend_analysis(llm_call)
-        if isinstance(ebook_topics, list):
-            topic = ebook_topics[0] if isinstance(ebook_topics[0], str) else (ebook_topics[0][0] if isinstance(ebook_topics[0], tuple) else str(ebook_topics[0]))
-            results.append(f"📈 電子書選題：{topic}")
-            eid = self.ebook.select_topic(topic)
-        else:
-            topic = "Python 自動化入門"
-            results.append(f"📈 電子書選題（模板）：{topic}")
-            eid = self.ebook.select_topic(topic)
+        # 0. 資源偵查（確保管線不枯竭）
+        try:
+            scout_result = resource_scout.scout_all()
+            total = sum(v["total"] for v in scout_result.values())
+            avail = sum(v["available"] for v in scout_result.values())
+            results.append(f"🔍 資源偵查：{avail}/{total} 項可用")
+        except Exception as e:
+            results.append(f"🔍 資源偵查失敗：{e}")
 
-        kid_themes = self.kidbook.trend_analysis(llm_call)
-        if isinstance(kid_themes, list):
-            theme_data = kid_themes[0] if isinstance(kid_themes[0], tuple) else ("小故事大道理", "教育", "3-6")
-            title, theme, age = theme_data
-            results.append(f"📖 童書選題：{title}（{theme}/{age}）")
-            kid = self.kidbook.select_theme(title, theme, age)
-        else:
-            results.append("📖 童書選題（模板）：小熊學勇敢")
-            kid = self.kidbook.select_theme("小熊學勇敢", "勇氣", "3-6")
+        def retry_call(step_name: str, fn, max_attempts=3):
+            """重試包裝 — 失敗不跳過，最多重試 3 次"""
+            for attempt in range(1, max_attempts + 1):
+                try:
+                    return fn()
+                except Exception as e:
+                    if attempt < max_attempts:
+                        time.sleep(5 * attempt)
+                        results.append(f"  ⚠️ {step_name} 第{attempt}次失敗，重試中...")
+                    else:
+                        raise RuntimeError(f"{step_name} 失敗 {max_attempts} 次: {e}")
 
-        # 2. 內容生成
-        outline = self.ebook.generate_outline(eid, llm_call)
-        results.append(f"  📝 電子書目錄已生成")
-        content = self.ebook.write_content(eid, llm_call)
-        results.append(f"  ✍️ 電子書內容已撰寫")
+        # ── 1. 處理未完成的電子書 ──
+        ebook_advanced = 0
+        for book in self.ebook.ebooks:
+            status = book.get("status", "selected")
+            bid = book["id"]
+            if status == "selected":
+                def _gen_outline(b=book, bid=bid):
+                    self.ebook.generate_outline(bid, llm_call)
+                    return f"  📝 《{b['topic']}》目錄已生成"
+                result = retry_call(f"生成目錄 {bid}", lambda: _gen_outline())
+                results.append(result)
+                ebook_advanced += 1
+                break
+            elif status == "outline_done":
+                def _write(b=book, bid=bid):
+                    self.ebook.write_content(bid, llm_call)
+                    return f"  ✍️ 《{b['topic']}》內容已撰寫"
+                result = retry_call(f"撰寫內容 {bid}", lambda: _write())
+                results.append(result)
+                ebook_advanced += 1
+                break
+            elif status == "content_done":
+                self.ebook.submit_for_review(bid)
+                results.append(f"  📋 《{book['topic']}》已送審")
+                ebook_advanced += 1
+                break
+            elif status == "rejected":
+                results.append(f"  ⏸️ 《{book['topic']}》已被退回，待人工處理")
+                ebook_advanced += 1
+                break
 
-        chars = self.kidbook.create_characters(kid, llm_call)
-        results.append(f"  🎭 童書角色已設定")
-        story = self.kidbook.write_story(kid, llm_call)
-        results.append(f"  📝 童書故事已撰寫")
+        # ── 2. 處理未完成的童書 ──
+        kid_advanced = 0
+        for book in self.kidbook.kidbooks:
+            status = book.get("status", "selected")
+            bid = book["id"]
+            if status == "selected":
+                def _chars(b=book, bid=bid):
+                    self.kidbook.create_characters(bid, llm_call)
+                    return f"  🎭 《{b['title']}》角色已設定"
+                result = retry_call(f"創建角色 {bid}", lambda: _chars())
+                results.append(result)
+                kid_advanced += 1
+                break
+            elif status == "characters_done":
+                def _story(b=book, bid=bid):
+                    self.kidbook.write_story(bid, llm_call)
+                    return f"  📝 《{b['title']}》故事已撰寫"
+                result = retry_call(f"撰寫故事 {bid}", lambda: _story())
+                results.append(result)
+                kid_advanced += 1
+                break
+            elif status == "story_done":
+                self.kidbook.submit_for_review(bid)
+                results.append(f"  📋 《{book['title']}》已送審")
+                kid_advanced += 1
+                break
+            elif status == "rejected":
+                results.append(f"  ⏸️ 《{book['title']}》已被退回，待人工處理")
+                kid_advanced += 1
+                break
 
-        # 3. 自動送審（給人類審核閘門）
-        self.ebook.submit_for_review(eid)
-        self.kidbook.submit_for_review(kid)
-        results.append(f"  📋 兩本已送審，等待人工批准")
+        # ── 3. 只有完全沒有進行中的書，才開新選題 ──
+        if ebook_advanced == 0:
+            results.append("  ℹ️ 電子書：無進行中項目，開始新選題...")
+            try:
+                ebook_topics = self.ebook.trend_analysis(llm_call)
+                if isinstance(ebook_topics, list):
+                    topic = ebook_topics[0] if isinstance(ebook_topics[0], str) else (
+                        ebook_topics[0][0] if isinstance(ebook_topics[0], tuple) else str(ebook_topics[0]))
+                else:
+                    topic = "Python 自動化入門"
+                eid = self.ebook.select_topic(topic)
+                results.append(f"  📈 新選題：《{topic}》（ID: {eid}）")
+            except Exception as e:
+                results.append(f"  ❌ 新選題失敗: {e}")
 
-        # 4. 如果已經有 sales data，回饋到下次選題
+        if kid_advanced == 0:
+            results.append("  ℹ️ 童書：無進行中項目，開始新選題...")
+            try:
+                kid_themes = self.kidbook.trend_analysis(llm_call)
+                if isinstance(kid_themes, list):
+                    theme_data = kid_themes[0] if isinstance(kid_themes[0], tuple) else (
+                        "小故事大道理", "教育", "3-6")
+                    title, theme, age = theme_data
+                else:
+                    title, theme, age = "小熊學勇敢", "勇氣", "3-6"
+                kid = self.kidbook.select_theme(title, theme, age)
+                results.append(f"  📖 新選題：《{title}》（{theme}/{age}）")
+            except Exception as e:
+                results.append(f"  ❌ 新選題失敗: {e}")
+
+        # 4. 銷售回饋
         sales_feedback = self.ebook.trending_topics()
         if sales_feedback:
             results.append(f"  🔄 銷售回饋：暢銷主題 → {', '.join(sales_feedback[:3])}")
 
-        cycle_log.record("engine", "auto_cycle", f"{eid},{kid}", "; ".join(results))
+        cycle_log.record("engine", "auto_cycle", "; ".join(results))
         return "\n".join(results)
 
     def start_auto_pilot(self, llm_call=None, interval_hours=24):
@@ -596,12 +673,14 @@ class PublisherEngine:
 
     def generate_report(self, detailed: bool = False) -> str:
         st = self.status()
+        rs = resource_scout.status()
         lines = []
         lines.append("🏭 出版工廠日報")
         lines.append("=" * 30)
         lines.append(f"📚 電子書已出版：{st['ebook_published']} 本")
         lines.append(f"📖 童書已出版：{st['kidbook_published']} 本")
         lines.append(f"🌐 客服網站啟用：{st['service_active']} 個")
+        lines.append(f"🔍 資源庫：{rs['catalog_entries']} 項")
         lines.append(f"🔄 自動循環：{'🟢 運行中' if st['engine_running'] else '🔴 已停止'}")
         lines.append(f"🔄 累積循環次數：{st['cycle_count']}")
 
