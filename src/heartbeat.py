@@ -20,10 +20,9 @@ def check_deepseek():
     if not key:
         return False
     try:
-        r = requests.post("https://api.deepseek.com/v1/chat/completions",
-            headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
-            json={"model":"deepseek-chat","messages":[{"role":"user","content":"ping"}],"max_tokens":2},
-            timeout=10)
+        r = requests.get("https://api.deepseek.com/v1/models",
+            headers={"Authorization": f"Bearer {key}"},
+            timeout=5)
         return r.status_code == 200
     except:
         return False
@@ -44,17 +43,24 @@ def auto_heal():
     return "正常"
 
 def heartbeat_loop():
+    tick = 0
+    DS_CHECK_INTERVAL = 10   # 10 * 30s = 5 minutes
+    _cached_ds = True
     while True:
+        # DeepSeek ping 每 5 分钟一次，其余用缓存
+        if tick % DS_CHECK_INTERVAL == 0:
+            _cached_ds = check_deepseek()
         status = {
             "time": time.strftime("%Y-%m-%dT%H:%M:%S"),
             "bot": check_bot(),
-            "deepseek": check_deepseek(),
+            "deepseek": _cached_ds,
             "ollama": check_ollama(),
         }
         HEARTBEAT_FILE.parent.mkdir(parents=True, exist_ok=True)
         HEARTBEAT_FILE.write_text(json.dumps(status, indent=2))
         if not status["bot"]:
             auto_heal()
+        tick += 1
         time.sleep(30)
 
 def start():
