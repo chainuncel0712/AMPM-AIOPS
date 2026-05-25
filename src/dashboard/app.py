@@ -2,9 +2,14 @@
 Dashboard + 網站聊天 API
 """
 from flask import Flask, jsonify, request
-from flask_cors import CORS
 import sys
 from pathlib import Path
+
+try:
+    from flask_cors import CORS
+except ImportError:
+    def CORS(app):
+        return app
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
