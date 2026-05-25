@@ -546,5 +546,42 @@ def health():
         "brain": "alive",
     }), status_code
 
+# ── AMPM 付款註冊頁面（掛在現有 Dashboard 下） ──
+_REGISTER_HTML = None
+_REGISTER_PATH = Path(__file__).resolve().parent.parent / "website" / "templates" / "index.html"
+
+@app.route("/register")
+def register_page():
+    global _REGISTER_HTML
+    if _REGISTER_HTML is None:
+        if _REGISTER_PATH.exists():
+            _REGISTER_HTML = _REGISTER_PATH.read_text(encoding="utf-8")
+        else:
+            return "<h1>註冊頁面未找到</h1>", 404
+    return _REGISTER_HTML
+
+@app.route("/activate", methods=["POST"])
+def activate_license():
+    from payment_verifier import verify_tx
+    from license_manager import generate_key
+    data = request.get_json()
+    txid = (data.get("txid", "") if data else "").strip()
+    if not txid:
+        return jsonify({"success": False, "message": "❌ 請輸入 TXID"})
+    result = verify_tx(txid)
+    if not result.get("success"):
+        return jsonify({"success": False, "message": result.get("message", "驗證失敗")})
+    days = result.get("days", 30)
+    tier = result.get("tier", "basic")
+    plan = result.get("plan", "月方案")
+    license_key = generate_key(0, days, tier)
+    return jsonify({
+        "success": True,
+        "message": f"收到 {result['amount']:.2f} USDT，符合{plan}（{days} 天）",
+        "license_key": license_key,
+        "plan": plan,
+        "days": days,
+    })
+
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000, debug=True)

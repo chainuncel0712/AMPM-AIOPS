@@ -69,6 +69,8 @@ Telegram 日報 (每 10 分鐘)
 /publish resource status         — 資源庫狀態
 /publish auto on <小時>          — 啟動自動循環
 /publish auto off                — 停止自動循環
+/publish auto publish on/off     — 自動上架開關
+/publish website                 — 註冊網站網址
 ```
 
 ## 當前運行狀態

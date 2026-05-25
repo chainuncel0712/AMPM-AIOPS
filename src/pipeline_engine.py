@@ -796,6 +796,7 @@ class PublisherEngine:
         lines.append(f"🔍 資源庫：{rs['catalog_entries']} 項")
         lines.append(f"🔄 自動循環：{'🟢 運行中' if st['engine_running'] else '🔴 已停止'}")
         lines.append(f"🔄 累積循環次數：{st['cycle_count']}")
+        lines.append(f"🚀 自動上架：{'🟢 開啟' if st.get('auto_publish', False) else '🔴 關閉'}")
 
         sales = self.ebook.get_sales_summary()
         lines.append(f"💰 {sales}")
