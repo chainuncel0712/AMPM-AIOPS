@@ -20,12 +20,20 @@ BASE = Path(__file__).resolve().parent.parent
 
 
 class PublisherEngine:
-    """統一管線引擎"""
+    """統一管線引擎（全身器官整合版）"""
 
     def __init__(self):
         self._running = False
         self._cycle_thread = None
         self._auto_publish = False
+        self._orchestrator = None
+
+    @property
+    def orchestrator(self):
+        if self._orchestrator is None:
+            from pipeline_orchestrator import orchestrator
+            self._orchestrator = orchestrator
+        return self._orchestrator
 
     # ── 選題 ──
 
@@ -86,13 +94,9 @@ class PublisherEngine:
             if stage == 8:
                 return {"ok": False, "stage": stage, "status": "human_gate", "reason": f"《{title}》最終審核待處理"}
 
-        # 自動階段
-        handler = STAGE_HANDLERS.get(stage)
-        if not handler:
-            return {"ok": False, "error": f"no handler for stage {stage}"}
-
+        # 自動階段 — 使用器官協調器
         try:
-            result_data = handler(book, stage_cfg, llm_call)
+            result_data = self.orchestrator.execute_stage(stage, book)
             book_copy = store.get(book_id)
             if book_copy:
                 sd = dict(book_copy.get("stage_data", {}))
@@ -200,6 +204,10 @@ class PublisherEngine:
 
     def generate_report(self, detailed: bool = False) -> str:
         stats = store.stats()
+        from publishing_system import publisher as pub_mgr
+        pub_items = pub_mgr.get_prepared_books()
+        platforms = pub_mgr.get_platform_status()
+
         lines = ["🏭 出版工廠日報", "=============================="]
         by_type = stats.get("by_type", {})
         for pt, count in sorted(by_type.items()):
@@ -207,6 +215,20 @@ class PublisherEngine:
             lines.append(f"{preset.get('icon','?')} {preset.get('label',pt)}：{count} 本")
         lines.append("")
         lines.append(f"📊 總書籍：{stats['total']} | 活躍：{stats['active']} | 已出版：{stats['published']}")
+
+        # 上架狀態
+        lines.append("")
+        lines.append("📤 上架平台狀態：")
+        for name, p in platforms.items():
+            icon = p["icon"]
+            status = "✅" if p["status"] == "ready" else "🔧"
+            lines.append(f"  {icon} {p['name']}: {status}")
+
+        lines.append(f"📦 待上架：{len(pub_items)} 本")
+        if pub_items:
+            for item in pub_items[:5]:
+                lines.append(f"  📗 {item['title'][:35]} — {item['status']}")
+
         lines.append(f"🔄 自動循環：{'🟢 運行中' if self._running else '🔴 已停止'}")
         return "\n".join(lines)
 
