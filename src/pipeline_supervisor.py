@@ -32,7 +32,7 @@ class PipelineSupervisor:
     def _load(self):
         with self._lock:
             for f, default in [(self.audit_file, {"cycles": 0, "books_started": 0, "books_completed": 0,
-                                                   "books_rejected": 0, "total_retries": 0}), (self.stall_file, [])]:
+                                                   "books_rejected": 0, "total_retries": 0, "alerts": 0}), (self.stall_file, [])]:
                 if f.exists():
                     try:
                         setattr(self, f.stem, json.loads(f.read_text()))
@@ -220,6 +220,8 @@ class PipelineSupervisor:
                     f"《{s['title']}》停在 {s['status']} 已 {s['stalled_hours']} 小時" for s in stalls[:5])
                 try:
                     self.alert_callback(alert)
+                    self.audit["alerts"] = self.audit.get("alerts", 0) + 1
+                    self._save()
                 except Exception as e:
                     lines.append(f"  ⚠️ 警報發送失敗: {e}")
         else:
@@ -271,6 +273,8 @@ class PipelineSupervisor:
         a = self.audit
         total = a["books_started"]
         completed = a["books_completed"]
+        stalled = sum(1 for s in self.stalls
+                      if isinstance(s, dict) and s.get("stalled") and not s.get("resolved"))
         return {
             "name": "PipelineSupervisor",
             "alive": True,
@@ -281,6 +285,8 @@ class PipelineSupervisor:
             "rejected": a["books_rejected"],
             "retries": a["total_retries"],
             "stalls_tracked": len(self.stalls),
+            "stalled_count": stalled,
+            "alert_count": a.get("alerts", 0),
             "running": self._running,
         }
 
