@@ -286,16 +286,9 @@ def main():
         print(f"  [❌] 科技感儀表板啟動失敗: {e}")
     print()
     
-    # 步驟 2.9：主動執行器（自動生成內容）
-    print("🤖 步驟 2.9/3: 啟動主動執行器...")
-    try:
-        from core.proactive_executor import ProactiveExecutor
-        obsidian.proactive = ProactiveExecutor(obsidian)
-        obsidian.proactive.start()
-        print("  [✅] 主動執行器已啟動")
-    except Exception as e:
-        print(f"  [⚠️] 主動執行器啟動失敗: {e}")
-        obsidian.proactive = None
+    # 步驟 2.9：PublisherEngine 已取代 ProactiveExecutor
+    print("🤖 步驟 2.9/3: ProactiveExecutor 已由 PublisherEngine 取代")
+    obsidian.proactive = None
     print()
 
      # 健康報告（科技感風格）
