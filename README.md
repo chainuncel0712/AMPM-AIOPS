@@ -10,8 +10,8 @@
 
 <p align="center">
   <a href="#-what-is-this">什麼是 AMPM？</a> •
+  <a href="#-ecosystem">🌐 生態系</a> •
   <a href="#-organ-system">🧬 器官系統</a> •
-  <a href="#-security-boundary">🔒 邊界</a> •
   <a href="#-quick-start">⚡ 開始</a>
 </p>
 
@@ -53,6 +53,59 @@ AMPM 是一套以 <strong>生物器官</strong> 為隱喻的 AI 作業系統。<
 
 <p align="center" style="color:#666;">
   👆 公開框架 + 私有核心 = 完整 AI OS
+</p>
+
+<br>
+
+---
+
+<h2 align="center" style="font-size:1.8em;">🌐 ECOSYSTEM</h2>
+
+<table>
+  <tr>
+    <th>Repository</th>
+    <th>可見性</th>
+    <th>用途</th>
+  </tr>
+  <tr>
+    <td><strong>AMPM-AIOPS</strong></td>
+    <td>🔓 Public</td>
+    <td>主框架 — Telegram Bot + 授權 + 付款 + 儀表板</td>
+  </tr>
+  <tr>
+    <td><strong>AMPM-KEL</strong></td>
+    <td>🔒 Private</td>
+    <td>核心智能 — Brain / Runtime / Governance / Evolution</td>
+  </tr>
+  <tr>
+    <td><strong>ampm-core</strong></td>
+    <td>🔓 Public</td>
+    <td>基礎函式庫 — 30 個基礎元件（AgentMaker, Memory, ToolSystem…）</td>
+  </tr>
+  <tr>
+    <td><strong>AMPM-PLUGINS</strong></td>
+    <td>🔓 Public</td>
+    <td>插件生態 — 社群貢獻的 Telegram / Discord / 自動化插件</td>
+  </tr>
+  <tr>
+    <td><strong>AMPM-SDK</strong></td>
+    <td>🔓 Public</td>
+    <td>開發套件 — 讓第三方開發者建立自定義插件</td>
+  </tr>
+  <tr>
+    <td><strong>AMPM-DASHBOARD</strong></td>
+    <td>🔓 Public</td>
+    <td>獨立儀表板 — 監控 UI（可獨立部署）</td>
+  </tr>
+  <tr>
+    <td><strong>AMPM-DOCS</strong></td>
+    <td>🔓 Public</td>
+    <td>文件中心 — 架構圖 / API 文檔 / 部署指南</td>
+  </tr>
+</table>
+
+<p align="center" style="color:#666;">
+  7 個倉庫 · 1 個生命體
 </p>
 
 <br>
@@ -111,25 +164,56 @@ AMPM 是一套以 <strong>生物器官</strong> 為隱喻的 AI 作業系統。<
 
 ---
 
-<h2 align="center" style="font-size:1.8em;">🔒 SECURITY BOUNDARY</h2>
+<h2 align="center" style="font-size:1.8em;">📁 PROJECT STRUCTURE</h2>
 
-<p align="center" style="font-size:1.05em;">
-公開層看得到，碰不到核心。
-</p>
-
-<br>
-
-| 公開層可以… | 公開層不行… |
-|:---|---:|
-| ✅ 用 SDK 開發插件 | ❌ 改 routing |
-| ✅ 看儀表板狀態 | ❌ 改 governance |
-| ✅ 讀公開文件 | ❌ 改 memory ranking |
-| ✅ 用工具介面 | ❌ 改 context policy |
-| ✅ 訂閱事件 | ❌ 持有決策權限 |
-
-<p align="center" style="margin-top:20px;">
-  <strong style="color:#e94560;">決策權力永遠在 AMPM-KERNEL。</strong>
-</p>
+```
+AMPM-AIOPS/
+├── main.py                 ★ 主要啟動入口
+├── service_bot.py          售後服務客服機器人
+├── bot.py                  舊版 Bot（已棄用）
+├── connect.py              WebSocket 永久通道
+│
+├── src/                    ★ 主要原始碼
+│   ├── config.py           設定（讀取 .env）
+│   ├── license_manager.py  授權碼管理
+│   ├── payment_verifier.py BscScan 對帳
+│   ├── support.py          FAQ 客服引擎
+│   ├── service_agent.py    服務代理（業務/客服/安裝/售後）
+│   ├── models.py           資料模型
+│   ├── tools.py            工具系統
+│   ├── heartbeat.py        心跳監控
+│   ├── monitor.py          系統監控
+│   ├── nose.py             輸入過濾
+│   ├── breath.py           節流閥
+│   ├── personality.py      人格模板
+│   ├── pipeline_ebook.py   電子書流水線
+│   ├── pipeline_kidbook.py 童書流水線
+│   ├── rollback.py         回滾機制
+│   │
+│   ├── dashboard/          Flask 儀表板
+│   ├── brain/              ★ 大腦核心（私有，gitignored）
+│   ├── governance/         ★ 治理系統（私有，gitignored）
+│   ├── runtime/            ★ 執行環境（私有，gitignored）
+│   ├── core/               ★ 核心模組（私有，gitignored）
+│   └── ...                 40+ 子系統
+│
+├── assets/                 Logo / 圖片 / SVG
+├── data/                   JSON 資料庫（gitignored）
+├── docs/                   產品展示網站（ampm-aiops.com）
+├── scripts/                部署 / 管理腳本
+├── tests/                  自動化測試
+├── memory/                 記憶目錄
+├── outputs/                輸出產出（gitignored）
+├── plugins/                插件目錄
+├── publisher/              發佈器
+├── versions/               版本存檔（gitignored）
+│
+├── .env                    環境變數（gitignored）
+├── .env.example            環境變數範本
+├── Dockerfile              Docker 構建
+├── requirements.txt        Python 依賴
+└── AGENTS.md               專案備忘錄
+```
 
 <br>
 
@@ -139,7 +223,7 @@ AMPM 是一套以 <strong>生物器官</strong> 為隱喻的 AI 作業系統。<
 
 <p align="center">
   想當使用者？直接對 Telegram Bot 說話。<br>
-  想開發插件？跳轉 <a href="https://github.com/chainuncel0712/AMPM-PLUGINS">AMPM-PLUGINS</a>。
+  想開發插件？跳轉 <b>AMPM-PLUGINS</b>。
 </p>
 
 <table>
@@ -147,43 +231,67 @@ AMPM 是一套以 <strong>生物器官</strong> 為隱喻的 AI 作業系統。<
     <th>如果你…</th>
     <th>去這裡</th>
   </tr>
-  <tr><td>想用 AI 幫你賺錢</td><td>🤖 啟動 bot（內部）</td></tr>
-  <tr><td>想開發 plugin</td><td><a href="https://github.com/chainuncel0712/AMPM-PLUGINS">🔌 AMPM-PLUGINS</a></td></tr>
-  <tr><td>想接 SDK</td><td><a href="https://github.com/chainuncel0712/AMPM-SDK">📦 AMPM-SDK</a></td></tr>
-  <tr><td>想看架構</td><td><a href="https://github.com/chainuncel0712/AMPM-DOCS">📚 AMPM-DOCS</a></td></tr>
-  <tr><td>想看監控</td><td><a href="https://github.com/chainuncel0712/AMPM-DASHBOARD">📊 AMPM-DASHBOARD</a></td></tr>
+  <tr><td>想用 AI 幫你賺錢</td><td>🤖 啟動 bot</td></tr>
+  <tr><td>想開發 plugin</td><td>🔌 AMPM-PLUGINS</td></tr>
+  <tr><td>想接 SDK</td><td>📦 AMPM-SDK</td></tr>
+  <tr><td>想看架構</td><td>📚 AMPM-DOCS</td></tr>
+  <tr><td>想看監控</td><td>📊 AMPM-DASHBOARD</td></tr>
 </table>
 
+<h3>🔧 本地開發</h3>
+
+```bash
+# 1. 複製倉庫
+git clone https://github.com/chainuncel0712/AMPM-AIOPS.git
+cd AMPM-AIOPS
+
+# 2. 設定環境變數
+cp .env.example .env
+# 編輯 .env 填入你的 API Keys
+
+# 3. 安裝依賴
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+# 4. 啟動
+python3 main.py
+```
+
+<h3>🐳 Docker 部署</h3>
+
+```bash
+docker build -t ampm-aiops .
+docker run -d \
+  --name ampm-aiops \
+  --env-file .env \
+  -p 5050:5050 \
+  ampm-aiops
+```
+
 <br>
 
 ---
 
-<h2 align="center" style="font-size:1.8em;">📁 STRUCTURE</h2>
+<h2 align="center" style="font-size:1.8em;">💰 BUSINESS MODEL</h2>
 
-```
-assets/       logo + 器官圖
-scripts/      安裝、設定
-docs/         文件與指南
-src/
-├── dashboard/    監控 UI（公開）
-├── tool_decorators/  公開工具裝飾器
-├── tools.py          工具介面
-├── monitor.py        輕量監控
-├── rollback.py       回滾機制
-└── skeleton/         框架支架
-```
+<table>
+  <tr><th>方案</th><th>價格</th><th>天數</th></tr>
+  <tr><td>月</td><td>$15</td><td>30</td></tr>
+  <tr><td>季</td><td>$39</td><td>90</td></tr>
+  <tr><td>年</td><td>$120</td><td>365</td></tr>
+</table>
 
-<br>
-
----
-
-<p align="center">
-  <strong style="color:#e94560;">公開的是框架。</strong>
-  <strong style="color:#7b4fbf;">私有的是智慧。</strong>
+<p>
+  用戶付 USDT (BEP20) → 貼 TXID → /activate → BscScan 驗證 → 自動開通<br>
+  錢包: <code>0x7f3110c1314bD68Fdf8E32cD921E646912108587</code>
 </p>
 
 <br>
+
+---
+
 <hr style="border:1px solid #30363d;">
 <p align="center" style="color:#8b949e; font-size:0.85em;">
-  <sub>AMPM-AIOPS — AI OS Public Framework</sub>
+  <sub>AMPM-AIOPS — AI OS Public Framework · 黑曜 · Obsidian</sub>
 </p>
