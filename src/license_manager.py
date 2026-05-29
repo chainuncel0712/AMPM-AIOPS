@@ -20,26 +20,37 @@ def _save(data: dict):
     DATA_FILE.write_text(json.dumps(data, indent=2, ensure_ascii=False))
 
 
+def _load_licenses():
+    """相容新舊格式：{key: {...}} 或 {last_updated, licenses: {key: {...}}}"""
+    data = _load()
+    if isinstance(data, dict) and "licenses" in data:
+        return data["licenses"]
+    return data
+
+def _save_licenses(licenses: dict):
+    _save({"last_updated": datetime.now(timezone.utc).isoformat(), "licenses": licenses})
+
+
 def generate_key(user_id: int, days: int = 30, tier: str = "basic") -> str:
     import secrets
     key = "AMPM-" + secrets.token_hex(8).upper()
     expiry = (datetime.now(timezone.utc) + timedelta(days=days)).isoformat()
-    data = _load()
-    data[key] = {
+    licenses = _load_licenses()
+    licenses[key] = {
         "user_id": user_id,
         "expires": expiry,
         "active": True,
         "tier": tier,
     }
-    _save(data)
+    _save_licenses(licenses)
     return key
 
 
 def activate(key: str, user_id: int) -> str:
-    data = _load()
-    if key not in data:
+    licenses = _load_licenses()
+    if key not in licenses:
         return "❌ 授權碼無效。"
-    lic = data[key]
+    lic = licenses[key]
     if lic.get("user_id") and lic["user_id"] != user_id:
         return "❌ 此授權碼已綁定其他使用者。"
     if not lic.get("active", True):
@@ -49,15 +60,15 @@ def activate(key: str, user_id: int) -> str:
         return "❌ 授權碼已過期。"
     lic["user_id"] = user_id
     lic["activated_at"] = datetime.now(timezone.utc).isoformat()
-    _save(data)
+    _save_licenses(licenses)
     remaining = (expiry - datetime.now(timezone.utc)).days
     return f"✅ 啟用成功！剩餘 {remaining} 天。"
 
 
 def check_access(user_id: int) -> tuple:
     """Returns (allowed: bool, message: str, tier: str)"""
-    data = _load()
-    for key, lic in data.items():
+    licenses = _load_licenses()
+    for key, lic in licenses.items():
         if lic.get("user_id") == user_id and lic.get("active", True):
             expiry = datetime.fromisoformat(lic["expires"]).replace(tzinfo=timezone.utc)
             if expiry > datetime.now(timezone.utc):
@@ -66,14 +77,14 @@ def check_access(user_id: int) -> tuple:
                 return True, f"剩餘 {remaining} 天", tier
             else:
                 lic["active"] = False
-                _save(data)
+                _save_licenses(licenses)
                 return False, "❌ 授權已過期。請續費。", "none"
     return False, "⛔ 無有效授權。請輸入 /activate <授權碼>", "none"
 
 
 def get_user_tier(user_id: int) -> str:
-    data = _load()
-    for key, lic in data.items():
+    licenses = _load_licenses()
+    for key, lic in licenses.items():
         if lic.get("user_id") == user_id and lic.get("active", True):
             expiry = datetime.fromisoformat(lic["expires"]).replace(tzinfo=timezone.utc)
             if expiry > datetime.now(timezone.utc):
@@ -82,8 +93,8 @@ def get_user_tier(user_id: int) -> str:
 
 
 def status(user_id: int) -> str:
-    data = _load()
-    for key, lic in data.items():
+    licenses = _load_licenses()
+    for key, lic in licenses.items():
         if lic.get("user_id") == user_id:
             expiry = datetime.fromisoformat(lic["expires"]).replace(tzinfo=timezone.utc)
             remaining = (expiry - datetime.now(timezone.utc)).days

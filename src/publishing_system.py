@@ -175,7 +175,7 @@ class PublishingManager:
         # 生成元數據
         metadata = {
             "title": title,
-            "title_en": title,  # TODO: translate
+            "title_en": self._translate_title(title),
             "author": "AMPM-AIOPS",
             "language": book.get("language", "bilingual"),
             "description": book.get("stage_data", {}).get("9", {}).get("description", ""),
@@ -234,6 +234,30 @@ class PublishingManager:
         }
 
     # ── 輔助 ──
+
+    def _translate_title(self, title: str) -> str:
+        """簡單中英文轉換（後續可接 LLM 翻譯）"""
+        import re
+        if not title:
+            return ""
+        if re.search(r'[a-zA-Z]', title) and not re.search(r'[\u4e00-\u9fff]', title):
+            return title
+        romanized = title
+        replacements = {
+            "從零開始": "From Zero", "入門": "Intro", "指南": "Guide",
+            "攻略": "Strategy", "完全": "Complete", "新手": "Beginner",
+            "實戰": "Practical", "基礎": "Basics", "進階": "Advanced",
+            "教學": "Tutorial", "手冊": "Handbook", "聖經": "Bible",
+            "模板": "Templates", "模型": "Models", "方案": "Solutions",
+            "日報": "Daily", "短漫": "Comics", "探險": "Adventure",
+            "安心": "Calm", "睡前": "Bedtime", "故事": "Stories",
+        }
+        result = title
+        for cn, en in replacements.items():
+            result = result.replace(cn, en)
+        result = re.sub(r'[\u4e00-\u9fff\u3000-\u303f\uff00-\uffef：]', '', result)
+        result = result.strip()
+        return result if result else title
 
     def _extract_keywords(self, title: str) -> List[str]:
         kw = [w for w in title.replace("："," ").replace("《","").replace("》","").replace("的","").split() if len(w) >= 2]

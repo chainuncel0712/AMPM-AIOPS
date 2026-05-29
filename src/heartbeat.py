@@ -71,3 +71,34 @@ def start():
     t = threading.Thread(target=heartbeat_loop, daemon=True)
     t.start()
     print("[心跳] 監控已啟動，每30秒檢查一次")
+
+
+def check() -> str:
+    """執行一次健康檢查並回報狀態"""
+    try:
+        bot_alive = check_bot()
+        ds_alive = check_deepseek()
+        ollama_alive = check_ollama()
+        lines = [
+            "💓 黑曜心跳檢查",
+            f"  Bot: {'✅ 運行中' if bot_alive else '❌ 離線'}",
+            f"  DeepSeek: {'✅ 正常' if ds_alive else '❌ 異常'}",
+            f"  Ollama: {'✅ 正常' if ollama_alive else '❌ 異常'}",
+        ]
+        if not bot_alive:
+            lines.append(f"\n⚠️ Bot 離線，嘗試自動重啟...")
+            result = auto_heal()
+            lines.append(f"  重啟結果: {result}")
+        else:
+            lines.append(f"\n  系統狀態: 正常")
+        return "\n".join(lines)
+    except Exception as e:
+        return f"❌ 心跳檢查失敗: {e}"
+
+
+def register_tools(tool_system):
+    """Register heartbeat tools with the tool system."""
+    from tools import ToolSystem
+    if not isinstance(tool_system, ToolSystem):
+        return
+    tool_system.register_tool("heartbeat", check, "執行心跳檢查：檢查 Bot、DeepSeek、Ollama 狀態")

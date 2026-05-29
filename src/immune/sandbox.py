@@ -24,13 +24,13 @@ class Sandbox(BaseOrgan):
     """
 
     DEFAULT_LIMITS = {
-        "timeout": 30,           # 秒
-        "max_memory_mb": 256,    # MB
+        "timeout": 60,           # 秒
+        "max_memory_mb": 512,    # MB
         "max_output_bytes": 1024 * 1024,  # 1MB
         "max_file_size": 10 * 1024 * 1024,  # 10MB
-        "allow_network": False,
-        "allow_file_write": False,
-        "allowed_dirs": [tempfile.gettempdir()],
+        "allow_network": True,    # 開放網路（交易所 API、Web 搜尋）
+        "allow_file_write": True,
+        "allowed_dirs": [str(Path.home()), tempfile.gettempdir()],
     }
 
     def __init__(self, limits: Dict = None):

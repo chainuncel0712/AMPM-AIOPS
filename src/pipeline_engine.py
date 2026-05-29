@@ -11,12 +11,41 @@ from typing import Callable, Optional, Dict, List
 
 from pipeline_presets import PRODUCT_TYPES, FALLBACK_TOPICS, STAGE_LABELS, HUMAN_GATES
 from pipeline_data import store, create_book
-from pipeline_stages import STAGE_HANDLERS, TOPIC_PROMPTS, _llm_call
+from pipeline_stages import STAGE_HANDLERS, TOPIC_PROMPTS
 
 from resource_scout import scout as resource_scout
 from pipeline_supervisor import supervisor as pipeline_supervisor
 
 BASE = Path(__file__).resolve().parent.parent
+
+
+class _PipelineProxy:
+    """Dispatch pipeline commands to the engine, filtering by product type."""
+
+    def __init__(self, engine, product_type: str):
+        self._engine = engine
+        self._type = product_type
+
+    def trend_analysis(self):
+        return self._engine.create_topic(self._type)
+
+    def select_topic(self, topic: str):
+        return self._engine.create_topic(self._type, topic)
+
+    def select_theme(self, title: str, theme: str, age: str, summary: str):
+        return self._engine.create_topic(
+            self._type, title,
+            theme=theme, age=age, summary=summary,
+        )
+
+    def approve(self, book_id: str):
+        return self._engine.approve_topic(self._type, book_id)
+
+    def reject(self, book_id: str, reason: str = ""):
+        return self._engine.reject_topic(book_id)
+
+    def publish(self, book_id: str):
+        return self._engine.approve_topic(self._type, book_id)
 
 
 class PublisherEngine:
@@ -27,6 +56,8 @@ class PublisherEngine:
         self._cycle_thread = None
         self._auto_publish = False
         self._orchestrator = None
+        self.ebook = _PipelineProxy(self, "ebook")
+        self.kidbook = _PipelineProxy(self, "kidbook")
 
     @property
     def orchestrator(self):

@@ -35,17 +35,25 @@ class ToolSystem:
     def _register_builtin_tools(self):
         # 1. ls 工具
         self.registry["ls"] = {
-            "description": "列出目錄內容",
+            "description": "列出目錄內容，支援 ~ 開頭的路徑",
             "type": "builtin",
-            "code": "def execute(path='.'): import os; return os.listdir(path)",
+            "code": "def execute(path='.'):\n from pathlib import Path\n p = Path(path).expanduser()\n if p.is_dir():\n  return '\\n'.join(sorted(p.iterdir()))\n else:\n  return f'路徑不存在或不是目錄: {p}'",
             "created_at": datetime.now().isoformat(),
             "use_count": 0
         }
         # 2. cat 工具
         self.registry["cat"] = {
-            "description": "讀取檔案內容",
+            "description": "讀取檔案內容，支援 ~ 開頭的路徑",
             "type": "builtin",
-            "code": "def execute(path): return open(path, 'r').read()",
+            "code": "def execute(path):\n from pathlib import Path\n p = Path(path).expanduser()\n if p.exists() and p.is_file():\n  return p.read_text(encoding='utf-8', errors='replace')\n else:\n  return f'檔案不存在: {p}'",
+            "created_at": datetime.now().isoformat(),
+            "use_count": 0
+        }
+        # 2.5 find_file 工具
+        self.registry["find_file"] = {
+            "description": "搜尋檔案，依名稱或模式尋找",
+            "type": "builtin",
+            "code": "def execute(name_pattern, search_path='~'):\n from pathlib import Path\n import fnmatch\n results = []\n base = Path(search_path).expanduser()\n if not base.exists():\n  return f'搜尋起點不存在: {base}'\n try:\n  for p in base.rglob('*'):\n   if fnmatch.fnmatch(p.name, name_pattern) or fnmatch.fnmatch(p.name.lower(), name_pattern.lower()):\n    results.append(str(p))\n except PermissionError:\n  pass\n if results:\n  return '\\n'.join(results[:20]) + (f'\\n...還有 {len(results)-20} 個' if len(results) > 20 else '')\n else:\n  return f'在 {base} 底下找不到符合「{name_pattern}」的檔案'",
             "created_at": datetime.now().isoformat(),
             "use_count": 0
         }
@@ -53,7 +61,7 @@ class ToolSystem:
         self.registry["web_search"] = {
             "description": "搜尋網頁內容",
             "type": "builtin",
-            "code": "def execute(query): from web.search import Search; return Search().query(query)",
+            "code": "def execute(query): from web.search import WebSearch; return WebSearch().search(query)",
             "created_at": datetime.now().isoformat(),
             "use_count": 0
         }
@@ -65,12 +73,11 @@ class ToolSystem:
             "created_at": datetime.now().isoformat(),
             "use_count": 0
         }
-        # 5. write_file 工具 — 寫入內容到檔案（用於產生電子書章節）
-        ALLOWED_WRITE_DIRS = {"/home/pop5057273712_gmail_com/AMPM-AIOPS/data", "/home/pop5057273712_gmail_com/AMPM-AIOPS/outputs"}
+        # 5. write_file 工具 — 寫入內容到檔案（允許寫入家目錄，排除敏感位置）
         self.registry["write_file"] = {
-            "description": "將文字內容寫入指定的檔案路徑",
+            "description": "將文字內容寫入指定的檔案路徑。支援 ~ 開頭的路徑。保護：禁止寫入 .ssh/、金鑰、密碼等敏感位置。",
             "type": "builtin",
-            "code": "def execute(path, content):\n import os\n from pathlib import Path\n abs_p = Path(path).resolve()\n allowed = {r'/home/pop5057273712_gmail_com/AMPM-AIOPS/data', r'/home/pop5057273712_gmail_com/AMPM-AIOPS/outputs'}\n if not any(str(abs_p).startswith(d) for d in allowed):\n  return '不允許寫入此路徑'\n os.makedirs(abs_p.parent, exist_ok=True)\n abs_p.write_text(content, encoding='utf-8')\n return f'已寫入 {len(content)} 字元到 {abs_p}'",
+            "code": "def execute(path, content):\n import os\n from pathlib import Path\n p = Path(path).expanduser()\n abs_p = p.resolve()\n home = Path.home()\n \n sensitive_patterns = [\n  '/.ssh/', '/.gnupg/', '/.aws/', '/.azure/',\n  'id_rsa', 'id_dsa', 'id_ecdsa', 'id_ed25519',\n  'private_key', 'secret', 'password',\n ]\n p_str = str(abs_p).lower()\n for pat in sensitive_patterns:\n  if pat.lower() in p_str:\n   return f'禁止寫入敏感位置: {abs_p}'\n \n if not str(abs_p).startswith(str(home)):\n  return f'僅允許寫入家目錄內的路徑: {home}'\n \n if 'venv/' in str(abs_p) or '__pycache__' in str(abs_p):\n  return '不允許寫入 venv'\n \n os.makedirs(abs_p.parent, exist_ok=True)\n abs_p.write_text(content, encoding='utf-8')\n return f'已寫入 {len(content)} 字元到 {abs_p}'",
             "created_at": datetime.now().isoformat(),
             "use_count": 0
         }
@@ -87,6 +94,62 @@ class ToolSystem:
             "description": "列出黑曜的記憶內容（working/semantic/episodic），可指定記憶類型和數量",
             "type": "builtin",
             "code": "def execute(memory_type='semantic', count=10):\n import json\n from pathlib import Path\n base = Path.home() / '.ampm_brain' / 'memory'\n file_map = {'working': base/'working.json', 'semantic': base/'semantic.json', 'episodic': base/'episodic.json'}\n path = file_map.get(memory_type)\n if not path or not path.exists():\n  return f'找不到記憶檔案: {memory_type}'\n data = json.loads(path.read_text())\n if isinstance(data, list):\n  items = data[-count:]\n  lines = []\n  for e in items:\n   fact = e.get('fact', e.get('user', ''))[:120]\n   imp = e.get('importance', 0)\n   lines.append(f'[imp={imp}] {fact}')\n  return '\\n'.join(lines)\n return str(data)[:2000]",
+            "created_at": datetime.now().isoformat(),
+            "use_count": 0
+        }
+        # 8. exchange_status 工具 — 檢查交易所連線狀態
+        self.registry["exchange_status"] = {
+            "description": "檢查交易所 API 連線、餘額、BTC 價格",
+            "type": "builtin",
+            "code": "def execute():\n import os, sys, json\n from pathlib import Path\n sys.path.insert(0, str(Path(__file__).resolve().parent))\n try:\n  from exchange.gate import GateIO\n  api_key = os.getenv('GATE_IO_API_KEY', '')\n  api_secret = os.getenv('GATE_IO_API_SECRET', '')\n  if not api_key or not api_secret:\n   return json.dumps({'status': 'error', 'message': '未設定 GATE_IO_API_KEY 或 GATE_IO_API_SECRET'}, ensure_ascii=False)\n  gate = GateIO(api_key, api_secret)\n  result = gate.status()\n  return json.dumps(result, ensure_ascii=False, indent=2)\n except Exception as e:\n  return json.dumps({'status': 'error', 'message': str(e)}, ensure_ascii=False)",
+            "created_at": datetime.now().isoformat(),
+            "use_count": 0
+        }
+        # 9. spot_buy_market 工具 — 市價買入現貨
+        self.registry["spot_buy_market"] = {
+            "description": "現貨市價買入，參數: pair=交易對(預設BTC_USDT), quote_amount=要花費的quote貨幣數量(例如100代表花100 USDT)",
+            "type": "builtin",
+            "code": "def execute(pair='BTC_USDT', quote_amount='100'):\n import os, sys, json\n from pathlib import Path\n sys.path.insert(0, str(Path(__file__).resolve().parent))\n try:\n  from exchange.gate import GateIO\n  api_key = os.getenv('GATE_IO_API_KEY', '')\n  api_secret = os.getenv('GATE_IO_API_SECRET', '')\n  if not api_key or not api_secret:\n   return json.dumps({'error': '未設定 API Key'}, ensure_ascii=False)\n  gate = GateIO(api_key, api_secret)\n  result = gate.quick_buy_market(pair, quote_amount)\n  return json.dumps(result, ensure_ascii=False, indent=2)\n except Exception as e:\n  return json.dumps({'error': str(e)}, ensure_ascii=False)",
+            "created_at": datetime.now().isoformat(),
+            "use_count": 0
+        }
+        # 10. spot_sell_market 工具 — 市價賣出現貨
+        self.registry["spot_sell_market"] = {
+            "description": "現貨市價賣出，參數: pair=交易對, base_amount=要賣出的base貨幣數量(例如0.01代表賣0.01 BTC)",
+            "type": "builtin",
+            "code": "def execute(pair='BTC_USDT', base_amount='0.01'):\n import os, sys, json\n from pathlib import Path\n sys.path.insert(0, str(Path(__file__).resolve().parent))\n try:\n  from exchange.gate import GateIO\n  api_key = os.getenv('GATE_IO_API_KEY', '')\n  api_secret = os.getenv('GATE_IO_API_SECRET', '')\n  if not api_key or not api_secret:\n   return json.dumps({'error': '未設定 API Key'}, ensure_ascii=False)\n  gate = GateIO(api_key, api_secret)\n  result = gate.quick_sell_market(pair, base_amount)\n  return json.dumps(result, ensure_ascii=False, indent=2)\n except Exception as e:\n  return json.dumps({'error': str(e)}, ensure_ascii=False)",
+            "created_at": datetime.now().isoformat(),
+            "use_count": 0
+        }
+        # 11. get_price 工具 — 獲取交易對價格
+        self.registry["get_price"] = {
+            "description": "獲取交易對最新價格，參數: pair=交易對(預設BTC_USDT)",
+            "type": "builtin",
+            "code": "def execute(pair='BTC_USDT'):\n import sys, json\n from pathlib import Path\n sys.path.insert(0, str(Path(__file__).resolve().parent))\n try:\n  from exchange.gate import GateIO\n  gate = GateIO()\n  price = gate.get_price(pair)\n  if price:\n   return json.dumps({'pair': pair, 'price': price}, ensure_ascii=False)\n  return json.dumps({'error': f'無法獲取 {pair} 價格'}, ensure_ascii=False)\n except Exception as e:\n  return json.dumps({'error': str(e)}, ensure_ascii=False)",
+            "created_at": datetime.now().isoformat(),
+            "use_count": 0
+        }
+         # 12. trading_report 工具 — 交易狀態報告
+        self.registry["trading_report"] = {
+            "description": "完整交易報告：餘額、價格、持倉、網格策略",
+            "type": "builtin",
+            "code": "def execute():\n import os, sys, json\n from pathlib import Path\n sys.path.insert(0, str(Path(__file__).resolve().parent))\n try:\n  from exchange.gate import GateIO\n  from exchange.trading_engine import get_trading_engine\n  api_key = os.getenv('GATE_IO_API_KEY', '')\n  api_secret = os.getenv('GATE_IO_API_SECRET', '')\n  report = {}\n  if api_key and api_secret:\n   gate = GateIO(api_key, api_secret)\n   balances = gate.get_spot_balances()\n   if isinstance(balances, list):\n    report['balances'] = [{'currency': b.get('currency'), 'available': b.get('available'), 'locked': b.get('locked')} for b in balances if float(b.get('available', 0)) > 0 or float(b.get('locked', 0)) > 0]\n   price = gate.get_price('BTC_USDT')\n   if price:\n    report['btc_price'] = price\n  engine = get_trading_engine()\n  grids = engine.get_grids()\n  if grids:\n   report['grids'] = grids\n  return json.dumps(report, ensure_ascii=False, indent=2)\n except Exception as e:\n  return json.dumps({'error': str(e)}, ensure_ascii=False)",
+            "created_at": datetime.now().isoformat(),
+            "use_count": 0
+        }
+        # 13. strategy_safe_scan 工具 — 安全策略掃描 (波動+TA 雙重過濾)
+        self.registry["strategy_safe_scan"] = {
+            "description": "安全策略掃描：波動 20~80% + MA多頭 + RSI 30~65，停利 +6% / 停損 -3%",
+            "type": "builtin",
+            "code": "def execute():\n import os, sys\n from pathlib import Path\n sys.path.insert(0, str(Path(__file__).resolve().parent))\n try:\n  from exchange.gate import GateIO\n  from exchange.strategy_engine import get_strategy_engine\n  api_key = os.getenv('GATE_IO_API_KEY', '')\n  api_secret = os.getenv('GATE_IO_API_SECRET', '')\n  if not api_key or not api_secret:\n   return '❌ 未設定 GATE_IO_API_KEY 或 GATE_IO_API_SECRET'\n  gate = GateIO(api_key, api_secret)\n  engine = get_strategy_engine(gate)\n  engine.set_exchange(gate)\n  signals = engine.scan_and_analyze()\n  return engine.get_report(signals)\n except Exception as e:\n  return f'❌ 安全策略掃描失敗: {e}'",
+            "created_at": datetime.now().isoformat(),
+            "use_count": 0
+        }
+        # 14. strategy_sniper_scan 工具 — 新幣狙擊掃描 (高風險、觀察模式)
+        self.registry["strategy_sniper_scan"] = {
+            "description": "新幣狙擊掃描：短線熱幣、買賣單壓力分析，停利 +5% / 停損 -2% (高風險，建議先觀察)",
+            "type": "builtin",
+            "code": "def execute():\n import os, sys\n from pathlib import Path\n sys.path.insert(0, str(Path(__file__).resolve().parent))\n try:\n  from exchange.gate import GateIO\n  from exchange.new_coin_sniper import get_new_coin_sniper\n  api_key = os.getenv('GATE_IO_API_KEY', '')\n  api_secret = os.getenv('GATE_IO_API_SECRET', '')\n  if not api_key or not api_secret:\n   return '❌ 未設定 GATE_IO_API_KEY 或 GATE_IO_API_SECRET'\n  gate = GateIO(api_key, api_secret)\n  sniper = get_new_coin_sniper(gate)\n  sniper.set_exchange(gate)\n  targets = sniper.scan()\n  return sniper.get_report(targets)\n except Exception as e:\n  return f'❌ 狙擊掃描失敗: {e}'",
             "created_at": datetime.now().isoformat(),
             "use_count": 0
         }
@@ -119,6 +182,33 @@ class ToolSystem:
         self._save_registry()
         print(f"🔧 已註冊工具：{name}")
 
+    def create_tool_from_need(self, need: str, call_ai) -> str:
+        try:
+            prompt = f"根據以下需求創建一個新工具（Python function）：\n{need}\n\n回傳 JSON：{{'name': '工具名', 'description': '描述', 'code': 'Python 程式碼'}}"
+            messages = [{"role": "system", "content": "你是工具產生專家，只輸出 JSON。"}, {"role": "user", "content": prompt}]
+            result = call_ai(messages)
+            import json, re
+            match = re.search(r'\{.*\}', result, re.DOTALL)
+            if match:
+                data = json.loads(match.group())
+                self.register_tool(data["name"], lambda *a, **kw: exec(data["code"]), data.get("description", ""))
+                return f"✅ 已創建工具: {data['name']}"
+            return f"❌ 無法解析 AI 回覆: {result[:200]}"
+        except Exception as e:
+            return f"❌ 創建工具失敗: {e}"
+
+    def learn_tool(self, name: str, description: str, category: str = "custom", code: str = None):
+        import json
+        self.registry[name] = {
+            "description": description,
+            "type": category,
+            "code": code or f"def execute():\n    return '{name} tool executed'",
+            "created_at": __import__('datetime').datetime.now().isoformat(),
+            "use_count": 0
+        }
+        self._save_registry()
+        print(f"🔧 已學習工具：{name}")
+
     def execute_tool(self, name, *args, **kwargs):
         """
         執行一個已註冊的工具
@@ -144,7 +234,8 @@ class ToolSystem:
             # 如果是內建工具，執行程式碼字串
             code = tool["code"]
             local_vars = {}
-            restricted = {"__builtins__": {"None": None, "True": True, "False": False, "int": int, "str": str, "float": float, "bool": bool, "list": list, "dict": dict, "len": len, "range": range, "open": open, "print": print, "isinstance": isinstance, "enumerate": enumerate, "zip": zip, "map": map, "filter": filter, "min": min, "max": max, "sum": sum, "abs": abs, "any": any, "all": all, "sorted": sorted, "reversed": reversed, "type": type}}
+            import builtins as _builtins
+            restricted = {"__builtins__": _builtins.__dict__}
             exec(code, restricted, local_vars)
             execute_func = local_vars.get("execute")
             if execute_func:

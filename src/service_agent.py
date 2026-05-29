@@ -180,17 +180,6 @@ class ServiceAgent:
 
     def _fallback(self, c: dict, msg: str) -> str:
         m = msg.lower()
-        if any(k in m for k in ["方案", "價格", "多少錢", "plan", "price"]):
-            return (
-                "📋 方案：$15/月 · $39/季 · $120/年\n"
-                "全部功能全開，沒有分級。也有 3 天試用。"
-            )
-        if any(k in m for k in ["付款", "怎麼買", "pay", "usdt", "購買"]):
-            return (
-                "💳 USDT BEP20 轉帳到：\n"
-                "`0x7f3110c1314bD68Fdf8E32cD921E646912108587`\n"
-                "付款後貼 TXID 自動開通。"
-            )
         if re.search(r'\b(?:\d{1,3}\.){3}\d{1,3}\b', m):
             ips = re.findall(r'\b(?:\d{1,3}\.){3}\d{1,3}\b', m)
             c["vps"]["ip"] = ips[0]
@@ -200,10 +189,8 @@ class ServiceAgent:
             c["vps"]["collected_at"] = datetime.now(timezone.utc).isoformat()
             c["status"] = "ready_for_install"
             db.save()
-            return f"收到主機 {c['vps']['ip']}，準備安裝腳本..."
-        if any(k in m for k in ["售後", "問題", "壞", "錯誤", "故障", "重啟", "慢"]):
-            return "收到，幫您診斷中。請描述具體症狀（何時開始、發生什麼事）？"
-        return "我是黑曜服務窗口，有什麼需要？方案介紹、付款問題、安裝部署、售後診斷，我都能處理。"
+            return f"收到主機 {c['vps']['ip']}，準備安裝。"
+        return ""
 
     def _generate(self, cid: str) -> str:
         c = db.get(cid)

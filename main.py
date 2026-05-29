@@ -185,7 +185,8 @@ def main():
                         tasks=None,
                         executor=None,
                         registry=None,
-                        persona=None
+                        persona=None,
+                        contradiction=None
                     )
         obsidian = Obsidian()
         print("  [✅] 黑曜初始化完成")
@@ -420,35 +421,13 @@ def main():
                 result = license_manager.status(user_id)
                 await update.message.reply_text(result)
                 return
-            if msg == "/pricing":
-                photo_path = Path(__file__).parent / "assets" / "100.jpg"
-                with open(photo_path, "rb") as f:
-                    await update.message.reply_photo(
-                        photo=f,
-                        caption=(
-                            "💰 黑曜 AI 方案\n\n"
-                            "📦 自託管（自備 VPS）\n"
-                            "🔹 $15/月 — 30 天\n"
-                            "🔹 $39/季 — 90 天\n"
-                            "🔹 $120/年 — 365 天\n\n"
-                            "☁️ 雲端版（我們代管）\n"
-                            "🔹 $30/月 — 30 天\n"
-                            "🔹 $80/季 — 90 天\n"
-                            "🔹 $240/年 — 365 天\n\n"
-                            "💳 掃上方 QRCode 付款（BNB Chain / BEP20）\n"
-                            "或 PayPal 支付：請私訊管理員索取付款連結\n"
-                            "付款後將 TXID 複製，輸入 /activate <TXID> 自動開通。"
-                        )
-                    )
                 return
 
             # ── 授權檢查 ──
             allowed, auth_msg, tier = license_manager.check_access(user_id)
             if not allowed and user_id not in AUTHORIZED:
                 await update.message.reply_text(
-                    f"⛔ 無授權\n\n{auth_msg}\n\n"
-                    "輸入 /pricing 查看方案\n"
-                    "輸入 /activate <授權碼> 啟用"
+                    f"⛔ 無授權\n\n{auth_msg}"
                 )
                 return
             msg = update.message.text
@@ -473,29 +452,14 @@ def main():
                     else:
                         raise StopIteration("fallthrough")
                 except StopIteration:
-                    # ── 客服代理路由 ──
-                    uid_str = str(update.effective_user.id)
-                    customer_ctx = dispatcher.get_context_for_obsidian(uid_str)
-                    dispatcher.log_usage(uid_str, "chat")
-                    if any(k in msg.lower() for k in [
-                        "客服", "業務", "安裝", "售後",
-                        "方案", "價格", "多少錢", "特色", "功能", "能做", "試用", "trial", "免費",
-                        "付款", "怎麼買", "購買", "pay", "usdt", "主機", "vps", "部署",
-                        "問題", "故障", "錯誤", "壞", "重啟", "慢", "更新", "記憶", "restart", "ping",
-                    ]):
-                        reply = dispatcher.route(uid_str, msg)
-                        _sys.stdout.write(f"[Bot] 使用客服代理\n")
+                    if obsidian.langgraph and hasattr(obsidian.langgraph, 'process'):
+                        _sys.stdout.write(f"[Bot] 使用 LangGraph 引擎\n")
+                        reply = obsidian.langgraph.process(msg)
+                    elif hasattr(obsidian, 'cortex') and obsidian.cortex and hasattr(obsidian.cortex, 'think'):
+                        _sys.stdout.write(f"[Bot] 使用 Cortex 引擎\n")
+                        reply = obsidian.cortex.think(msg)
                     else:
-                        _sys.stdout.write(f"[Bot] 客戶上下文: {customer_ctx}\n")
-                        msg_with_ctx = f"[客戶資料: {customer_ctx}] {msg}"
-                        if obsidian.langgraph and hasattr(obsidian.langgraph, 'process'):
-                            _sys.stdout.write(f"[Bot] 使用 LangGraph 引擎\n")
-                            reply = obsidian.langgraph.process(msg_with_ctx)
-                        elif hasattr(obsidian, 'cortex') and obsidian.cortex and hasattr(obsidian.cortex, 'think'):
-                            _sys.stdout.write(f"[Bot] 使用 Cortex 引擎\n")
-                            reply = obsidian.cortex.think(msg_with_ctx)
-                        else:
-                            reply = "🤔 思考引擎尚未初始化。"
+                        reply = "🤔 思考引擎尚未初始化。"
                 except Exception as e:
                         _sys.stdout.write(f"[Bot] 引擎錯誤: {e}\n")
                         reply = f"⚠️ {translate_error(e)}"
@@ -543,87 +507,6 @@ def main():
                 lines.append(f"  🔄 rebirth: {obsidian.rebirth.rebirth_count} restores")
             await update.message.reply_text("\n".join(lines))
 
-        async def service_cmd(update, context):
-            uid = update.effective_user.id
-            args = context.args
-            if not args:
-                await update.message.reply_text(
-                    "🧑‍💼 客服系統\n\n"
-                    "指令：\n"
-                    "/service trial <姓名> — 啟用 3 天試用\n"
-                    "/service new <姓名> <方案> — 新增客戶\n"
-                    "/service pay <客戶ID> <方式> <金額> — 確認付款\n"
-                    "/service vps <客戶ID> <IP> <使用者> — 記錄主機\n"
-                    "/service install <客戶ID> — 產生安裝腳本\n"
-                    "/service done <客戶ID> — 標記安裝完成\n"
-                    "/service note <客戶ID> <備註> — 加備註\n"
-                    "/service summary <客戶ID> — 查看客戶摘要\n"
-                    "/customers — 所有客戶列表"
-                )
-                return
-            cmd = args[0]
-            try:
-                if cmd == "trial" and len(args) >= 2:
-                    cid = abs(hash(args[1])) % 1000000
-                    dispatcher.db.get_or_create(cid)
-                    dispatcher.db.data[str(cid)]["name"] = args[1]
-                    reply = dispatcher.start_trial(cid)
-                    await update.message.reply_text(reply)
-                elif cmd == "new" and len(args) >= 3:
-                    cid = abs(hash(args[1])) % 1000000
-                    c = dispatcher.db.get_or_create(cid)
-                    c["name"] = args[1]
-                    c["plan"] = args[2]
-                    dispatcher.db.save()
-                    await update.message.reply_text(f"✅ 客戶已建立\nID: {cid}\n姓名: {args[1]}\n方案: {args[2]}")
-                elif cmd == "pay" and len(args) >= 3:
-                    c = dispatcher.db.get(args[1])
-                    if c:
-                        c["payment"] = {"method": args[2], "amount": args[3] if len(args) > 3 else "0", "paid_at": datetime.now().isoformat()}
-                        c["status"] = "paid"
-                        dispatcher.db.save()
-                        await update.message.reply_text("✅ 付款已確認")
-                    else:
-                        await update.message.reply_text("❌ 找不到客戶")
-                elif cmd == "vps" and len(args) >= 4:
-                    c = dispatcher.db.get(args[1])
-                    if c:
-                        c["vps"] = {"ip": args[2], "user": args[3], "port": int(args[4]) if len(args) > 4 else 22}
-                        c["status"] = "ready_for_install"
-                        dispatcher.db.save()
-                        await update.message.reply_text(f"✅ 已記錄主機 {args[2]}")
-                    else:
-                        await update.message.reply_text("❌ 找不到客戶")
-                elif cmd == "install" and len(args) >= 2:
-                    reply = dispatcher.install._generate(args[1])
-                    await update.message.reply_text(reply)
-                elif cmd == "done" and len(args) >= 2:
-                    c = dispatcher.db.get(args[1])
-                    if c:
-                        c["status"] = "installed"
-                        c["installed_at"] = datetime.now().isoformat()
-                        dispatcher.db.save()
-                        await update.message.reply_text("✅ 已標記安裝完成")
-                    else:
-                        await update.message.reply_text("❌ 找不到客戶")
-                elif cmd == "note" and len(args) >= 3:
-                    c = dispatcher.db.get(args[1])
-                    if c:
-                        c.setdefault("notes", []).append({"note": " ".join(args[2:]), "time": datetime.now().isoformat()})
-                        dispatcher.db.save()
-                        await update.message.reply_text("✅ 備註已新增")
-                    else:
-                        await update.message.reply_text("❌ 找不到客戶")
-                elif cmd == "summary" and len(args) >= 2:
-                    summary = dispatcher.get_customer_detail(args[1])
-                    await update.message.reply_text(f"📋 客戶資料：\n{summary}")
-                elif cmd == "context" and len(args) >= 2:
-                    ctx = dispatcher.get_context_for_obsidian(args[1])
-                    await update.message.reply_text(f"📋 客戶上下文：\n{ctx}")
-                else:
-                    await update.message.reply_text("❌ 指令格式錯誤，請檢查參數")
-            except Exception as e:
-                await update.message.reply_text(f"❌ 錯誤: {e}")
 
         async def train_cmd(update, context):
             args = context.args
@@ -732,26 +615,50 @@ def main():
                     lines.append(f"  ❌ {name} → {str(e)[:40]}")
             await update.message.reply_text("\n".join(lines))
 
-        async def customers_cmd(update, context):
-            all_c = dispatcher.get_customers_summary()
-            if not all_c:
-                await update.message.reply_text("目前沒有客戶資料")
-                return
-            lines = ["📋 所有客戶:"]
-            for cid, info in all_c.items():
-                lines.append(f"  {cid}: {info.get('name','?')} — {info.get('plan','?')} — {info.get('status','?')}")
-            await update.message.reply_text("\n".join(lines[-20:]))
-        
+
+        # ── 收圖 handler：使用者傳 UniDream 高階圖回來，存進 inbox/ ──
+        async def handle_photo(update, context):
+            supervisor.heartbeat("bot")
+            try:
+                from pathlib import Path as _Path
+                import time as _time
+                inbox = _Path(__file__).resolve().parent / "inbox"
+                inbox.mkdir(exist_ok=True)
+                uid = update.effective_user.id
+                ts = int(_time.time())
+                msg = update.message
+
+                # 取得檔案（照片取最大尺寸，或圖片文件）
+                if msg.photo:
+                    tg_file = await msg.photo[-1].get_file()
+                    ext = "jpg"
+                elif msg.document and (msg.document.mime_type or "").startswith("image"):
+                    tg_file = await msg.document.get_file()
+                    ext = (msg.document.file_name or "img.png").split(".")[-1]
+                else:
+                    return
+
+                caption = (msg.caption or "").strip()
+                safe_cap = "".join(c for c in caption[:30] if c.isalnum() or c in " _-")
+                fname = f"{ts}_{uid}{('_'+safe_cap.replace(' ','_')) if safe_cap else ''}.{ext}"
+                dest = inbox / fname
+                await tg_file.download_to_drive(str(dest))
+                import sys as _sys
+                _sys.stdout.write(f"[Bot] 📥 收到圖片，已存 inbox/{fname}\n"); _sys.stdout.flush()
+                await msg.reply_text(f"✅ 已收到圖，存到 inbox/{fname}\n（共 {len(list(inbox.glob('*')))} 張待整合）")
+            except Exception as e:
+                try: await update.message.reply_text(f"⚠️ 收圖失敗：{str(e)[:80]}")
+                except: pass
+
         app = Application.builder().token(TOKEN).build()
         app.add_handler(CommandHandler("start", start_cmd))
         app.add_handler(CommandHandler("status", status_cmd))
-        app.add_handler(CommandHandler("service", service_cmd))
-        app.add_handler(CommandHandler("customers", customers_cmd))
         app.add_handler(CommandHandler("train", train_cmd))
         app.add_handler(CommandHandler("publish", publish_cmd))
         app.add_handler(CommandHandler("git", git_status_cmd))
         app.add_handler(CommandHandler("domain", domain_status_cmd))
         app.add_handler(CommandHandler("llm", llm_health_cmd))
+        app.add_handler(MessageHandler(filters.PHOTO | filters.Document.IMAGE, handle_photo))
         app.add_handler(MessageHandler(filters.TEXT, handle))
         
         print("  [✅] Bot 已啟動")
@@ -765,46 +672,57 @@ def main():
                     await app.bot.send_message(chat_id=uid, text=msg[:4000])
                 except: pass
 
-        # ── 啟動自我進化引擎 ──
-        try:
-            from self_evolution import evolution_engine
-            evolution_engine.start(interval_hours=12, llm_fn=None)
-            print("  [✅] 自我進化引擎已啟動 (每 12 小時)")
-        except Exception as e:
-            print(f"  [⚠️] 自我進化啟動失敗: {e}")
+        # ══════════════════════════════════════════════════════════════
+        # 自主背景迴圈總開關（預設關閉）
+        # 這 5 個迴圈會自言自語、推訊息到 Telegram、持續呼叫 LLM 燒 CPU。
+        # 要重新啟用，在 .env 設 AUTONOMY_ENABLED=true。
+        # 注意：出版線（品質監督 + 出版引擎）不受此開關影響，永遠保留。
+        # ══════════════════════════════════════════════════════════════
+        AUTONOMY_ENABLED = os.getenv("AUTONOMY_ENABLED", "false").strip().lower() in ("1", "true", "yes", "on")
 
-        # ── 啟動關鍵字爬蟲（即時趨勢） ──
-        try:
-            from keyword_scout import keyword_scout
-            keyword_scout.start(interval_seconds=900)
-            print("  [✅] 關鍵字爬蟲已啟動 (每 15 分鐘)")
-        except Exception as e:
-            print(f"  [⚠️] 關鍵字爬蟲啟動失敗: {e}")
+        if not AUTONOMY_ENABLED:
+            print("  [⏸️] 自主背景迴圈已停用 (AUTONOMY_ENABLED=false) — 只保留 bot / 收款 / 出版線")
+        else:
+            # ── 啟動自我進化引擎 ──
+            try:
+                from self_evolution import evolution_engine
+                evolution_engine.start(interval_hours=12, llm_fn=None)
+                print("  [✅] 自我進化引擎已啟動 (每 12 小時)")
+            except Exception as e:
+                print(f"  [⚠️] 自我進化啟動失敗: {e}")
 
-        # ── 啟動自主循環引擎 ──
-        try:
-            from proactive_cycle import proactive
-            proactive.start(interval_seconds=14400, llm_fn=None)
-            print("  [✅] 自主循環引擎已啟動 (每 4 小時)")
-        except Exception as e:
-            print(f"  [⚠️] 自主循環啟動失敗: {e}")
+            # ── 啟動關鍵字爬蟲（即時趨勢） ──
+            try:
+                from keyword_scout import keyword_scout
+                keyword_scout.start(interval_seconds=900)
+                print("  [✅] 關鍵字爬蟲已啟動 (每 15 分鐘)")
+            except Exception as e:
+                print(f"  [⚠️] 關鍵字爬蟲啟動失敗: {e}")
 
-        # ── 啟動成長追蹤 ──
-        try:
-            from growth_tracker import growth_tracker
-            growth_tracker.set_telegram(tg_push)
-            growth_tracker.start(interval_hours=720, llm_fn=None)
-            print("  [✅] 成長追蹤已啟動 (每 30 天)")
-        except Exception as e:
-            print(f"  [⚠️] 成長追蹤啟動失敗: {e}")
+            # ── 啟動自主循環引擎 ──
+            try:
+                from proactive_cycle import proactive
+                proactive.start(interval_seconds=1800, llm_fn=None)
+                print("  [✅] 自主循環引擎已啟動 (每 30 分鐘)")
+            except Exception as e:
+                print(f"  [⚠️] 自主循環啟動失敗: {e}")
 
-        # ── 啟動資源偵查機械組件（確保管線永不枯竭） ──
-        try:
-            from resource_scout import scout
-            scout.start(interval_seconds=3600)
-            print("  [✅] 資源偵查機械組件已啟動 (每 1 小時)")
-        except Exception as e:
-            print(f"  [⚠️] 資源偵查啟動失敗: {e}")
+            # ── 啟動成長追蹤 ──
+            try:
+                from growth_tracker import growth_tracker
+                growth_tracker.set_telegram(tg_push)
+                growth_tracker.start(interval_hours=12, llm_fn=None)
+                print("  [✅] 成長追蹤已啟動 (每 12 小時)")
+            except Exception as e:
+                print(f"  [⚠️] 成長追蹤啟動失敗: {e}")
+
+            # ── 啟動資源偵查機械組件（確保管線永不枯竭） ──
+            try:
+                from resource_scout import scout
+                scout.start(interval_seconds=3600)
+                print("  [✅] 資源偵查機械組件已啟動 (每 1 小時)")
+            except Exception as e:
+                print(f"  [⚠️] 資源偵查啟動失敗: {e}")
 
         # ── 啟動品質監督機械組件（確保每本完成不遺漏） ──
         try:

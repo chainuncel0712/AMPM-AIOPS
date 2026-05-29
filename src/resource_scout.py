@@ -257,6 +257,27 @@ class ResourceScout:
         self._thread.start()
         return f"🔍 資源偵查已啟動（每 {interval_seconds//60} 分鐘）"
 
+    def run(self, use_web=False) -> str:
+        """執行一次資源偵查並回報結果"""
+        try:
+            result = self.scout_all(use_web=use_web)
+            lines = ["🔍 資源偵查結果", "=" * 30]
+            total_all = 0
+            avail_all = 0
+            for category, info in result.items():
+                lines.append(f"\n  {info['label']}:")
+                lines.append(f"    可用: {info['available']}/{info['total']}")
+                for src in info.get("sources", []):
+                    status_icon = "✅" if src["status"] in ("alive", "listed") else "❌"
+                    lines.append(f"    {status_icon} {src['name']}")
+                total_all += info["total"]
+                avail_all += info["available"]
+            lines.append(f"\n  總計: {avail_all}/{total_all} 資源可用")
+            lines.append(f"  偵查時間: {self.last_scout_time or 'N/A'}")
+            return "\n".join(lines)
+        except Exception as e:
+            return f"❌ 資源偵查失敗: {e}"
+
     def stop(self):
         self._running = False
         return "🔍 資源偵查已停止"
@@ -288,3 +309,11 @@ class ResourceScout:
         return "\n".join(lines)
 
 scout = ResourceScout()
+
+
+def register_tools(tool_system):
+    """Register resource_scout tools with the tool system."""
+    from tools import ToolSystem
+    if not isinstance(tool_system, ToolSystem):
+        return
+    tool_system.register_tool("resource_scout", scout.run, "執行資源偵查：外出尋找免費優質資源（圖片/字型/API/趨勢/工具）")

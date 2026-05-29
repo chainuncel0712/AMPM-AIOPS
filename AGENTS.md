@@ -82,7 +82,7 @@ Telegram 日報 (每 10 分鐘)
 ## 當前運行狀態
 
 ### 黑曜主體
-- **PID**: 2807917
+- **PID**: 3126180
 - **運行時間**: 持續成長中
 - **機械組件**: 54/54 正常（47 原有 + 7 新出版/上架機械組件）
 - **LLM 供應鏈**: DeepSeek (primary) → NVIDIA NIM (secondary) → Ollama (fallback, 本機未啟動)
@@ -184,3 +184,48 @@ Telegram 日報 (每 10 分鐘)
 - 用戶自備 VPS，你收授權費
 - 核心競爭力：持續更新 + 技術支援 + 自動出版管線
 - 防盜版靠服務，不靠技術鎖
+
+## 🧠 Session Log — 2026-05-28
+
+### 本次完成
+- **ProactiveCycle**：4 小時 → **30 分鐘**一次
+- **GrowthTracker**：30 天 → **12 小時**一次
+- **Ollama**：已啟動（7 個模型可用），設為 LLM 備援
+- **PipelineSupervisor bug 修復**：`created` 變數未初始化問題
+- **真實圖片生成**：`stage_6_art` 接 HuggingFace Stable Diffusion 3.5，產封面時同步生成 PNG
+- **網站部署**：Nginx 已設定、`website/app.py` 運行在 5051
+- **服務 Bot**：已啟動
+- **Domain Email**：Cloudflare Email Routing 設定完成，`pop73712@gmail.com` 接收
+- **Cloudflare 金鑰更新**：`.env` 已更新兩組新 API Token
+
+### 📧 AMPM-AIOPS.COM 公司信箱（全部轉信到 POP5057273712@gmail.com）
+| 信箱 | 用途 |
+|------|------|
+| hello@ampm-aiops.com | 主要對外聯絡 |
+| publishing@ampm-aiops.com | 出版合作、作者投稿 |
+| support@ampm-aiops.com | 客服、讀者問題 |
+| rights@ampm-aiops.com | 版權授權、海外發行 |
+| marketing@ampm-aiops.com | 行銷合作、媒體 |
+| info@ampm-aiops.com | 一般詢問 |
+
+### 🏦 收款資料
+- **銀行**：元大商業銀行
+- **SWIFT Code**：APBKTWTH
+- **分行**：北桃園分行
+- **帳號**：0200209370614
+- **戶名**：陳則旻
+
+### 🧠 黑曜任務清單
+
+請思考並完成以下任務，自主執行，步驟自己規劃：
+
+1. **註冊 Amazon KDP（publishing@ampm-aiops.com）**
+   - 密碼：@@HH712330ll
+   - kdp.amazon.com 從 VPS 可直接存取
+   - 需填 W-8BEN 稅務表 + 元大銀行收款資料
+
+2. **審核 pipeline 書**：data/pipeline/books.json 有 29 本 pending_review，需逐本批准或退回
+
+3. **EPUB 產出路徑**：stage 7 epub_path 空的，書沒檔案可下載
+
+4. **系統維護**：54/54 機械組件正常、看門狗每15分鐘

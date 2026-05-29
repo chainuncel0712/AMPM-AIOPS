@@ -1,38 +1,37 @@
-                    GNU AFFERO GENERAL PUBLIC LICENSE
-                       Version 3, 19 November 2007
+AMPM COMMERCIAL LICENSE — Version 1.0 — 2026
+Copyright (c) 2026 AMPM Labs / AM&PM ADVENTURE
+Contact: info@ampm-aiops.com
 
- Copyright (C) 2026 AMPM Labs / chainuncel0712
+═══════════════════════════════════════════════════════════
+GRANT OF RIGHTS
 
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published
- by the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+Subject to obtaining a valid license key, you may:
+  1. Deploy and operate this software on your own servers.
+  2. Modify the software for your own use.
+  3. Access source code for learning and personal study.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
+═══════════════════════════════════════════════════════════
+RESTRICTIONS — Without explicit written permission you MAY NOT:
+  1. Redistribute, resell, sublicense, or transfer this software.
+  2. Use this software to build a competing product or service.
+  3. Remove copyright notices or attribution text.
+  4. Deploy in production without a valid license key.
 
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <https://www.gnu.org/licenses/>.
+═══════════════════════════════════════════════════════════
+LICENSE TIERS
 
----
+  Developer License  ($49 USDT)  — Single VPS · Public layer · 6mo updates
+  Full License       ($149 USDT) — Single VPS · KERNEL included · 12mo + support
+  White-Label        (contact)   — Multi-deploy · Brand replacement · Redistribution
 
-ADDITIONAL TERMS (per section 7 of AGPLv3):
+  Purchase: Telegram @ampm_ops · info@ampm-aiops.com
 
-1. **Non-Commercial Use Restriction**
-   This software may not be used for commercial purposes without explicit
-   written permission from the copyright holder. Commercial use includes
-   but is not limited to: selling access to the software, hosting the
-   software as a service, incorporating it into a commercial product,
-   or using it for internal business operations that generate revenue.
+═══════════════════════════════════════════════════════════
+DISCLAIMER
 
-2. **Trademark Protection**
-   The name "AI-BOS" and "AMPM" are registered trademarks. Any use of
-   these marks in derivative works must include attribution.
+THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY. THE LICENSOR
+IS NOT LIABLE FOR TRADING LOSSES, DATA LOSS, OR LOSS OF PROFITS.
+Trading features carry inherent financial risk.
 
-3. **Attribution Requirement**
-   All copies, modifications, and derivative works must retain the
-   original copyright notice and this additional terms section.
-
-For commercial licensing inquiries, contact: chainuncel0712@gmail.com
+"AM&PM ADVENTURE", "AMPM", "黑曜" and the dual-cat IP are
+trademarks of AMPM Labs. Separate permission required for use.

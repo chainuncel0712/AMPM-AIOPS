@@ -56,6 +56,7 @@ class PipelineSupervisor:
         """驗證一本書的內容品質，回傳缺失清單（空清單 = 通過）"""
         issues = []
         now = datetime.now()
+        created = ""
 
         if pipeline_type == "ebook":
             topic = book.get("topic", "")
@@ -116,39 +117,22 @@ class PipelineSupervisor:
         stalls = []
         now = datetime.now()
 
-        for book in engine.ebook.ebooks:
-            status = book.get("status", "selected")
-            if status in ("published", "rejected"):
+        from pipeline_data import store as data_store
+        for book in data_store.books:
+            status = ("published" if book.get("current_stage") == 10 else "pending")
+            if book.get("current_stage") == 10:
                 continue
             created = book.get("created_at", "")
             created_dt = datetime.fromisoformat(created) if created else now
             hours = (now - created_dt).total_seconds() / 3600
             cycle_stall_count = sum(1 for s in self.stalls if s.get("book_id") == book["id"])
+            title = book.get("stage_data", {}).get("1", {}).get("title", "?")
             if hours > 24 and cycle_stall_count >= 3:
                 stalls.append({
                     "book_id": book["id"],
-                    "title": book.get("topic", "?"),
-                    "type": "ebook",
-                    "status": status,
-                    "stalled_hours": int(hours),
-                    "cycles_stalled": cycle_stall_count,
-                    "created_at": created,
-                })
-
-        for book in engine.kidbook.kidbooks:
-            status = book.get("status", "selected")
-            if status in ("published", "rejected"):
-                continue
-            created = book.get("created_at", "")
-            created_dt = datetime.fromisoformat(created) if created else now
-            hours = (now - created_dt).total_seconds() / 3600
-            cycle_stall_count = sum(1 for s in self.stalls if s.get("book_id") == book["id"])
-            if hours > 24 and cycle_stall_count >= 3:
-                stalls.append({
-                    "book_id": book["id"],
-                    "title": book.get("title", "?"),
-                    "type": "kidbook",
-                    "status": status,
+                    "title": title,
+                    "type": book.get("product_type", "ebook"),
+                    "status": f"stage_{book.get('current_stage', 1)}",
                     "stalled_hours": int(hours),
                     "cycles_stalled": cycle_stall_count,
                     "created_at": created,
@@ -190,19 +174,17 @@ class PipelineSupervisor:
         lines = ["🔎 管線品質監督報告", "=" * 30]
 
         # 1. 品質抽檢
+        from pipeline_data import store as data_store
         ebook_issues = 0
-        for book in engine.ebook.ebooks:
-            gate = self.check_quality_gate(book, "ebook")
-            if not gate["passed"]:
-                ebook_issues += 1
-                lines.append(f"  ⚠️ 電子書《{gate['title']}》: {'; '.join(gate['issues'])}")
-
         kid_issues = 0
-        for book in engine.kidbook.kidbooks:
-            gate = self.check_quality_gate(book, "kidbook")
+        for book in data_store.books:
+            gate = self.check_quality_gate(book, book.get("product_type", "ebook"))
             if not gate["passed"]:
-                kid_issues += 1
-                lines.append(f"  ⚠️ 童書《{gate['title']}》: {'; '.join(gate['issues'])}")
+                if book.get("product_type") == "kidbook":
+                    kid_issues += 1
+                else:
+                    ebook_issues += 1
+                lines.append(f"  ⚠️ {gate['title']}: {'; '.join(gate['issues'])}")
 
         if ebook_issues == 0 and kid_issues == 0:
             lines.append("  ✅ 所有書籍品質檢查通過")
